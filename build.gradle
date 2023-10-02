@@ -1,0 +1,55 @@
+buildscript {
+    ext {
+        lifecycle_version = '2.5.1'
+        navigation_version = '2.5.3'
+
+        // ktx
+        core_ktx_version = '1.12.0-alpha04'
+        lifecycle_viewmodel_ktx_version = 'lifecycle-viewmodel-ktx:2.5.1'
+        lifecycle_runtime_ktx_version = 'lifecycle-runtime-ktx:2.5.1'
+
+        // hilt
+        hilt_version = '2.44.2'
+        hilt_compose_version = '1.0.0'
+        hilt_android_version = "hilt-android:$hilt_version"
+        hilt_android_compiler_version = "hilt-android-compiler:$hilt_version"
+
+        // worker
+        worker_version = '2.8.1'
+        hilt_worker_version = '1.0.0'
+
+        // coroutines
+        kotlinx_coroutines_core_version = '1.6.4'
+
+        // compose
+        compose_version = '1.5.0-alpha04'
+        compose_ui_version = "ui:$compose_version"
+        compose_runtime_version = "runtime:$compose_version"
+        compose_ui_tooling_preview_version = "ui-tooling-preview:$compose_version"
+        compose_material3_version = '1.1.0'
+        activity_compose_version = '1.7.1'
+        lifecycle_compose_version = '2.6.0-alpha01'
+        lifecycle_viewmodel_compose_version = "lifecycle-viewmodel-compose:$lifecycle_version"
+
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.44.2'
+        classpath 'com.google.gms:google-services:4.3.15'
+    }
+}// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    id 'com.android.application' version '7.2.2' apply false
+    id 'com.android.library' version '7.2.2' apply false
+    id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
+    id 'org.jetbrains.kotlin.jvm' version '1.7.20' apply false
+    id 'com.google.dagger.hilt.android' version "2.44" apply false
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
