@@ -24,8 +24,8 @@ class MotivationPhraseRepositoryImpl @Inject constructor(
 ) : MotivationPhraseRepository {
 
     override fun getGroupsFlow(): Flow<List<GroupPhraseModel>> = combine(
-        firebaseDataSource.userGroupsFlow,
         firebaseDataSource.groupsFlow,
+        firebaseDataSource.userGroupsFlow,
         firebaseDataSource.selectedGroupsFlow
     ) { groups, userGroups, selectedGroups ->
 

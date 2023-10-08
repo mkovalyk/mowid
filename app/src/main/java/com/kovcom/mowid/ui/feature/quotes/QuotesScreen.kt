@@ -60,7 +60,7 @@ fun QuotesScreen(
             when (effect) {
 
                 is QuotesEffect.ShowError -> {
-                    Timber.e("Error: ${effect.message}")
+                    Timber.e("${effect.message}")
                     Toast.makeText(
                         context,
                         effect.message,

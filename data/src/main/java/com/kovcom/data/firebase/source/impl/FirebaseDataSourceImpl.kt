@@ -49,7 +49,8 @@ class FirebaseDataSourceImpl @Inject constructor(
     override val userGroupsFlow = authDataSource.userFlow.flatMapLatest { token ->
         token.data.let { user ->
             if (user == null) {
-                flowOf(ResultDataModel.error(Exception("User is null")))
+                Timber.tag(TAG).w("User is null while getting user groups")
+                flowOf(ResultDataModel.success(emptyList()))
             } else {
                 userGroups(token = user.token)
             }
@@ -59,7 +60,8 @@ class FirebaseDataSourceImpl @Inject constructor(
     override val selectedGroupsFlow: Flow<ResultDataModel<List<SelectedGroupDataModel>>> = authDataSource.userFlow.flatMapLatest { token ->
         token.data.let { user ->
             if (user == null) {
-                flowOf(ResultDataModel.error(Exception("User is null")))
+                Timber.tag(TAG).w("User is null while getting user groups")
+                flowOf(ResultDataModel.success(emptyList()))
             } else {
                 selectedGroups(token = user.token)
             }
@@ -424,7 +426,10 @@ class FirebaseDataSourceImpl @Inject constructor(
                         trySend(ResultDataModel.success(groups))
                     }
                 }
-            awaitClose { subscription.remove() }
+            awaitClose {
+                subscription.remove()
+                channel.close()
+            }
         }
 
 
@@ -443,10 +448,13 @@ class FirebaseDataSourceImpl @Inject constructor(
                     for (doc in snapShot) {
                         groups.add(doc.toObject())
                     }
-                    trySend(ResultDataModel.success(groups))
+                    trySend(ResultDataModel.success<List<GroupDataModel>>(groups))
                 }
             }
-        awaitClose { subscription.remove() }
+        awaitClose {
+            subscription.remove()
+            channel.close()
+        }
     }
 
     private fun selectedGroups(token: String) = callbackFlow {
@@ -467,7 +475,10 @@ class FirebaseDataSourceImpl @Inject constructor(
                     trySend(ResultDataModel.success(groups))
                 }
             }
-        awaitClose { subscription.remove() }
+        awaitClose {
+            subscription.remove()
+            channel.close()
+        }
     }
 
     private fun quotesFlow(groupId: String): Flow<ResultDataModel<List<QuoteDataModel>>> = callbackFlow {
@@ -490,39 +501,45 @@ class FirebaseDataSourceImpl @Inject constructor(
             }
         awaitClose {
             subscription.remove()
+            channel.close()
         }
     }
 
-    private fun userQuotesFlow(groupId: String?, token: String?): Flow<ResultDataModel<List<QuoteDataModel>>> = callbackFlow {
+    private fun userQuotesFlow(
+        groupId: String?,
+        token: String?,
+    ): Flow<ResultDataModel<List<QuoteDataModel>>> {
         if (groupId == null) {
-            trySend(ResultDataModel.error(Exception("Group id is null")))
-            return@callbackFlow
+            return flowOf(ResultDataModel.error(Exception("Group id is null")))
         }
         if (token == null) {
-            trySend(ResultDataModel.error(Exception("Token is null")))
-            return@callbackFlow
+            Timber.tag(TAG).i("Token is null while getting user quotes")
+            return flowOf(ResultDataModel.success(emptyList()))
         }
 
-        val subscription = dbInstance.collection(COLLECTION_PERSONAL)
-            .document(token)
-            .collection(COLLECTION_GROUPS)
-            .document(groupId)
-            .collection(COLLECTION_QUOTES)
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    trySend(ResultDataModel.error(error))
-                    return@addSnapshotListener
-                }
-                value?.let { snapShot ->
-                    val groups = mutableListOf<QuoteDataModel>()
-                    for (doc in snapShot) {
-                        groups.add(doc.toObject())
+        return callbackFlow {
+            val subscription = dbInstance.collection(COLLECTION_PERSONAL)
+                .document(token)
+                .collection(COLLECTION_GROUPS)
+                .document(groupId)
+                .collection(COLLECTION_QUOTES)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        trySend(ResultDataModel.error(error))
+                        return@addSnapshotListener
                     }
-                    trySend(ResultDataModel.success(groups))
+                    value?.let { snapShot ->
+                        val groups = mutableListOf<QuoteDataModel>()
+                        for (doc in snapShot) {
+                            groups.add(doc.toObject())
+                        }
+                        trySend(ResultDataModel.success(groups))
+                    }
                 }
+            awaitClose {
+                subscription.remove()
+                channel.close()
             }
-        awaitClose {
-            subscription.remove()
         }
     }
 
@@ -587,43 +604,47 @@ class FirebaseDataSourceImpl @Inject constructor(
         }
     }
 
-
-    private fun selectedQuotes(groupId: String?, token: String?): Flow<ResultDataModel<List<SelectedQuoteDataModel>>> = callbackFlow {
+    private fun selectedQuotes(
+        groupId: String?,
+        token: String?,
+    ): Flow<ResultDataModel<List<SelectedQuoteDataModel>>> {
         if (groupId == null) {
-            trySend(ResultDataModel.error(Exception("Group id is null")))
-            return@callbackFlow
-        }
-        if (token == null) {
-            trySend(ResultDataModel.error(Exception("Token is null")))
-            return@callbackFlow
+            return flowOf(ResultDataModel.error(Exception("Group id is null")))
         }
 
-        val subscription =
-            dbInstance.collection(COLLECTION_PERSONAL)
-                .document(token)
-                .collection(COLLECTION_SELECTION)
-                .document(groupId)
-                .collection(COLLECTION_SELECTED_QUOTES)
-                .addSnapshotListener { value, error ->
-                    if (error != null) {
-                        trySend(ResultDataModel.error(error))
-                        return@addSnapshotListener
-                    }
-                    value?.let {
-                        val selections = mutableListOf<SelectedQuoteDataModel>()
-                        for (doc in value) {
-                            selections.add(doc.toObject())
+        if (token == null) {
+            Timber.tag(TAG).i("Token is null while getting selected quotes")
+            return flowOf(ResultDataModel.success(emptyList()))
+        }
+
+        return callbackFlow {
+            val subscription =
+                dbInstance.collection(COLLECTION_PERSONAL)
+                    .document(token)
+                    .collection(COLLECTION_SELECTION)
+                    .document(groupId)
+                    .collection(COLLECTION_SELECTED_QUOTES)
+                    .addSnapshotListener { value, error ->
+                        if (error != null) {
+                            trySend(ResultDataModel.error(error))
+                            return@addSnapshotListener
                         }
-                        trySend(
-                            ResultDataModel.success(selections)
-                        )
+                        value?.let {
+                            val selections = mutableListOf<SelectedQuoteDataModel>()
+                            for (doc in value) {
+                                selections.add(doc.toObject())
+                            }
+                            trySend(
+                                ResultDataModel.success(selections)
+                            )
+                        }
                     }
-                }
-        awaitClose {
-            subscription.remove()
+            awaitClose {
+                subscription.remove()
+                channel.close()
+            }
         }
     }
-
 
     companion object {
 

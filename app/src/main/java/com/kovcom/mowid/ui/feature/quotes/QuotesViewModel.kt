@@ -2,13 +2,20 @@ package com.kovcom.mowid.ui.feature.quotes
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.kovcom.data.firebase.source.impl.FirebaseDataSourceImpl.Companion.TAG
 import com.kovcom.domain.interactor.MotivationPhraseInteractor
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.model.toUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,19 +29,17 @@ class QuotesViewModel @Inject constructor(
     init {
         motivationPhraseInteractor.getQuotesListFlow(groupId).onStart {
             setState { copy(isLoading = true) }
-        }.flowOn(Dispatchers.IO).onEach { data ->
-            setState {
-                copy(
-                    isLoading = false, quotes = data.toUIModel()
+        }.flowOn(Dispatchers.IO)
+            .onEach { data -> setState { copy(isLoading = false, quotes = data.toUIModel()) } }
+            .onCompletion { setState { copy(isLoading = false) } }
+            .catch {
+                Timber.tag(TAG).e(it)
+                QuotesEffect.ShowError(
+                    message = it.message.toString()
                 )
+                    .sendEffect()
             }
-        }.onCompletion {
-            setState { copy(isLoading = false) }
-        }.catch {
-            QuotesEffect.ShowError(
-                message = it.message.toString()
-            ).sendEffect()
-        }.launchIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
     private fun deleteQuote(quoteId: String, isSelected: Boolean) {
@@ -57,7 +62,11 @@ class QuotesViewModel @Inject constructor(
             is QuotesEvent.QuoteItemChecked -> {
                 viewModelScope.launch {
                     motivationPhraseInteractor.saveSelection(
-                        groupId = groupId, quoteId = event.quoteId, quote = event.quote, author = event.author, isSelected = event.checked
+                        groupId = groupId,
+                        quoteId = event.quoteId,
+                        quote = event.quote,
+                        author = event.author,
+                        isSelected = event.checked
                     )
                 }
             }
@@ -68,7 +77,10 @@ class QuotesViewModel @Inject constructor(
             is QuotesEvent.OnEditClicked -> {
                 viewModelScope.launch {
                     motivationPhraseInteractor.editQuote(
-                        groupId = groupId, quoteId = event.id, editedQuote = event.editedQuote, editedAuthor = event.editedAuthor
+                        groupId = groupId,
+                        quoteId = event.id,
+                        editedQuote = event.editedQuote,
+                        editedAuthor = event.editedAuthor
                     )
                 }
             }

@@ -38,6 +38,7 @@ class AuthDataSourceImpl @Inject constructor(
 
         awaitClose {
             subscription.remove()
+            cancel()
         }
     }
 
