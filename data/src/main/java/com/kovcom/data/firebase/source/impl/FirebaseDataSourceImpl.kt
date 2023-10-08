@@ -3,7 +3,6 @@ package com.kovcom.data.firebase.source.impl
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
 import com.kovcom.data.firebase.source.AuthDataSource
 import com.kovcom.data.firebase.source.FirebaseDataSource
@@ -32,14 +31,6 @@ class FirebaseDataSourceImpl @Inject constructor(
 
     override val coroutineContext: CoroutineContext = Dispatchers.IO + SupervisorJob()
 
-    private val _frequenciesFlow = MutableSharedFlow<ResultDataModel<List<FrequencyDataModel>>>(
-        replay = 1
-    )
-
-    private val _userFrequencyFlow = MutableSharedFlow<ResultDataModel<Long>>(
-        replay = 1
-    )
-
     private val currentGroupFlow = MutableStateFlow<String?>(null)
 
     override val groupsFlow = groupsFlow()
@@ -57,36 +48,42 @@ class FirebaseDataSourceImpl @Inject constructor(
         }
     }
 
-    override val selectedGroupsFlow: Flow<ResultDataModel<List<SelectedGroupDataModel>>> = authDataSource.userFlow.flatMapLatest { token ->
-        token.data.let { user ->
-            if (user == null) {
-                Timber.tag(TAG).w("User is null while getting user groups")
-                flowOf(ResultDataModel.success(emptyList()))
-            } else {
-                selectedGroups(token = user.token)
+    override val selectedGroupsFlow: Flow<ResultDataModel<List<SelectedGroupDataModel>>> =
+        authDataSource.userFlow.flatMapLatest { token ->
+            token.data.let { user ->
+                if (user == null) {
+                    Timber.tag(TAG).w("User is null while getting user groups")
+                    flowOf(ResultDataModel.success(emptyList()))
+                } else {
+                    selectedGroups(token = user.token)
+                }
             }
         }
-    }
 
-    override val selectedQuotesFlow = currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
-        selectedQuotes(groupId, token.data?.token)
-    }.flattenMerge(1)
+    override val selectedQuotesFlow =
+        currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
+            selectedQuotes(groupId, token.data?.token)
+        }.flattenMerge(1)
 
-    override val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>> = currentGroupFlow.flatMapConcat { groupId ->
-        if (groupId == null) {
-            flowOf(ResultDataModel.error(Exception("Group id is null")))
-        } else {
-            quotesFlow(groupId)
+    override val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>> =
+        currentGroupFlow.flatMapConcat { groupId ->
+            if (groupId == null) {
+                flowOf(ResultDataModel.error(Exception("Group id is null")))
+            } else {
+                quotesFlow(groupId)
+            }
         }
+
+    override val userQuotesFlow =
+        currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
+            userQuotesFlow(groupId, token.data?.token)
+        }.flattenMerge(1)
+
+    override val frequenciesFlow = frequenciesFlow()
+
+    override val userFrequencyFlow: Flow<ResultDataModel<Long>> = tokenFlow.flatMapLatest {
+        userFrequenciesFlow(it)
     }
-
-    override val userQuotesFlow = currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
-        userQuotesFlow(groupId, token.data?.token)
-    }.flattenMerge(1)
-
-    override val frequenciesFlow = _frequenciesFlow.asSharedFlow()
-
-    override val userFrequencyFlow = _userFrequencyFlow.asSharedFlow()
 
     private val mutex = Mutex()
 
@@ -94,11 +91,6 @@ class FirebaseDataSourceImpl @Inject constructor(
         launch {
             currentGroupFlow.emit(groupId)
         }
-    }
-
-    override fun subscribeFrequencySettings() {
-        subscribeFrequencies()
-        subscribeUserFrequency()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -128,7 +120,6 @@ class FirebaseDataSourceImpl @Inject constructor(
                 }
         }
     }
-
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun updateUserFrequency(settingId: Long): ResultDataModel<Long> =
@@ -409,7 +400,6 @@ class FirebaseDataSourceImpl @Inject constructor(
             }
     }
 
-
     private fun groupsFlow(): Flow<ResultDataModel<List<GroupDataModel>>> =
         callbackFlow {
             val subscription = dbInstance.collection(COLLECTION_GROUPS)
@@ -431,7 +421,6 @@ class FirebaseDataSourceImpl @Inject constructor(
                 channel.close()
             }
         }
-
 
     private fun userGroups(token: String) = callbackFlow {
         val subscription = dbInstance.collection(COLLECTION_PERSONAL)
@@ -481,29 +470,30 @@ class FirebaseDataSourceImpl @Inject constructor(
         }
     }
 
-    private fun quotesFlow(groupId: String): Flow<ResultDataModel<List<QuoteDataModel>>> = callbackFlow {
-        val subscription = dbInstance
-            .collection(COLLECTION_GROUPS)
-            .document(groupId)
-            .collection(COLLECTION_QUOTES)
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    trySend(ResultDataModel.error(error))
-                    return@addSnapshotListener
-                }
-                value?.let { snapShot ->
-                    val groups = mutableListOf<QuoteDataModel>()
-                    for (doc in snapShot) {
-                        groups.add(doc.toObject())
+    private fun quotesFlow(groupId: String): Flow<ResultDataModel<List<QuoteDataModel>>> =
+        callbackFlow {
+            val subscription = dbInstance
+                .collection(COLLECTION_GROUPS)
+                .document(groupId)
+                .collection(COLLECTION_QUOTES)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        trySend(ResultDataModel.error(error))
+                        return@addSnapshotListener
                     }
-                    trySend(ResultDataModel.success(groups))
+                    value?.let { snapShot ->
+                        val groups = mutableListOf<QuoteDataModel>()
+                        for (doc in snapShot) {
+                            groups.add(doc.toObject())
+                        }
+                        trySend(ResultDataModel.success(groups))
+                    }
                 }
+            awaitClose {
+                subscription.remove()
+                channel.close()
             }
-        awaitClose {
-            subscription.remove()
-            channel.close()
         }
-    }
 
     private fun userQuotesFlow(
         groupId: String?,
@@ -543,67 +533,6 @@ class FirebaseDataSourceImpl @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun subscribeFrequencies() {
-        launch {
-            var subscription: ListenerRegistration? = null
-            _frequenciesFlow.subscriptionCount.collect { subscribers ->
-                Timber.tag(TAG).i("subscribeFrequencies: subscribers: $subscribers")
-                if (subscribers > 0) {
-                    subscription = dbInstance.collection(COLLECTION_FREQUENCY)
-                        .addSnapshotListener { value, error ->
-                            if (error != null) {
-                                _frequenciesFlow.tryEmit(ResultDataModel.error(error))
-                                return@addSnapshotListener
-                            }
-                            value?.let { snapShot ->
-                                val setting = mutableListOf<FrequencyDataModel>()
-                                for (doc in snapShot) {
-                                    setting.add(doc.toObject())
-                                }
-                                _frequenciesFlow.tryEmit(ResultDataModel.success(setting))
-                            }
-                        }
-                } else {
-                    subscription?.let {
-                        it.remove()
-                        _frequenciesFlow.resetReplayCache()
-                        cancel()
-                    }
-                }
-            }
-        }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun subscribeUserFrequency() {
-        launch {
-            var subscription: ListenerRegistration? = null
-            _userFrequencyFlow.subscriptionCount.collect { subscribers ->
-                Timber.tag(TAG).i("subscribeUserFrequency: subscribers: $subscribers")
-                if (subscribers > 0) {
-                    subscription = dbInstance.collection(COLLECTION_PERSONAL)
-                        .document(localDataSource.token)
-                        .addSnapshotListener { value, error ->
-                            if (error != null) {
-                                _userFrequencyFlow.tryEmit(ResultDataModel.error(error))
-                                return@addSnapshotListener
-                            }
-                            val frequency = value?.data?.get(FREQUENCY_FIELD) as? Long
-                            localDataSource.setFrequency(frequency ?: DEFAULT_FREQUENCY_VALUE)
-                            _userFrequencyFlow.tryEmit(ResultDataModel.success(frequency))
-                        }
-                } else {
-                    subscription?.let {
-                        it.remove()
-                        _userFrequencyFlow.resetReplayCache()
-                        cancel()
-                    }
-                }
-            }
-        }
-    }
-
     private fun selectedQuotes(
         groupId: String?,
         token: String?,
@@ -639,6 +568,52 @@ class FirebaseDataSourceImpl @Inject constructor(
                             )
                         }
                     }
+            awaitClose {
+                subscription.remove()
+                channel.close()
+            }
+        }
+    }
+    
+    private fun frequenciesFlow() = callbackFlow {
+        val subscription = dbInstance.collection(COLLECTION_FREQUENCY)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    trySend(ResultDataModel.error(error))
+                    return@addSnapshotListener
+                }
+                value?.let { snapShot ->
+                    val setting = mutableListOf<FrequencyDataModel>()
+                    for (doc in snapShot) {
+                        setting.add(doc.toObject())
+                    }
+                    trySend(ResultDataModel.success(setting))
+                }
+            }
+        awaitClose {
+            subscription.remove()
+            channel.close()
+        }
+    }
+    
+    private fun userFrequenciesFlow(token: String?): Flow<ResultDataModel<Long>> {
+        if (token == null) {
+            Timber.tag(TAG).w("Token is null while trying to get user frequencies")
+            return flowOf(ResultDataModel.success(-1))
+        }
+
+        return callbackFlow {
+            val subscription = dbInstance.collection(COLLECTION_PERSONAL)
+                .document(token)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        trySend(ResultDataModel.error(error))
+                        return@addSnapshotListener
+                    }
+                    val frequency = value?.data?.get(FREQUENCY_FIELD) as? Long
+                    localDataSource.setFrequency(frequency ?: DEFAULT_FREQUENCY_VALUE)
+                    trySend(ResultDataModel.success(frequency))
+                }
             awaitClose {
                 subscription.remove()
                 channel.close()

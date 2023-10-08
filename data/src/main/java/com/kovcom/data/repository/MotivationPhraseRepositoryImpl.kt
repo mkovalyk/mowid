@@ -74,7 +74,6 @@ class MotivationPhraseRepositoryImpl @Inject constructor(
     }
 
     override fun getFrequencySettingsFlow(): Flow<FrequenciesModel> {
-        firebaseDataSource.subscribeFrequencySettings()
         return combine(
             firebaseDataSource.frequenciesFlow,
             firebaseDataSource.userFrequencyFlow

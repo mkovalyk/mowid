@@ -25,8 +25,6 @@ interface FirebaseDataSource {
 
     fun subscribeAllGroupsQuotes(groupId: String)
 
-    fun subscribeFrequencySettings()
-
     suspend fun getSelectedQuotes(): ResultDataModel<List<SelectedQuoteDataModel>>
 
     suspend fun updateSelectedQuote(groupId: String, quoteId: String, shownTime: Long)
