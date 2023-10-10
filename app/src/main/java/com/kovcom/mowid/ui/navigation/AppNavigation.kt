@@ -24,6 +24,7 @@ fun AppNavigation(activityViewModel: MainViewModel) {
             route = Navigation.Route.Home.route
         ) {
             HomeScreenDestination(
+                sendMainEvent = activityViewModel::publishEvent,
                 onNavigateToQuotes = { groupId ->
                     navController.navigate(route = Navigation.Route.Quotes.createRoute(groupId))
                 },

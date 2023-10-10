@@ -25,6 +25,7 @@ import com.kovcom.mowid.ui.composable.bottomsheet.rememberBottomSheetScaffoldSta
 import com.kovcom.mowid.ui.feature.bottomsheet.BottomSheet
 import com.kovcom.mowid.ui.feature.bottomsheet.BottomSheetUIState
 import com.kovcom.mowid.ui.feature.home.composable.HomeList
+import com.kovcom.mowid.ui.feature.main.MainEvent
 import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.onEach
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    sendMainEvent: (MainEvent) -> Unit,
     onNavigateToQuotes: (id: String) -> Unit,
     onNavigateToSettings: () -> Unit,
 ) {
@@ -56,6 +58,16 @@ fun HomeScreen(
                     effect.message,
                     Toast.LENGTH_SHORT
                 ).show()
+
+                HomeEffect.ShowAddGroupModel -> {
+                    bottomSheetScaffoldState.bottomSheetState.expand()
+                }
+                is HomeEffect.ShowEditGroupModal ->{
+                    bottomSheetScaffoldState.bottomSheetState.expand()
+                }
+                HomeEffect.ShowLoginScreen -> {
+                    sendMainEvent(MainEvent.SignIn)
+                }
             }
         }.collect()
     }
@@ -84,6 +96,9 @@ fun HomeScreen(
                 is HomeEvent.OnEditClicked -> {
                     bottomSheetScaffoldState.bottomSheetState.collapse()
                 }
+
+                HomeEvent.AddClicked -> {}
+                HomeEvent.ShowLoginScreen -> TODO()
             }
         }.collect()
     }
@@ -157,14 +172,11 @@ private fun HomeScreenContent(
             if (state.isLoading.not()) AppFloatingActionButton(
                 onClick = {
                     bottomSheetUIState.value = BottomSheetUIState.AddGroupBottomSheet
-                    sendEvent(HomeEvent.ShowGroupModal)
+                    sendEvent(HomeEvent.AddClicked)
                 }
             ) else Unit
         }
     ) { padding ->
-//        Column(
-//            modifier = Modifier.padding(padding)
-//        ) {
         when {
             state.isLoading -> AppProgress()
             else -> HomeList(
@@ -186,7 +198,6 @@ private fun HomeScreenContent(
                 }
             )
         }
-//        }
     }
 }
 
@@ -244,7 +255,8 @@ fun ScreenContentPreview() {
         ScreenContent(
             state = HomeState(
                 isLoading = false,
-                groupPhraseList = list
+                groupPhraseList = list,
+                isLoggedIn = true,
             ),
             sendEvent = {},
             bottomSheetState = rememberBottomSheetScaffoldState(),

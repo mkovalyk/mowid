@@ -39,7 +39,9 @@ private const val USER_NAME_TAG = "USER_NAME_TAG"
 
 @Composable
 fun SettingsScreen(
-    activityViewModel: MainViewModel, viewModel: SettingsViewModel, onBackClicked: () -> Unit
+    activityViewModel: MainViewModel,
+    viewModel: SettingsViewModel,
+    onBackClicked: () -> Unit,
 ) {
     val state: SettingsState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -51,6 +53,7 @@ fun SettingsScreen(
                 is SettingsEffect.ShowToast -> Toast.makeText(
                     context, effect.message, Toast.LENGTH_SHORT
                 ).show()
+
                 is SettingsEffect.ShowToastId -> Toast.makeText(
                     context, effect.messageId, Toast.LENGTH_SHORT
                 ).show()
@@ -68,33 +71,33 @@ fun SettingsScreen(
     }
 
     ScreenContent(
-        state = state, sendMainEvent = activityViewModel::publishEvent, sendEvent = viewModel::publishEvent
+        state = state,
+        sendMainEvent = activityViewModel::publishEvent,
+        sendEvent = viewModel::publishEvent
     )
 }
 
 @Composable
 fun ScreenContent(
-    state: SettingsState, sendMainEvent: (MainEvent) -> Unit, sendEvent: (SettingsEvent) -> Unit
+    state: SettingsState,
+    sendMainEvent: (MainEvent) -> Unit,
+    sendEvent: (SettingsEvent) -> Unit,
 ) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(topBar = {
-            AppCenterAlignedTopAppBar(title = stringResource(id = R.string.title_settings),
-                navigationIcon = {
-                    IconButton(onClick = { sendEvent(SettingsEvent.BackButtonClicked) }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack, contentDescription = "Back"
-                        )
-                    }
-                })
+            AppCenterAlignedTopAppBar(title = stringResource(id = R.string.title_settings), navigationIcon = {
+                IconButton(onClick = { sendEvent(SettingsEvent.BackButtonClicked) }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack, contentDescription = "Back"
+                    )
+                }
+            })
         }) { padding ->
             when {
                 state.isLoading -> AppProgress()
                 else -> Content(
-                    padding = padding,
-                    state = state,
-                    sendEvent = sendEvent,
-                    sendMainEvent = sendMainEvent
+                    padding = padding, state = state, sendEvent = sendEvent, sendMainEvent = sendMainEvent
                 )
 
 
@@ -148,41 +151,30 @@ fun Content(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             ExposedDropdownMenuBox(modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-                expanded = showDropDown,
-                onExpandedChange = { showDropDown = !showDropDown }) {
+                .padding(16.dp), expanded = showDropDown, onExpandedChange = { showDropDown = !showDropDown }) {
 
                 OutlinedTextField(modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(),
-                    value = selectedFrequency?.value?.let { stringResource(id = it) } ?: "",
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(id = R.string.label_frequency)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_settings),
-                            contentDescription = "TODO"
-                        )
-                    },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDropDown)
-                    })
+                    .menuAnchor(), value = selectedFrequency?.value?.let { stringResource(id = it) }
+                    ?: "", onValueChange = {}, readOnly = true, label = { Text(stringResource(id = R.string.label_frequency)) }, leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_settings), contentDescription = "TODO"
+                    )
+                }, trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDropDown)
+                })
 
-                ExposedDropdownMenu(expanded = showDropDown,
-                    onDismissRequest = { showDropDown = false }) {
+                ExposedDropdownMenu(expanded = showDropDown, onDismissRequest = { showDropDown = false }) {
                     state.frequencies.forEach { option ->
-                        DropdownMenuItem(text = { Text(stringResource(id = option.value)) },
-                            onClick = {
-                                selectedFrequency = option
-                                showDropDown = false
-                            })
+                        DropdownMenuItem(text = { Text(stringResource(id = option.value)) }, onClick = {
+                            selectedFrequency = option
+                            showDropDown = false
+                        })
                     }
                 }
             }
@@ -196,8 +188,7 @@ fun Content(
                 )
             }) {
                 Text(
-                    text = stringResource(id = R.string.label_apply),
-                    style = MaterialTheme.typography.labelLarge
+                    text = stringResource(id = R.string.label_apply), style = MaterialTheme.typography.labelLarge
                 )
             }
             Spacer(modifier = Modifier.weight(1f))

@@ -2,6 +2,7 @@ package com.kovcom.mowid.ui.feature.home
 
 import androidx.lifecycle.viewModelScope
 import com.kovcom.domain.interactor.MotivationPhraseInteractor
+import com.kovcom.domain.interactor.UserInteractor
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.model.toUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val motivationPhraseInteractor: MotivationPhraseInteractor
+    private val motivationPhraseInteractor: MotivationPhraseInteractor,
+    private val userInteractor: UserInteractor,
 ) : BaseViewModel<HomeState, HomeEvent, HomeEffect>() {
 
     init {
@@ -39,25 +41,36 @@ class HomeViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
+        userInteractor.getUserFlow()
+            .flowOn(Dispatchers.IO)
+            .onEach { data ->
+                setState { copy(isLoggedIn = data != null) }
+            }
+            .onCompletion {
+                setState { copy(isLoading = false) }
+            }
+            .catch {
+                HomeEffect.ShowError(
+                    message = it.message.toString()
+                ).sendEffect()
+            }
+            .launchIn(viewModelScope)
     }
 
     override fun createInitialState(): HomeState = HomeState(
         isLoading = true,
-        groupPhraseList = emptyList()
+        groupPhraseList = emptyList(),
+        isLoggedIn = false,
     )
 
     override fun handleEvent(event: HomeEvent) {
         when (event) {
-            is HomeEvent.GroupItemClicked -> {
-                // handle directly on UI
-            }
-
-            HomeEvent.ShowGroupModal -> {
-                // handle directly on UI
-            }
-
-            HomeEvent.HideGroupModal -> {
-                // handle directly on UI
+            is HomeEvent.AddClicked -> {
+                if (uiState.value.isLoggedIn) {
+                    HomeEffect.ShowAddGroupModel.sendEffect()
+                } else {
+                    HomeEffect.ShowLoginScreen.sendEffect()
+                }
             }
 
             is HomeEvent.AddGroupClicked -> {
@@ -80,6 +93,13 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
+            is HomeEvent.GroupItemClicked,
+            HomeEvent.HideGroupModal,
+            HomeEvent.ShowGroupModal,
+            HomeEvent.ShowLoginScreen,
+            -> {
+                // handle directly on UI
+            }
         }
     }
 
