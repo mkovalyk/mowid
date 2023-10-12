@@ -10,9 +10,9 @@ const val EFFECTS_KEY = "effects_key"
 const val EVENTS_KEY = "event_key"
 
 abstract class BaseViewModel<
-    State : UiState,
-    Event : UiEvent,
-    Effect : UiEffect,
+    State : com.kovcom.mowid.base.ui.State,
+    Event : com.kovcom.mowid.base.ui.Event,
+    Effect : com.kovcom.mowid.base.ui.Effect,
     > : ViewModel() {
 
     private var eventJob: Job? = null

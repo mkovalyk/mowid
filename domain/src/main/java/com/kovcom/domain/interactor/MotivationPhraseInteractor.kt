@@ -6,6 +6,7 @@ import com.kovcom.domain.model.QuoteModel
 import com.kovcom.domain.repository.MotivationPhraseRepository
 import kotlinx.coroutines.flow.Flow
 
+// TODO remove this class
 class MotivationPhraseInteractor(private val motivationPhraseRepository: MotivationPhraseRepository) {
 
     fun getGroupPhraseListFlow(): Flow<List<GroupPhraseModel>> =

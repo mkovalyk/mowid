@@ -8,9 +8,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
 
 abstract class BaseActivity<
-    State : UiState,
-    Event : UiEvent,
-    Effect : UiEffect,
+    State : com.kovcom.mowid.base.ui.State,
+    Event : com.kovcom.mowid.base.ui.Event,
+    Effect : com.kovcom.mowid.base.ui.Effect,
     ViewModel : BaseViewModel<State, Event, Effect>> :
     ComponentActivity() {
 

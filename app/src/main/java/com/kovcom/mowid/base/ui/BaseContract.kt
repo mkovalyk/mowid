@@ -1,7 +1,18 @@
 package com.kovcom.mowid.base.ui
 
-interface UiState
+interface State
 
-interface UiEvent
+interface Event
 
-interface UiEffect
+interface UserIntent {
+
+    val priority: Priority
+        get() = Priority.Low
+}
+
+enum class Priority {
+    Low,
+    High,
+}
+
+interface Effect

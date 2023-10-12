@@ -1,6 +1,5 @@
 package com.kovcom.mowid.ui.feature.home
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.EFFECTS_KEY
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.GroupPhraseUIModel
 import com.kovcom.mowid.ui.composable.*
@@ -46,30 +44,8 @@ fun HomeScreen(
         enabled = bottomSheetScaffoldState.bottomSheetState.isExpanded
     ) {
         if (bottomSheetScaffoldState.bottomSheetState.isExpanded) {
-            viewModel.publishEvent(HomeEvent.HideGroupModal)
+            viewModel.processIntent(HomeUserIntent.HideGroupModal)
         }
-    }
-
-    LaunchedEffect(EFFECTS_KEY) {
-        viewModel.effect.onEach { effect ->
-            when (effect) {
-                is HomeEffect.ShowError -> Toast.makeText(
-                    context,
-                    effect.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                HomeEffect.ShowAddGroupModel -> {
-                    bottomSheetScaffoldState.bottomSheetState.expand()
-                }
-                is HomeEffect.ShowEditGroupModal ->{
-                    bottomSheetScaffoldState.bottomSheetState.expand()
-                }
-                HomeEffect.ShowLoginScreen -> {
-                    sendMainEvent(MainEvent.SignIn)
-                }
-            }
-        }.collect()
     }
 
     LaunchedEffect(EVENTS_KEY) {
@@ -83,22 +59,24 @@ fun HomeScreen(
                     }
                 }
 
-                is HomeEvent.GroupItemClicked -> onNavigateToQuotes(event.groupPhrase.id)
+//                is HomeEvent.GroupItemClicked -> onNavigateToQuotes(event.groupPhrase.id)
                 is HomeEvent.HideGroupModal -> {
                     bottomSheetScaffoldState.bottomSheetState.collapse()
                 }
 
-                is HomeEvent.AddGroupClicked -> {
-                    bottomSheetScaffoldState.bottomSheetState.collapse()
-                }
+//                is HomeEvent.AddGroupClicked -> {
+//                    bottomSheetScaffoldState.bottomSheetState.collapse()
+//                }
 
                 is HomeEvent.OnItemDeleted -> {}
-                is HomeEvent.OnEditClicked -> {
-                    bottomSheetScaffoldState.bottomSheetState.collapse()
-                }
+//                is HomeEvent.OnEditClicked -> {
+//                    bottomSheetScaffoldState.bottomSheetState.collapse()
+//                }
 
-                HomeEvent.AddClicked -> {}
                 HomeEvent.ShowLoginScreen -> TODO()
+                is HomeEvent.ShowError -> TODO()
+                is HomeEvent.ShowSnackbar -> TODO()
+                is HomeEvent.ItemClicked -> TODO()
             }
         }.collect()
     }
@@ -106,7 +84,7 @@ fun HomeScreen(
 
     ScreenContent(
         state = state,
-        sendEvent = viewModel::publishEvent,
+        sendEvent = viewModel::processIntent,
         bottomSheetState = bottomSheetScaffoldState,
         onNavigateToSettings = onNavigateToSettings
     )
@@ -115,7 +93,7 @@ fun HomeScreen(
 @Composable
 fun ScreenContent(
     state: HomeState,
-    sendEvent: (HomeEvent) -> Unit,
+    sendEvent: (HomeUserIntent) -> Unit,
     bottomSheetState: BottomSheetScaffoldState,
     onNavigateToSettings: () -> Unit,
 ) {
@@ -130,7 +108,7 @@ fun ScreenContent(
                 onButtonClick = { id, name, description ->
                     if (id != null) {
                         sendEvent(
-                            HomeEvent.OnEditClicked(
+                            HomeUserIntent.OnEditClicked(
                                 id = id,
                                 editedName = name,
                                 editedDescription = description
@@ -138,7 +116,7 @@ fun ScreenContent(
                         )
                     } else {
                         sendEvent(
-                            HomeEvent.AddGroupClicked(
+                            HomeUserIntent.AddGroupClicked(
                                 name = name,
                                 description = description
                             )
@@ -164,7 +142,7 @@ private fun HomeScreenContent(
     onNavigateToSettings: () -> Unit,
     state: HomeState,
     bottomSheetUIState: MutableState<BottomSheetUIState>,
-    sendEvent: (HomeEvent) -> Unit,
+    sendEvent: (HomeUserIntent) -> Unit,
 ) {
     Scaffold(
         topBar = { TopBar(showMenu, onNavigateToSettings) },
@@ -172,7 +150,7 @@ private fun HomeScreenContent(
             if (state.isLoading.not()) AppFloatingActionButton(
                 onClick = {
                     bottomSheetUIState.value = BottomSheetUIState.AddGroupBottomSheet
-                    sendEvent(HomeEvent.AddClicked)
+                    sendEvent(HomeUserIntent.AddClicked)
                 }
             ) else Unit
         }
@@ -183,10 +161,10 @@ private fun HomeScreenContent(
                 groupPhraseList = state.groupPhraseList,
                 modifier = Modifier.padding(padding),
                 onClick = {
-                    sendEvent(HomeEvent.GroupItemClicked(it))
+                    sendEvent(HomeUserIntent.GroupItemClicked(it))
                 },
                 onDelete = {
-                    sendEvent(HomeEvent.OnItemDeleted(it))
+                    sendEvent(HomeUserIntent.OnItemDeleted(it))
                 },
                 onEdit = { id, name, description ->
                     bottomSheetUIState.value = BottomSheetUIState.EditGroupBottomSheet(
@@ -194,7 +172,7 @@ private fun HomeScreenContent(
                         textField1 = name,
                         textField2 = description
                     )
-                    sendEvent(HomeEvent.ShowGroupModal)
+                    sendEvent(HomeUserIntent.ShowGroupModal)
                 }
             )
         }

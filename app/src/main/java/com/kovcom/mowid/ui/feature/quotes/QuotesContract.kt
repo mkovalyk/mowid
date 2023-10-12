@@ -1,22 +1,22 @@
 package com.kovcom.mowid.ui.feature.quotes
 
-import com.kovcom.mowid.base.ui.UiEffect
-import com.kovcom.mowid.base.ui.UiEvent
-import com.kovcom.mowid.base.ui.UiState
+import com.kovcom.mowid.base.ui.Effect
+import com.kovcom.mowid.base.ui.Event
+import com.kovcom.mowid.base.ui.State
 import com.kovcom.mowid.model.QuoteUIModel
 
 data class QuotesState(
     val isLoading: Boolean,
     val deleteDialogInfo: DeleteDialogInfo? = null,
     val quotes: List<QuoteUIModel>,
-) : UiState
+) : State
 
 data class DeleteDialogInfo(
     val id: String,
     val isSelected: Boolean,
 )
 
-sealed interface QuotesEvent : UiEvent {
+sealed interface QuotesEvent : Event {
     data class QuoteItemChecked(
         val quoteId: String,
         val checked: Boolean,
@@ -39,6 +39,6 @@ sealed interface QuotesEvent : UiEvent {
     object HideDeleteConfirmationDialog : QuotesEvent
 }
 
-sealed class QuotesEffect : UiEffect {
+sealed class QuotesEffect : Effect {
     data class ShowError(val message: String) : QuotesEffect()
 }
