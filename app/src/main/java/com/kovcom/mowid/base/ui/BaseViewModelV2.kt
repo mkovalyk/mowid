@@ -38,36 +38,32 @@ abstract class BaseViewModelV2<
     private val _event: MutableSharedFlow<UiEvent> = MutableSharedFlow()
     val event = _event.asSharedFlow()
 
-    private val _effect: Channel<UiEffect> = Channel()
-    val effect = _effect.receiveAsFlow()
-
     private val shouldLog = true
 
     abstract val tag: String
 
     init {
         coroutineScope.launch {
-            userIntentQueue.consumeAsFlow().onEach { intent ->
-                val effectFlow = intentProcessor.processIntent(intent, currentState)
-                effectFlow.map { effect ->
-                    if (shouldLog) Timber.tag(tag).i("intent: $intent -> Effect: $effect")
-                    val time = measureTimeMillis {
-                        val newState = reducer.reduce(effect, currentState)
-                        withContext(Dispatchers.Main) {
-                            setState(newState).also {
-                                if (shouldLog) Timber.tag(tag).i("Reduce state: $newState")
-                            }
-                            val event = publisher.publish(effect, currentState)
-                            if (shouldLog) Timber.tag(tag).i("publish State: $currentState. $effect -> $event")
-                            if (event != null) {
-                                _event.emit(event)
-                            }
-                        }
-                    }
-                    if (shouldLog) Timber.tag(tag).i("Reduce time Duration: $time")
-                }.collect()
+            userIntentQueue.consumeAsFlow().flatMapLatest { intent ->
+                logIntent(intent)
+                intentProcessor.processIntent(intent, currentState)
+            }.collectLatest { effect ->
+                var newState = currentState
+                if (shouldLog) Timber.tag(tag).i("Effect: $effect")
 
-            }.collect()
+                newState = reduce(newState, effect)
+
+                withContext(Dispatchers.Main) {
+                    setState(newState).also {
+                        if (shouldLog) Timber.tag(tag).i("Reduce state: $newState")
+                    }
+                    val event = publisher.publish(effect, newState)
+                    if (shouldLog) Timber.tag(tag).i("Publish State: $newState. $effect -> $event")
+                    if (event != null) {
+                        _event.emit(event)
+                    }
+                }
+            }
         }
 
         if (initialUserIntent != null) {
@@ -75,16 +71,27 @@ abstract class BaseViewModelV2<
         }
     }
 
+    private fun logIntent(intent: Intent) {
+        if (shouldLog) {
+            Timber.tag(tag).i("------------------------------------")
+            Timber.tag(tag).i("Process intent: $intent")
+        }
+    }
+
+    private fun reduce(currentState: UiState, effect: UiEffect): UiState {
+        var result: UiState
+        val duration = measureTimeMillis {
+            result = reducer.reduce(effect, currentState)
+        }
+        if (shouldLog) Timber.tag(tag).i("reduce[$duration] state: $currentState -> $result")
+        return result
+    }
+
     fun processIntent(intent: Intent) {
         // TODO handle highPriority intents
         viewModelScope.launch {
             userIntentQueue.send(intent)
         }
-    }
-
-    private fun setState(proceed: UiState.() -> UiState) {
-        val newState = _uiState.value.proceed()
-        _uiState.value = newState
     }
 
     private fun setState(newState: UiState) {

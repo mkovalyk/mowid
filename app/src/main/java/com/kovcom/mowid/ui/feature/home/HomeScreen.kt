@@ -1,5 +1,6 @@
 package com.kovcom.mowid.ui.feature.home
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,7 +60,6 @@ fun HomeScreen(
                     }
                 }
 
-//                is HomeEvent.GroupItemClicked -> onNavigateToQuotes(event.groupPhrase.id)
                 is HomeEvent.HideGroupModal -> {
                     bottomSheetScaffoldState.bottomSheetState.collapse()
                 }
@@ -68,15 +68,23 @@ fun HomeScreen(
 //                    bottomSheetScaffoldState.bottomSheetState.collapse()
 //                }
 
-                is HomeEvent.OnItemDeleted -> {}
+                is HomeEvent.OnItemDeleted -> {
+//                    viewModel.processIntent(HomeUserIntent.OnItemDeleted(event.id))
+                }
 //                is HomeEvent.OnEditClicked -> {
 //                    bottomSheetScaffoldState.bottomSheetState.collapse()
 //                }
 
-                HomeEvent.ShowLoginScreen -> TODO()
-                is HomeEvent.ShowError -> TODO()
-                is HomeEvent.ShowSnackbar -> TODO()
-                is HomeEvent.ItemClicked -> TODO()
+                is HomeEvent.ShowLoginScreen -> {
+                    sendMainEvent(MainEvent.SignIn)
+                }
+
+                is HomeEvent.ShowError -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                is HomeEvent.ShowSnackbar -> {
+                    Toast.makeText(context, "Snackbar: ${event.message}", Toast.LENGTH_SHORT).show()
+                }
+
+                is HomeEvent.ItemClicked -> onNavigateToQuotes(event.groupPhrase.id)
             }
         }.collect()
     }

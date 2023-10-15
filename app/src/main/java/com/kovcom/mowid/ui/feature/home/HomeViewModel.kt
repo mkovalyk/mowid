@@ -1,17 +1,14 @@
 package com.kovcom.mowid.ui.feature.home
 
-import androidx.lifecycle.viewModelScope
 import com.kovcom.domain.interactor.MotivationPhraseInteractor
 import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.model.toUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val motivationPhraseInteractor: MotivationPhraseInteractor,
     intentProcessor: HomeIntentProcessor,
     reducer: HomeReducer,
     publisher: HomePublisher,
@@ -30,11 +27,6 @@ class HomeViewModel @Inject constructor(
 
     override val tag: String = "HomeViewModel"
 
-    private fun deleteGroup(id: String) {
-        viewModelScope.launch {
-            motivationPhraseInteractor.deleteGroup(id)
-        }
-    }
 }
 
 class HomeIntentProcessor @Inject constructor(
@@ -59,7 +51,7 @@ class HomeIntentProcessor @Inject constructor(
                 flowOf(HomeEffect.ShowGroupCreatedMessage)
             }
 
-            is HomeUserIntent.GroupItemClicked -> TODO()
+            is HomeUserIntent.GroupItemClicked -> flowOf(HomeEffect.OpenDetails(intent.groupPhrase))
             is HomeUserIntent.Load -> flow {
                 motivationPhraseInteractor.getGroupPhraseListFlow()
                     .onEach { emit(HomeEffect.Loaded(it)) }
@@ -72,10 +64,10 @@ class HomeIntentProcessor @Inject constructor(
             }
 
 
-            HomeUserIntent.HideGroupModal -> flowOf(HomeEffect.HideGroupModal)
+            is HomeUserIntent.HideGroupModal -> flowOf(HomeEffect.HideGroupModal)
             is HomeUserIntent.OnEditClicked -> emptyFlow()
             is HomeUserIntent.OnItemDeleted -> emptyFlow()
-            HomeUserIntent.ShowGroupModal -> emptyFlow()
+            is HomeUserIntent.ShowGroupModal -> emptyFlow()
         }
     }
 }
@@ -98,14 +90,15 @@ class HomeReducer @Inject constructor() : Reducer<HomeEffect, HomeState> {
             is HomeEffect.ShowGroupCreatedMessage,
             is HomeEffect.ShowLoginScreen,
             is HomeEffect.HideGroupModal,
+            is HomeEffect.OpenDetails,
             -> state
+
         }
     }
 
 }
 
 class HomePublisher @Inject constructor() : Publisher<HomeEffect, HomeEvent, HomeState> {
-
 
     override fun publish(effect: HomeEffect, currentState: HomeState): HomeEvent? {
         return when (effect) {
@@ -119,6 +112,7 @@ class HomePublisher @Inject constructor() : Publisher<HomeEffect, HomeEvent, Hom
             is HomeEffect.ShowGroupCreatedMessage -> HomeEvent.ShowSnackbar("Group created")
             is HomeEffect.ShowLoginScreen -> HomeEvent.ShowLoginScreen
             is HomeEffect.HideGroupModal -> HomeEvent.HideGroupModal
+            is HomeEffect.OpenDetails -> HomeEvent.ItemClicked(effect.groupPhrase)
         }
     }
 

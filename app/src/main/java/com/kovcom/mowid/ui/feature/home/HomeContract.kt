@@ -40,6 +40,7 @@ sealed interface HomeEffect : Effect {
     data class Loaded(val information: List<GroupPhraseModel>) : HomeEffect
     data class ShowError(val message: String) : HomeEffect
     data class ShowEditGroupModal(val groupPhrase: GroupPhraseUIModel) : HomeEffect
+    data class OpenDetails(val groupPhrase: GroupPhraseUIModel) : HomeEffect
     object ShowAddGroupModel : HomeEffect
     object ShowLoginScreen : HomeEffect
     object ShowGroupCreatedMessage : HomeEffect
