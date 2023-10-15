@@ -3,18 +3,26 @@ package com.kovcom.data.firebase.source
 import com.kovcom.data.model.*
 import kotlinx.coroutines.flow.Flow
 
+interface CommonGroupsDataSource {
+    val groupsFlow: Flow<ResultDataModel<List<GroupDataModel>>>
+
+    val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>>
+    
+    val selectedLocaleFlow: Flow<ResultDataModel<String>>
+    
+    val localesFlow: Flow<ResultDataModel<List<LocaleDataModel>>>
+    
+    suspend fun selectLocale(locale: LocaleDataModel): ResultDataModel<String>
+}
+
 
 interface FirebaseDataSource {
-
-    val groupsFlow: Flow<ResultDataModel<List<GroupDataModel>>>
 
     val userGroupsFlow: Flow<ResultDataModel<List<GroupDataModel>>>
 
     val selectedGroupsFlow: Flow<ResultDataModel<List<SelectedGroupDataModel>>>
 
     val selectedQuotesFlow: Flow<ResultDataModel<List<SelectedQuoteDataModel>>>
-
-    val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>>
 
     val userQuotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>>
 

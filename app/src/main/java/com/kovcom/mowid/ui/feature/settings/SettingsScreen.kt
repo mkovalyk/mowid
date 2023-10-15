@@ -20,7 +20,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kovcom.data.firebase.source.impl.FirebaseDataSourceImpl
+import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EFFECTS_KEY
 import com.kovcom.mowid.base.ui.EVENTS_KEY

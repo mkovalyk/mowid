@@ -2,7 +2,7 @@ package com.kovcom.mowid.ui.feature.quotes
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.kovcom.data.firebase.source.impl.FirebaseDataSourceImpl.Companion.TAG
+import com.kovcom.data.firebase.source.FirebaseDataSourceImpl.Companion.TAG
 import com.kovcom.domain.interactor.MotivationPhraseInteractor
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.model.toUIModel

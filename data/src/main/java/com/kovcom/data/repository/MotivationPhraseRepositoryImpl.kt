@@ -1,7 +1,8 @@
 package com.kovcom.data.repository
 
+import com.kovcom.data.firebase.source.CommonGroupsDataSource
 import com.kovcom.data.firebase.source.FirebaseDataSource
-import com.kovcom.data.firebase.source.impl.FirebaseDataSourceImpl
+import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.data.mapper.mapToDomain
 import com.kovcom.data.mapper.toDomain
 import com.kovcom.data.model.*
@@ -21,10 +22,11 @@ import javax.inject.Singleton
 @Singleton
 class MotivationPhraseRepositoryImpl @Inject constructor(
     private val firebaseDataSource: FirebaseDataSource,
+    private val commonGroupsDataSource: CommonGroupsDataSource,
 ) : MotivationPhraseRepository {
 
     override fun getGroupsFlow(): Flow<List<GroupPhraseModel>> = combine(
-        firebaseDataSource.groupsFlow,
+        commonGroupsDataSource.groupsFlow,
         firebaseDataSource.userGroupsFlow,
         firebaseDataSource.selectedGroupsFlow
     ) { groups, userGroups, selectedGroups ->
@@ -34,15 +36,15 @@ class MotivationPhraseRepositoryImpl @Inject constructor(
                 "selectedGroups: ${selectedGroups.data?.size}"
         )
         val allGroups = groups.merge(userGroups)
-        if (selectedGroups.status == Status.ERROR) {
+        if (selectedGroups.status == Status.Error) {
             throw selectedGroups.error ?: Exception("Unknown exception")
         }
         when (allGroups.status) {
-            Status.SUCCESS -> allGroups.data?.distinctBy { it.id }
+            Status.Success -> allGroups.data?.distinctBy { it.id }
                 ?.map { model -> model.mapToDomain(selectedGroups.data.orEmpty()) }
                 ?: emptyList()
 
-            Status.ERROR -> throw allGroups.error ?: Exception("Unknown exception")
+            Status.Error -> throw allGroups.error ?: Exception("Unknown exception")
         }
     }
 
@@ -50,7 +52,7 @@ class MotivationPhraseRepositoryImpl @Inject constructor(
 
         firebaseDataSource.subscribeAllGroupsQuotes(groupId)
         return combine(
-            firebaseDataSource.quotesFlow,
+            commonGroupsDataSource.quotesFlow,
             firebaseDataSource.userQuotesFlow,
             firebaseDataSource.selectedQuotesFlow
         ) { quotes, userQuotes, selectedQuotes ->
@@ -59,16 +61,16 @@ class MotivationPhraseRepositoryImpl @Inject constructor(
                     " selectedQuotes: ${selectedQuotes.data?.size}"
             )
             val allQuotes = quotes.merge(userQuotes)
-            if (selectedQuotes.status == Status.ERROR) {
+            if (selectedQuotes.status == Status.Error) {
                 throw selectedQuotes.error ?: Exception("Unknown exception")
             }
             when (allQuotes.status) {
-                Status.SUCCESS -> {
+                Status.Success -> {
                     val selectedIds = selectedQuotes.data.orEmpty().map { it.id }.toSet()
                     allQuotes.data.orEmpty().map { model -> model.mapToDomain(selectedIds) }
                 }
 
-                Status.ERROR -> throw allQuotes.error ?: Exception("Unknown exception")
+                Status.Error -> throw allQuotes.error ?: Exception("Unknown exception")
             }
         }
     }
@@ -78,10 +80,10 @@ class MotivationPhraseRepositoryImpl @Inject constructor(
             firebaseDataSource.frequenciesFlow,
             firebaseDataSource.userFrequencyFlow
         ) { settings, userSettings ->
-            if (settings.status == Status.ERROR) {
+            if (settings.status == Status.Error) {
                 throw settings.error ?: Exception("Unknown exception")
             }
-            if (userSettings.status == Status.ERROR) {
+            if (userSettings.status == Status.Error) {
                 throw userSettings.error ?: Exception("Unknown exception")
             }
             settings.data?.toDomain(

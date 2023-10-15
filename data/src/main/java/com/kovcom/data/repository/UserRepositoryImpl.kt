@@ -18,8 +18,8 @@ class UserRepositoryImpl @Inject constructor(
     override fun getUserFlow(): Flow<UserModel?> {
         return authDataSource.userFlow.map {
             when (it.status) {
-                Status.SUCCESS -> it.data?.toDomain()
-                Status.ERROR -> throw it.error ?: Exception("Unknown exception")
+                Status.Success -> it.data?.toDomain()
+                Status.Error -> throw it.error ?: Exception("Unknown exception")
             }
         }
     }

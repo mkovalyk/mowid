@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -25,14 +27,6 @@ class LocalDataSourceImpl @Inject constructor(
 
     private val Context.dataStoreDelegate by preferencesDataStore("settings")
     private val dataStore: DataStore<Preferences> = context.dataStoreDelegate
-
-    companion object {
-
-        private val TEST_VALUE = booleanPreferencesKey("TEST_VALUE")
-        private val QUOTE_CHANGE_OPTION = stringPreferencesKey("QUOTE_CHANGE_OPTION")
-        private val TOKEN = stringPreferencesKey("TOKEN")
-        private val FREQUENCY = longPreferencesKey("FREQUENCY")
-    }
 
     override val testValue: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[TEST_VALUE] ?: false
@@ -97,4 +91,30 @@ class LocalDataSourceImpl @Inject constructor(
             }
         }
     }
+
+    override val selectedLocale: Flow<String>
+        get() = dataStore.data.map { preferences ->
+            val result = preferences[SELECTED_LOCALE] ?: Locale.getDefault().language
+            // log 
+            Timber.tag("LocalDataSourceImpl").i("selectedLocale: $result")
+            result
+        }
+
+    override fun setSelectedLocale(value: String) {
+        launch {
+            dataStore.edit { preferences ->
+                preferences[SELECTED_LOCALE] = value
+            }
+        }
+    }
+
+    companion object {
+
+        private val TEST_VALUE = booleanPreferencesKey("TEST_VALUE")
+        private val QUOTE_CHANGE_OPTION = stringPreferencesKey("QUOTE_CHANGE_OPTION")
+        private val TOKEN = stringPreferencesKey("TOKEN")
+        private val FREQUENCY = longPreferencesKey("FREQUENCY")
+        private val SELECTED_LOCALE = stringPreferencesKey("SELECTED_LOCALE")
+    }
+
 }

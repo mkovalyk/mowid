@@ -34,12 +34,12 @@ class QuotesWorker @AssistedInject constructor(
             Timber.tag("QuotesWorker").i("doWork option = ${option.name}")
             val result = firebaseDataSource.getSelectedQuotes()
             when (result.status) {
-                Status.SUCCESS -> {
+                Status.Success -> {
                     showNextQuote(result.data, option)
                     Result.success()
                 }
 
-                Status.ERROR -> Result.failure()
+                Status.Error -> Result.failure()
             }
         }.first()
 

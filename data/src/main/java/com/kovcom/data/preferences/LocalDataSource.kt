@@ -19,4 +19,7 @@ interface LocalDataSource {
 
     val frequency: Flow<Long>
     fun setFrequency(value: Long)
+    
+    val selectedLocale: Flow<String>
+    fun setSelectedLocale(value: String)
 }

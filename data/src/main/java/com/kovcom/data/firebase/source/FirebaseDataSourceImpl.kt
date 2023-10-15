@@ -1,11 +1,9 @@
-package com.kovcom.data.firebase.source.impl
+package com.kovcom.data.firebase.source
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.kovcom.data.firebase.source.AuthDataSource
-import com.kovcom.data.firebase.source.FirebaseDataSource
 import com.kovcom.data.model.*
 import com.kovcom.data.preferences.LocalDataSource
 import kotlinx.coroutines.*
@@ -32,8 +30,6 @@ class FirebaseDataSourceImpl @Inject constructor(
     override val coroutineContext: CoroutineContext = Dispatchers.IO + SupervisorJob()
 
     private val currentGroupFlow = MutableStateFlow<String?>(null)
-
-    override val groupsFlow = groupsFlow()
 
     private val tokenFlow = authDataSource.userFlow.map { it.data?.token }
 
@@ -64,15 +60,6 @@ class FirebaseDataSourceImpl @Inject constructor(
         currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
             selectedQuotes(groupId, token.data?.token)
         }.flattenMerge(1)
-
-    override val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>> =
-        currentGroupFlow.flatMapConcat { groupId ->
-            if (groupId == null) {
-                flowOf(ResultDataModel.error(Exception("Group id is null")))
-            } else {
-                quotesFlow(groupId)
-            }
-        }
 
     override val userQuotesFlow =
         currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
@@ -400,27 +387,6 @@ class FirebaseDataSourceImpl @Inject constructor(
             }
     }
 
-    private fun groupsFlow(): Flow<ResultDataModel<List<GroupDataModel>>> =
-        callbackFlow {
-            val subscription = dbInstance.collection(COLLECTION_GROUPS)
-                .addSnapshotListener { value, error ->
-                    if (error != null) {
-                        trySend(ResultDataModel.error(error))
-                        return@addSnapshotListener
-                    }
-                    value?.let { snapShot ->
-                        val groups = mutableListOf<GroupDataModel>()
-                        for (doc in snapShot) {
-                            groups.add(doc.toObject())
-                        }
-                        trySend(ResultDataModel.success(groups))
-                    }
-                }
-            awaitClose {
-                subscription.remove()
-                channel.close()
-            }
-        }
 
     private fun userGroups(token: String) = callbackFlow {
         val subscription = dbInstance.collection(COLLECTION_PERSONAL)
@@ -470,30 +436,7 @@ class FirebaseDataSourceImpl @Inject constructor(
         }
     }
 
-    private fun quotesFlow(groupId: String): Flow<ResultDataModel<List<QuoteDataModel>>> =
-        callbackFlow {
-            val subscription = dbInstance
-                .collection(COLLECTION_GROUPS)
-                .document(groupId)
-                .collection(COLLECTION_QUOTES)
-                .addSnapshotListener { value, error ->
-                    if (error != null) {
-                        trySend(ResultDataModel.error(error))
-                        return@addSnapshotListener
-                    }
-                    value?.let { snapShot ->
-                        val groups = mutableListOf<QuoteDataModel>()
-                        for (doc in snapShot) {
-                            groups.add(doc.toObject())
-                        }
-                        trySend(ResultDataModel.success(groups))
-                    }
-                }
-            awaitClose {
-                subscription.remove()
-                channel.close()
-            }
-        }
+    
 
     private fun userQuotesFlow(
         groupId: String?,

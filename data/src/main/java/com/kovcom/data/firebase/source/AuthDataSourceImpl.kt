@@ -1,9 +1,8 @@
-package com.kovcom.data.firebase.source.impl
+package com.kovcom.data.firebase.source
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.kovcom.data.firebase.source.AuthDataSource
 import com.kovcom.data.model.ResultDataModel
 import com.kovcom.data.model.UserDataModel
 import com.kovcom.data.preferences.LocalDataSource

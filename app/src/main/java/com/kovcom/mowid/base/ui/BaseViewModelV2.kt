@@ -38,7 +38,7 @@ abstract class BaseViewModelV2<
 
     private val initialState: UiState by lazy { createInitialState() }
 
-    private val userIntentQueue: Channel<Intent> = Channel(capacity = 15)
+    private val userIntentQueue: Channel<Intent> = Channel(capacity = DEFAULT_INTENT_CAPACITY)
 
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(initialState)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -109,6 +109,11 @@ abstract class BaseViewModelV2<
 
     private fun setState(newState: UiState) {
         _uiState.value = newState
+    }
+
+    companion object {
+
+        const val DEFAULT_INTENT_CAPACITY  = 10
     }
 }
 

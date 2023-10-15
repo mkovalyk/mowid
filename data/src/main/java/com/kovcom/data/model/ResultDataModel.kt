@@ -8,21 +8,21 @@ data class ResultDataModel<out T>(
 
     companion object {
         fun <T> success(data: T?): ResultDataModel<T> {
-            return ResultDataModel(status = Status.SUCCESS, data = data)
+            return ResultDataModel(status = Status.Success, data = data)
         }
 
         fun <T> error(error: Throwable): ResultDataModel<T> {
-            return ResultDataModel(status = Status.ERROR, error = error)
+            return ResultDataModel(status = Status.Error, error = error)
         }
     }
 }
 
 fun <T> ResultDataModel<List<T>>.merge(model: ResultDataModel<List<T>>): ResultDataModel<List<T>> =
-    if (this.status == Status.SUCCESS && model.status == Status.SUCCESS) {
+    if (this.status == Status.Success && model.status == Status.Success) {
         ResultDataModel.success(this.data.orEmpty() + model.data.orEmpty())
     } else {
         ResultDataModel.error(
-            if (this.status == Status.ERROR) {
+            if (this.status == Status.Error) {
                 error
             } else {
                 model.error
@@ -32,6 +32,6 @@ fun <T> ResultDataModel<List<T>>.merge(model: ResultDataModel<List<T>>): ResultD
 
 
 enum class Status {
-    SUCCESS,
-    ERROR
+    Success,
+    Error
 }
