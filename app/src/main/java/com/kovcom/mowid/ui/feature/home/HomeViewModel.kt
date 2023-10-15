@@ -1,10 +1,19 @@
 package com.kovcom.mowid.ui.feature.home
 
 import com.kovcom.domain.interactor.MotivationPhraseInteractor
-import com.kovcom.mowid.base.ui.*
+import com.kovcom.mowid.base.ui.BaseViewModelV2
+import com.kovcom.mowid.base.ui.IntentProcessor
+import com.kovcom.mowid.base.ui.Publisher
+import com.kovcom.mowid.base.ui.Reducer
 import com.kovcom.mowid.model.toUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,8 +34,7 @@ class HomeViewModel @Inject constructor(
         isLoggedIn = false,
     )
 
-    override val tag: String = "HomeViewModel"
-
+    override fun tag(): String = "HomeViewModel"
 }
 
 class HomeIntentProcessor @Inject constructor(
@@ -56,18 +64,30 @@ class HomeIntentProcessor @Inject constructor(
                 motivationPhraseInteractor.getGroupPhraseListFlow()
                     .onEach { emit(HomeEffect.Loaded(it)) }
                     .onStart { emit(HomeEffect.Loading(true)) }
-                    .catch { emit(HomeEffect.Loading(false)) }
-                    .collect {
-                        emit(HomeEffect.Loaded(it))
+                    .catch {
                         emit(HomeEffect.Loading(false))
+                        emit(HomeEffect.ShowError("Error: $it"))
+                    }
+                    .collect {
+                        emit(HomeEffect.Loading(false))
+                        emit(HomeEffect.Loaded(it))
                     }
             }
 
-
             is HomeUserIntent.HideGroupModal -> flowOf(HomeEffect.HideGroupModal)
             is HomeUserIntent.OnEditClicked -> emptyFlow()
-            is HomeUserIntent.OnItemDeleted -> emptyFlow()
+            is HomeUserIntent.OnItemDeleted -> flowOf(
+                HomeEffect.RemoveGroup(
+                    id = intent.id,
+                    name = intent.name
+                )
+            )
+
             is HomeUserIntent.ShowGroupModal -> emptyFlow()
+            is HomeUserIntent.RemoveGroupConfirmed -> flow {
+                motivationPhraseInteractor.deleteGroup(intent.id)
+                emit(HomeEffect.RemoveGroupConfirmed(intent.name))
+            }
         }
     }
 }
@@ -91,6 +111,8 @@ class HomeReducer @Inject constructor() : Reducer<HomeEffect, HomeState> {
             is HomeEffect.ShowLoginScreen,
             is HomeEffect.HideGroupModal,
             is HomeEffect.OpenDetails,
+            is HomeEffect.RemoveGroup,
+            is HomeEffect.RemoveGroupConfirmed,
             -> state
 
         }
@@ -104,15 +126,21 @@ class HomePublisher @Inject constructor() : Publisher<HomeEffect, HomeEvent, Hom
         return when (effect) {
             is HomeEffect.Loaded,
             is HomeEffect.Loading,
+            is HomeEffect.ShowAddGroupModel,
+            is HomeEffect.ShowEditGroupModal,
             -> null
 
-            is HomeEffect.ShowAddGroupModel -> HomeEvent.ShowGroupModal
-            is HomeEffect.ShowEditGroupModal -> HomeEvent.ShowGroupModal
             is HomeEffect.ShowError -> HomeEvent.ShowError(effect.message)
             is HomeEffect.ShowGroupCreatedMessage -> HomeEvent.ShowSnackbar("Group created")
             is HomeEffect.ShowLoginScreen -> HomeEvent.ShowLoginScreen
             is HomeEffect.HideGroupModal -> HomeEvent.HideGroupModal
             is HomeEffect.OpenDetails -> HomeEvent.ItemClicked(effect.groupPhrase)
+            is HomeEffect.RemoveGroup -> HomeEvent.ShowRemoveConfirmationDialog(
+                effect.id,
+                effect.name
+            )
+
+            is HomeEffect.RemoveGroupConfirmed -> HomeEvent.ShowSnackbar("Group ${effect.name} removed")
         }
     }
 

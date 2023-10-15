@@ -81,11 +81,7 @@ abstract class BaseViewModel<
         }
     }
 
-
-//    protected fun sendEffect(effect: Effect){
-//        viewModelScope.launch { _effect.send(effect) }
-//    }
-
+    
     protected fun Effect.sendEffect() {
         viewModelScope.launch { _effect.send(this@sendEffect) }
     }

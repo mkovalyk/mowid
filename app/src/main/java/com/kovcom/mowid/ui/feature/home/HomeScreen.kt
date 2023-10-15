@@ -6,8 +6,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -17,7 +25,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.GroupPhraseUIModel
-import com.kovcom.mowid.ui.composable.*
+import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
+import com.kovcom.mowid.ui.composable.AppDropDownMenu
+import com.kovcom.mowid.ui.composable.AppFloatingActionButton
+import com.kovcom.mowid.ui.composable.AppProgress
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffold
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffoldState
 import com.kovcom.mowid.ui.composable.bottomsheet.rememberBottomSheetScaffoldState
@@ -64,16 +75,9 @@ fun HomeScreen(
                     bottomSheetScaffoldState.bottomSheetState.collapse()
                 }
 
-//                is HomeEvent.AddGroupClicked -> {
-//                    bottomSheetScaffoldState.bottomSheetState.collapse()
-//                }
-
                 is HomeEvent.OnItemDeleted -> {
-//                    viewModel.processIntent(HomeUserIntent.OnItemDeleted(event.id))
+                    Toast.makeText(context, "Item deleted: ${event.name}", Toast.LENGTH_SHORT).show()
                 }
-//                is HomeEvent.OnEditClicked -> {
-//                    bottomSheetScaffoldState.bottomSheetState.collapse()
-//                }
 
                 is HomeEvent.ShowLoginScreen -> {
                     sendMainEvent(MainEvent.SignIn)
@@ -85,6 +89,7 @@ fun HomeScreen(
                 }
 
                 is HomeEvent.ItemClicked -> onNavigateToQuotes(event.groupPhrase.id)
+                is HomeEvent.ShowRemoveConfirmationDialog -> TODO()
             }
         }.collect()
     }
@@ -150,7 +155,7 @@ private fun HomeScreenContent(
     onNavigateToSettings: () -> Unit,
     state: HomeState,
     bottomSheetUIState: MutableState<BottomSheetUIState>,
-    sendEvent: (HomeUserIntent) -> Unit,
+    sendIntent: (HomeUserIntent) -> Unit,
 ) {
     Scaffold(
         topBar = { TopBar(showMenu, onNavigateToSettings) },
@@ -158,7 +163,7 @@ private fun HomeScreenContent(
             if (state.isLoading.not()) AppFloatingActionButton(
                 onClick = {
                     bottomSheetUIState.value = BottomSheetUIState.AddGroupBottomSheet
-                    sendEvent(HomeUserIntent.AddClicked)
+                    sendIntent(HomeUserIntent.AddClicked)
                 }
             ) else Unit
         }
@@ -169,18 +174,18 @@ private fun HomeScreenContent(
                 groupPhraseList = state.groupPhraseList,
                 modifier = Modifier.padding(padding),
                 onClick = {
-                    sendEvent(HomeUserIntent.GroupItemClicked(it))
+                    sendIntent(HomeUserIntent.GroupItemClicked(it))
                 },
-                onDelete = {
-                    sendEvent(HomeUserIntent.OnItemDeleted(it))
+                onDelete = { id, name ->
+                    sendIntent(HomeUserIntent.OnItemDeleted(id, name))
                 },
                 onEdit = { id, name, description ->
-                    bottomSheetUIState.value = BottomSheetUIState.EditGroupBottomSheet(
-                        id = id,
-                        textField1 = name,
-                        textField2 = description
-                    )
-                    sendEvent(HomeUserIntent.ShowGroupModal)
+//                    bottomSheetUIState.value = BottomSheetUIState.EditGroupBottomSheet(
+//                        id = id,
+//                        textField1 = name,
+//                        textField2 = description
+//                    )
+                    sendIntent(HomeUserIntent.ShowGroupModal(id, name, description))
                 }
             )
         }

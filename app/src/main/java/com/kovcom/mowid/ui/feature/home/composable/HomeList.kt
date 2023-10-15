@@ -20,7 +20,7 @@ import com.kovcom.mowid.ui.theme.MoWidTheme
 fun HomeList(
     groupPhraseList: List<GroupPhraseUIModel>,
     onClick: (groupPhrase: GroupPhraseUIModel) -> Unit,
-    onDelete: (String) -> Unit,
+    onDelete: (id: String, name: String) -> Unit,
     onEdit: (id: String, name: String, description: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -33,7 +33,7 @@ fun HomeList(
             val dismissState = rememberDismissState(
                 confirmValueChange = {
                     if (it == DismissValue.DismissedToStart) {
-                        onDelete(currentItem.id)
+                        onDelete(currentItem.id,currentItem.name)
                     }
                     true
                 },
@@ -99,7 +99,7 @@ fun HomeListPreview() {
                 )
             ),
             onClick = {},
-            onDelete = {},
+            onDelete = {_,_ -> },
             onEdit = { _, _, _ -> }
         )
     }

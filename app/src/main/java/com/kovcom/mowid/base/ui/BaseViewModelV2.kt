@@ -2,12 +2,26 @@ package com.kovcom.mowid.base.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.system.measureTimeMillis
 
+@OptIn(ExperimentalCoroutinesApi::class)
 abstract class BaseViewModelV2<
     UiState : State,
     UiEvent : Event,
@@ -21,9 +35,6 @@ abstract class BaseViewModelV2<
 ) : ViewModel() {
 
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
-    private var eventJob: Job? = null
-
-    abstract fun createInitialState(): UiState
 
     private val initialState: UiState by lazy { createInitialState() }
 
@@ -38,9 +49,13 @@ abstract class BaseViewModelV2<
     private val _event: MutableSharedFlow<UiEvent> = MutableSharedFlow()
     val event = _event.asSharedFlow()
 
-    private val shouldLog = true
+    protected val shouldLog = true
 
-    abstract val tag: String
+    abstract fun tag(): String
+    abstract fun createInitialState(): UiState
+
+    private val tag
+        get() = tag()
 
     init {
         coroutineScope.launch {
@@ -48,15 +63,13 @@ abstract class BaseViewModelV2<
                 logIntent(intent)
                 intentProcessor.processIntent(intent, currentState)
             }.collectLatest { effect ->
-                var newState = currentState
-                if (shouldLog) Timber.tag(tag).i("Effect: $effect")
+                if (shouldLog) Timber.tag(tag).i("Effect: $effect: $currentState")
 
-                newState = reduce(newState, effect)
-
+                val newState = reduce(currentState, effect)
+                setState(newState).also {
+                    if (shouldLog) Timber.tag(tag).i("Reduce state: $newState")
+                }
                 withContext(Dispatchers.Main) {
-                    setState(newState).also {
-                        if (shouldLog) Timber.tag(tag).i("Reduce state: $newState")
-                    }
                     val event = publisher.publish(effect, newState)
                     if (shouldLog) Timber.tag(tag).i("Publish State: $newState. $effect -> $event")
                     if (event != null) {
