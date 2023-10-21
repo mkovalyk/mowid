@@ -78,4 +78,8 @@ class MotivationPhraseInteractor(private val motivationPhraseRepository: Motivat
             editedDescription = editedDescription
         )
     }
+    
+    suspend fun selectGroup(groupId: String) {
+        motivationPhraseRepository.selectGroup(groupId)
+    }
 }

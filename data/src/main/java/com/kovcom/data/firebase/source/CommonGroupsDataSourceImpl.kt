@@ -16,12 +16,11 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flattenConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -48,13 +47,13 @@ class CommonGroupsDataSourceImpl  constructor(
     }
 
     override val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>> =
-        currentGroupFlow.flatMapConcat { groupId ->
+        selectedLocaleFlow.combine(currentGroupFlow) { locale, groupId ->
             if (groupId == null) {
                 flowOf(ResultDataModel.error(Exception("Group id is null")))
             } else {
-                quotesFlow(groupId)
+                quotesFlow(groupId, locale.data ?: "")
             }
-        }
+        }.flattenConcat()
 
     override val localesFlow: Flow<ResultDataModel<List<LocaleDataModel>>> = callbackFlow {
         val subscription = dbInstance.collection(COLLECTION_LOCALE)
@@ -82,6 +81,10 @@ class CommonGroupsDataSourceImpl  constructor(
         return ResultDataModel.success(locale.id)
     }
 
+    override suspend fun selectGroup(groupId: String) {
+        currentGroupFlow.value = groupId
+    }
+
     private fun groupsFlow(selectedLocaleId: String): Flow<ResultDataModel<List<GroupDataModel>>> =
         callbackFlow {
             val subscription =
@@ -107,9 +110,14 @@ class CommonGroupsDataSourceImpl  constructor(
             }
         }
 
-    private fun quotesFlow(groupId: String): Flow<ResultDataModel<List<QuoteDataModel>>> =
+    private fun quotesFlow(
+        groupId: String,
+        selectedLocaleId: String,
+    ): Flow<ResultDataModel<List<QuoteDataModel>>> =
         callbackFlow {
             val subscription = dbInstance
+                .collection(COLLECTION_LOCALE)
+                .document(selectedLocaleId)
                 .collection(COLLECTION_GROUPS)
                 .document(groupId)
                 .collection(COLLECTION_QUOTES)

@@ -125,6 +125,11 @@ class MotivationPhraseRepositoryImpl(
         firebaseDataSource.deleteGroup(id)
     }
 
+    override suspend fun selectGroup(groupId: String) {
+        commonGroupsDataSource.selectGroup(groupId)
+        firebaseDataSource.selectGroup(groupId)
+    }
+
     override suspend fun saveSelection(
         groupId: String,
         quoteId: String,

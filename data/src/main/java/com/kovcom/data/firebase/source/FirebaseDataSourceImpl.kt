@@ -222,6 +222,10 @@ class FirebaseDataSourceImpl constructor(
         Timber.tag(TAG).i("Group's selection for $groupId deleted successfully")
     }
 
+    override suspend fun selectGroup(groupId: String) {
+        currentGroupFlow.emit(groupId)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun saveSelection(
         quote: SelectedQuoteDataModel,

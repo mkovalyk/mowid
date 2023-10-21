@@ -22,6 +22,8 @@ interface MotivationPhraseRepository {
     suspend fun deleteQuote(groupId: String, quoteId: String, isSelected: Boolean)
 
     suspend fun deleteGroup(id: String)
+    
+    suspend fun selectGroup(groupId: String)
 
     suspend fun saveSelection(
         groupId: String,

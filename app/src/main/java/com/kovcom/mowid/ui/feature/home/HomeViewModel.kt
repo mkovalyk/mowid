@@ -2,9 +2,20 @@ package com.kovcom.mowid.ui.feature.home
 
 import com.kovcom.domain.repository.MotivationPhraseRepository
 import com.kovcom.domain.repository.UserRepository
-import com.kovcom.mowid.base.ui.*
+import com.kovcom.mowid.base.ui.BaseViewModelV2
+import com.kovcom.mowid.base.ui.IntentProcessor
+import com.kovcom.mowid.base.ui.Publisher
+import com.kovcom.mowid.base.ui.Reducer
 import com.kovcom.mowid.model.toUIModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
 class HomeViewModel constructor(
     intentProcessor: HomeIntentProcessor,
@@ -48,7 +59,11 @@ class HomeIntentProcessor constructor(
                 flowOf(HomeEffect.ShowGroupCreatedMessage)
             }
 
-            is HomeUserIntent.GroupItemClicked -> flowOf(HomeEffect.OpenDetails(intent.groupPhrase))
+            is HomeUserIntent.GroupItemClicked -> flow {
+                phraseRepository.selectGroup(intent.groupPhrase.id)
+                emit(HomeEffect.OpenDetails(intent.groupPhrase))
+            }
+
             is HomeUserIntent.Load -> flow {
                 phraseRepository.getGroupsFlow()
                     .onEach { emit(HomeEffect.Loaded(it)) }
