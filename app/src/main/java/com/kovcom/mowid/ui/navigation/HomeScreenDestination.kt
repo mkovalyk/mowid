@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kovcom.mowid.ui.feature.home.HomeScreen
 import com.kovcom.mowid.ui.feature.home.HomeViewModel
 import com.kovcom.mowid.ui.feature.main.MainEvent
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreenDestination(
@@ -12,7 +13,7 @@ fun HomeScreenDestination(
     onNavigateToQuotes: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
 ) {
-    val viewModel: HomeViewModel = viewModel()
+    val viewModel: HomeViewModel = koinViewModel()
     HomeScreen(
         viewModel = viewModel,
         sendMainEvent = sendMainEvent,
