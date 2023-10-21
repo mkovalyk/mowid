@@ -8,14 +8,11 @@ import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.model.toUIModel
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel (
     private val quotesWorkerManager: QuotesWorkerManager,
     private val interactor: MotivationPhraseInteractor,
     private val userInteractor: UserInteractor

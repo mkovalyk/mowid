@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class UserRepositoryImpl @Inject constructor(
+
+class UserRepositoryImpl  constructor(
     private val authDataSource: AuthDataSource,
 ) : UserRepository {
 

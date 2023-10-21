@@ -1,7 +1,7 @@
 package com.kovcom.mowid.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kovcom.mowid.ui.feature.home.HomeScreen
 import com.kovcom.mowid.ui.feature.home.HomeViewModel
 import com.kovcom.mowid.ui.feature.main.MainEvent
@@ -12,7 +12,7 @@ fun HomeScreenDestination(
     onNavigateToQuotes: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
 ) {
-    val viewModel: HomeViewModel = hiltViewModel()
+    val viewModel: HomeViewModel = viewModel()
     HomeScreen(
         viewModel = viewModel,
         sendMainEvent = sendMainEvent,

@@ -1,7 +1,6 @@
 package com.kovcom.mowid.ui.worker
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.kovcom.data.firebase.source.FirebaseDataSource
@@ -10,17 +9,14 @@ import com.kovcom.data.model.Status
 import com.kovcom.data.preferences.LocalDataSource
 import com.kovcom.mowid.ui.feature.widget.QuotesWidgetReceiver
 import com.kovcom.mowid.ui.feature.widget.WidgetQuoteInfo
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import java.util.Date
 
-@HiltWorker
-class QuotesWorker @AssistedInject constructor(
-    @Assisted private val context: Context,
-    @Assisted workParams: WorkerParameters,
+class QuotesWorker constructor(
+    private val context: Context,
+    workParams: WorkerParameters,
     private val firebaseDataSource: FirebaseDataSource,
     private val localDataSource: LocalDataSource,
 ) : CoroutineWorker(context, workParams) {

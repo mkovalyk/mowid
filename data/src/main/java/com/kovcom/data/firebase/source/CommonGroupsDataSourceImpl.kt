@@ -25,8 +25,8 @@ import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-@Singleton
-class CommonGroupsDataSourceImpl @Inject constructor(
+
+class CommonGroupsDataSourceImpl  constructor(
     private val dbInstance: FirebaseFirestore,
     private val localDataSource: LocalDataSource,
 ) : CommonGroupsDataSource, CoroutineScope {

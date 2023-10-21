@@ -2,8 +2,6 @@ plugins {
     id 'com.android.library'
     id 'kotlin-kapt'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.dagger.hilt.android'
-    id 'com.google.gms.google-services'
 }
 
 android {
@@ -36,8 +34,9 @@ dependencies {
     implementation project(":domain")
 
     // di
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation "io.insert-koin:koin-bom:3.5.1"
+    implementation "io.insert-koin:koin-core"
+    implementation "io.insert-koin:koin-android"
 
     // coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_core_version"
@@ -52,6 +51,8 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.3.1')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    api 'com.firebaseui:firebase-ui-auth:7.2.0'
     implementation 'com.google.firebase:firebase-firestore-ktx'
 
     implementation 'com.jakewharton.timber:timber:5.0.1'

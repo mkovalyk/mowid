@@ -49,6 +49,7 @@ sealed interface HomeEffect : Effect {
     data class Loading(val isLoading: Boolean) : HomeEffect
     data class Loaded(val information: List<GroupPhraseModel>) : HomeEffect
     data class ShowError(val message: String) : HomeEffect
+    data class UserLoaded(val isLoggedIn: Boolean) : HomeEffect
     data class ShowEditGroupModal(val id: String, val name: String, val description: String) :
         HomeEffect
 

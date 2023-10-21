@@ -14,14 +14,11 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@Singleton
-class FirebaseDataSourceImpl @Inject constructor(
+class FirebaseDataSourceImpl constructor(
     private val dbInstance: FirebaseFirestore,
     private val localDataSource: LocalDataSource,
     authDataSource: AuthDataSource,

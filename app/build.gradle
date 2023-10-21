@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-parcelize'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.dagger.hilt.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -60,15 +60,9 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
 
     // di
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation "androidx.hilt:hilt-navigation-compose:$hilt_compose_version"
-    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
-
-    // Worker
-    implementation "androidx.hilt:hilt-common:$hilt_worker_version"
-    implementation "androidx.hilt:hilt-work:$hilt_worker_version"
-    kapt("androidx.hilt:hilt-compiler:$hilt_worker_version")
-    implementation "androidx.work:work-runtime-ktx:$worker_version"
+//    implementation "com.google.dagger:hilt-android:$hilt_version"
+//    implementation "androidx.hilt:hilt-navigation-compose:$hilt_compose_version"
+//    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     // coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_core_version"
@@ -96,6 +90,12 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
 
     implementation 'androidx.core:core-splashscreen:1.0.1'
+
+    implementation "io.insert-koin:koin-bom:3.5.1"
+    implementation "io.insert-koin:koin-core"
+    implementation "io.insert-koin:koin-android"
+    implementation "io.insert-koin:koin-androidx-workmanager"
+    implementation "io.insert-koin:koin-androidx-compose"
 
     // tests
     testImplementation 'junit:junit:4.13.2'

@@ -1,33 +1,36 @@
 package com.kovcom.mowid
 
 import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
+import com.kovcom.data.di.dataModule
+import com.kovcom.mowid.di.appModule
+import com.kovcom.mowid.di.domainModule
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.koin.workManagerFactory
+import org.koin.core.context.GlobalContext.startKoin
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltAndroidApp
-class MoWidApplication : Application(), Configuration.Provider {
+class MoWidApplication : Application() {
 
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    @Inject
-    lateinit var workerManager: QuotesWorkerManager
-
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+    private val workerManager: QuotesWorkerManager by inject()
 
     override fun onCreate() {
         super.onCreate()
+        startKoin {
+            androidContext(this@MoWidApplication)
+            workManagerFactory()
+            modules(
+                dataModule,
+                domainModule,
+                appModule
+            )
+        }
+
         CoroutineScope(Dispatchers.IO)
             .launch {
                 workerManager.execute(ExecutionOption.REGULAR)

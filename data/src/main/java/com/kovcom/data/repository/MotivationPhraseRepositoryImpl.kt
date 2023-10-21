@@ -16,11 +16,8 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class MotivationPhraseRepositoryImpl @Inject constructor(
+class MotivationPhraseRepositoryImpl(
     private val firebaseDataSource: FirebaseDataSource,
     private val commonGroupsDataSource: CommonGroupsDataSource,
 ) : MotivationPhraseRepository {

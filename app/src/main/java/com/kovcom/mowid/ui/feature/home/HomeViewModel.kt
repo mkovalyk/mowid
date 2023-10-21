@@ -1,23 +1,12 @@
 package com.kovcom.mowid.ui.feature.home
 
-import com.kovcom.domain.interactor.MotivationPhraseInteractor
-import com.kovcom.mowid.base.ui.BaseViewModelV2
-import com.kovcom.mowid.base.ui.IntentProcessor
-import com.kovcom.mowid.base.ui.Publisher
-import com.kovcom.mowid.base.ui.Reducer
+import com.kovcom.domain.repository.MotivationPhraseRepository
+import com.kovcom.domain.repository.UserRepository
+import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.model.toUIModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import javax.inject.Inject
+import kotlinx.coroutines.flow.*
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel constructor(
     intentProcessor: HomeIntentProcessor,
     reducer: HomeReducer,
     publisher: HomePublisher,
@@ -37,12 +26,13 @@ class HomeViewModel @Inject constructor(
     override fun tag(): String = "HomeViewModel"
 }
 
-class HomeIntentProcessor @Inject constructor(
-    private val motivationPhraseInteractor: MotivationPhraseInteractor,
+class HomeIntentProcessor constructor(
+    private val phraseRepository: MotivationPhraseRepository,
+    private val userRepository: UserRepository,
 ) : IntentProcessor<HomeState, HomeUserIntent, HomeEffect> {
 
     override suspend fun processIntent(intent: HomeUserIntent, currentState: HomeState): Flow<HomeEffect> {
-        return when (intent) {
+        val effect = when (intent) {
             is HomeUserIntent.AddClicked -> {
                 if (currentState.isLoggedIn) {
                     flowOf(HomeEffect.ShowAddGroupModel)
@@ -52,16 +42,15 @@ class HomeIntentProcessor @Inject constructor(
             }
 
             is HomeUserIntent.AddGroupClicked -> {
-                motivationPhraseInteractor.addGroup(
-                    name = intent.name,
-                    description = intent.description
+                phraseRepository.addGroup(
+                    name = intent.name, description = intent.description
                 )
                 flowOf(HomeEffect.ShowGroupCreatedMessage)
             }
 
             is HomeUserIntent.GroupItemClicked -> flowOf(HomeEffect.OpenDetails(intent.groupPhrase))
             is HomeUserIntent.Load -> flow {
-                motivationPhraseInteractor.getGroupPhraseListFlow()
+                phraseRepository.getGroupsFlow()
                     .onEach { emit(HomeEffect.Loaded(it)) }
                     .onStart { emit(HomeEffect.Loading(true)) }
                     .catch {
@@ -75,7 +64,6 @@ class HomeIntentProcessor @Inject constructor(
             }
 
             is HomeUserIntent.HideGroupModal -> flowOf(HomeEffect.HideGroupModal)
-            is HomeUserIntent.OnEditClicked -> emptyFlow()
             is HomeUserIntent.OnItemDeleted -> flowOf(
                 HomeEffect.RemoveGroup(
                     id = intent.id,
@@ -83,16 +71,21 @@ class HomeIntentProcessor @Inject constructor(
                 )
             )
 
-            is HomeUserIntent.ShowGroupModal -> emptyFlow()
             is HomeUserIntent.RemoveGroupConfirmed -> flow {
-                motivationPhraseInteractor.deleteGroup(intent.id)
+                phraseRepository.deleteGroup(intent.id)
                 emit(HomeEffect.RemoveGroupConfirmed(intent.name))
             }
+
+            is HomeUserIntent.OnEditClicked -> emptyFlow()
+            is HomeUserIntent.ShowGroupModal -> emptyFlow()
         }
+        return merge(effect, userRepository.getUserFlow().map {
+            HomeEffect.UserLoaded(isLoggedIn = true)
+        })
     }
 }
 
-class HomeReducer @Inject constructor() : Reducer<HomeEffect, HomeState> {
+class HomeReducer : Reducer<HomeEffect, HomeState> {
 
     override fun reduce(effect: HomeEffect, state: HomeState): HomeState {
         return when (effect) {
@@ -115,21 +108,18 @@ class HomeReducer @Inject constructor() : Reducer<HomeEffect, HomeState> {
             is HomeEffect.RemoveGroupConfirmed,
             -> state
 
+            is HomeEffect.UserLoaded -> state.copy(
+                isLoggedIn = effect.isLoggedIn
+            )
         }
     }
 
 }
 
-class HomePublisher @Inject constructor() : Publisher<HomeEffect, HomeEvent, HomeState> {
+class HomePublisher : Publisher<HomeEffect, HomeEvent, HomeState> {
 
     override fun publish(effect: HomeEffect, currentState: HomeState): HomeEvent? {
         return when (effect) {
-            is HomeEffect.Loaded,
-            is HomeEffect.Loading,
-            is HomeEffect.ShowAddGroupModel,
-            is HomeEffect.ShowEditGroupModal,
-            -> null
-
             is HomeEffect.ShowError -> HomeEvent.ShowError(effect.message)
             is HomeEffect.ShowGroupCreatedMessage -> HomeEvent.ShowSnackbar("Group created")
             is HomeEffect.ShowLoginScreen -> HomeEvent.ShowLoginScreen
@@ -141,6 +131,13 @@ class HomePublisher @Inject constructor() : Publisher<HomeEffect, HomeEvent, Hom
             )
 
             is HomeEffect.RemoveGroupConfirmed -> HomeEvent.ShowSnackbar("Group ${effect.name} removed")
+
+            is HomeEffect.Loaded,
+            is HomeEffect.Loading,
+            is HomeEffect.ShowAddGroupModel,
+            is HomeEffect.ShowEditGroupModal,
+            is HomeEffect.UserLoaded,
+            -> null
         }
     }
 

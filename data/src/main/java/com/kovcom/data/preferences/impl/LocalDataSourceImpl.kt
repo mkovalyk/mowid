@@ -18,8 +18,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
-@Singleton
-class LocalDataSourceImpl @Inject constructor(
+
+class LocalDataSourceImpl  constructor(
     @Named("LocalDataStore")
     override val coroutineContext: CoroutineContext,
     context: Context,

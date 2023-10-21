@@ -8,12 +8,9 @@ import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MainViewModel @Inject constructor(
+class MainViewModel  constructor(
     private val interactor: UserInteractor,
     private val workerManager: QuotesWorkerManager,
 ) : BaseViewModel<MainState, MainEvent, MainEffect>() {

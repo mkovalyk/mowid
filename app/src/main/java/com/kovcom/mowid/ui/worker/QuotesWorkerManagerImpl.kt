@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class QuotesWorkerManagerImpl @Inject constructor(
+class QuotesWorkerManagerImpl  constructor(
     private val workManager: WorkManager,
     private val localDataSource: LocalDataSource
 ) : QuotesWorkerManager {

@@ -15,8 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
-@Singleton
-class AuthDataSourceImpl @Inject constructor(
+class AuthDataSourceImpl  constructor(
     private val dbInstance: FirebaseFirestore,
     private val authInstance: FirebaseAuth,
     private val localDataSource: LocalDataSource,

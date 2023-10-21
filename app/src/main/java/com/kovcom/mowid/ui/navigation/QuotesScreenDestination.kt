@@ -1,7 +1,7 @@
 package com.kovcom.mowid.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kovcom.mowid.ui.feature.quotes.QuotesScreen
 import com.kovcom.mowid.ui.feature.quotes.QuotesViewModel
 
@@ -11,6 +11,6 @@ fun QuotesScreenDestination(
     onBackClicked: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
-    val viewModel: QuotesViewModel = hiltViewModel()
+    val viewModel: QuotesViewModel = viewModel()
     QuotesScreen(viewModel, groupName, onBackClicked, onNavigateToSettings)
 }

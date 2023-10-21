@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,14 +19,13 @@ import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.BaseActivity
 import com.kovcom.mowid.ui.navigation.AppNavigation
 import com.kovcom.mowid.ui.theme.MoWidTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-@AndroidEntryPoint
 class MainActivity : BaseActivity<MainState, MainEvent, MainEffect, MainViewModel>() {
 
-    override val viewModel: MainViewModel by viewModels()
+    override val viewModel: MainViewModel by viewModel()
 
     private val groupId: String?
         get() = intent?.getStringExtra(GROUP_ID)

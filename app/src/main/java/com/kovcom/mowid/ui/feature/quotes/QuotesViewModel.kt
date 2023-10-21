@@ -6,7 +6,6 @@ import com.kovcom.data.firebase.source.FirebaseDataSourceImpl.Companion.TAG
 import com.kovcom.domain.interactor.MotivationPhraseInteractor
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.model.toUIModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
@@ -16,10 +15,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class QuotesViewModel @Inject constructor(
+class QuotesViewModel  constructor(
     private val motivationPhraseInteractor: MotivationPhraseInteractor,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<QuotesState, QuotesEvent, QuotesEffect>() {
