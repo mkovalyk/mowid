@@ -47,7 +47,7 @@ class FirebaseDataSourceImpl constructor(
                     Timber.tag(TAG).w("User is null while getting user groups")
                     flowOf(ResultDataModel.success(emptyList()))
                 } else {
-                    selectedGroups(userId = user.id)
+                    selectedGroups(userId = user.token)
                 }
             }
         }
