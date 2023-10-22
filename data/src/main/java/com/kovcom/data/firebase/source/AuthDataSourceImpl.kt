@@ -11,8 +11,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 class AuthDataSourceImpl  constructor(
@@ -59,12 +57,14 @@ class AuthDataSourceImpl  constructor(
         return suspendCancellableCoroutine { continuation ->
             authInstance.currentUser?.let {
                 if (token.isEmpty()) {
-                    dbInstance.collection(COLLECTION_USER).document(it.uid)
+                    dbInstance.collection(COLLECTION_USER)
+                        .document(it.uid)
                         .set(
                             UserDataModel(
-                                token = localDataSource.token,
+                                token = UUID.randomUUID().toString(),
                                 fullName = it.displayName,
-                                email = it.email
+                                email = it.email,
+                                id = it.uid,
                             )
                         )
                         .addOnCompleteListener { continuation.resume(token, {}) }
@@ -90,18 +90,18 @@ class AuthDataSourceImpl  constructor(
                 }
         }
 
-    private suspend fun saveCurrentToken(): String {
-        var token: String = getTokenFromUser() ?: ""
-        if (token.isEmpty()) {
-            if (localDataSource.token.isEmpty()) {
-                localDataSource.setToken(UUID.randomUUID().toString())
-            }
-            token = localDataSource.token
-        } else {
-            localDataSource.setToken(token)
-        }
-        return token
-    }
+//    private suspend fun saveCurrentToken(): String {
+//        var token: String = getTokenFromUser() ?: ""
+//        if (token.isEmpty()) {
+//            if (localDataSource.token.isEmpty()) {
+//                localDataSource.setToken(UUID.randomUUID().toString())
+//            }
+//            token = localDataSource.token
+//        } else {
+//            localDataSource.setToken(token)
+//        }
+//        return token
+//    }
 
     companion object {
 

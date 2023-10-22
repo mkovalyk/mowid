@@ -12,9 +12,6 @@ interface LocalDataSource {
 
     val tokenFlow: Flow<String?>
 
-    // It is a temporal solution to get token synchronously.
-    @Deprecated("Use tokenFlow instead")
-    val token: String
     fun setToken(value: String?)
 
     val frequency: Flow<Long>

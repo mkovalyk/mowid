@@ -53,8 +53,8 @@ class QuotesWorker constructor(
 
     private fun SelectedQuoteDataModel.toWidgetInfo(): WidgetQuoteInfo {
         return WidgetQuoteInfo(
-            quote = quote ?: "",
-            author = author ?: "",
+            quote =  "",// TODO fix
+            author = "", // TODO fix
             quoteId = id,
             groupId = groupId
         )

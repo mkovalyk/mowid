@@ -39,7 +39,6 @@ interface FirebaseDataSource {
 
     val userFrequencyFlow: Flow<ResultDataModel<Long>>
 
-
     fun subscribeAllGroupsQuotes(groupId: String)
 
     suspend fun getSelectedQuotes(): ResultDataModel<List<SelectedQuoteDataModel>>

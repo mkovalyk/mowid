@@ -71,7 +71,7 @@ abstract class BaseViewModelV2<
                 }
                 withContext(Dispatchers.Main) {
                     val event = publisher.publish(effect, newState)
-                    if (shouldLog) Timber.tag(tag).i("Publish State: $newState. $effect -> $event")
+                    if (shouldLog) Timber.tag(tag).i("Publish State: $effect -> $event. $newState")
                     if (event != null) {
                         _event.emit(event)
                     }

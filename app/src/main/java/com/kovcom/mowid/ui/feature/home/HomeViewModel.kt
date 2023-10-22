@@ -56,7 +56,10 @@ class HomeIntentProcessor constructor(
                 phraseRepository.addGroup(
                     name = intent.name, description = intent.description
                 )
-                flowOf(HomeEffect.ShowGroupCreatedMessage)
+                flowOf(
+                    HomeEffect.ShowGroupCreatedMessage,
+                    HomeEffect.HideGroupModal
+                )
             }
 
             is HomeUserIntent.GroupItemClicked -> flow {
@@ -95,7 +98,7 @@ class HomeIntentProcessor constructor(
             is HomeUserIntent.ShowGroupModal -> emptyFlow()
         }
         return merge(effect, userRepository.getUserFlow().map {
-            HomeEffect.UserLoaded(isLoggedIn = true)
+            HomeEffect.UserLoaded(isLoggedIn = it != null)
         })
     }
 }
@@ -146,10 +149,10 @@ class HomePublisher : Publisher<HomeEffect, HomeEvent, HomeState> {
             )
 
             is HomeEffect.RemoveGroupConfirmed -> HomeEvent.ShowSnackbar("Group ${effect.name} removed")
+            is HomeEffect.ShowAddGroupModel -> HomeEvent.ShowAddGroupModal
 
             is HomeEffect.Loaded,
             is HomeEffect.Loading,
-            is HomeEffect.ShowAddGroupModel,
             is HomeEffect.ShowEditGroupModal,
             is HomeEffect.UserLoaded,
             -> null

@@ -90,6 +90,13 @@ fun HomeScreen(
 
                 is HomeEvent.ItemClicked -> onNavigateToQuotes(event.groupPhrase.id)
                 is HomeEvent.ShowRemoveConfirmationDialog -> TODO()
+                is HomeEvent.ShowAddGroupModal -> {
+                    if (bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
+                        bottomSheetScaffoldState.bottomSheetState.expand()
+                    } else {
+                        bottomSheetScaffoldState.bottomSheetState.collapse()
+                    }
+                }
             }
         }.collect()
     }

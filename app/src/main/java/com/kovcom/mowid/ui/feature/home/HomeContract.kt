@@ -36,6 +36,7 @@ sealed interface HomeEvent : Event {
     data class OnItemDeleted(val name: String) : HomeEvent
     data class ShowGroupModal(val id: String, val name: String, val description: String) :
         HomeEvent
+    object ShowAddGroupModal: HomeEvent
 
     object HideGroupModal : HomeEvent
     object ShowLoginScreen : HomeEvent

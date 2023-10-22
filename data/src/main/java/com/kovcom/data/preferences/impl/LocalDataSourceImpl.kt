@@ -57,11 +57,6 @@ class LocalDataSourceImpl  constructor(
         }
     }
 
-    override val token: String
-        get() = runBlocking {
-            tokenFlow.first().orEmpty()
-        }
-
     override val tokenFlow: Flow<String?>
         get() = dataStore.data.map { preferences ->
             preferences[TOKEN]
