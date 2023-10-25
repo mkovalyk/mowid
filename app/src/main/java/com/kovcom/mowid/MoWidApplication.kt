@@ -17,7 +17,7 @@ import timber.log.Timber
 
 class MoWidApplication : Application() {
 
-    private val workerManager: QuotesWorkerManager by inject()
+    val workerManager: QuotesWorkerManager by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -33,7 +33,7 @@ class MoWidApplication : Application() {
 
         CoroutineScope(Dispatchers.IO)
             .launch {
-                workerManager.execute(ExecutionOption.REGULAR)
+                workerManager.execute(ExecutionOption.Regular)
             }
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())

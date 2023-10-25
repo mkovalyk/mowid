@@ -25,7 +25,7 @@ class QuotesWorker constructor(
         return localDataSource.quoteChangeOption.map { quoteOption ->
 
             val option = ExecutionOption.valueOf(
-                quoteOption ?: ExecutionOption.REGULAR.name
+                quoteOption ?: ExecutionOption.Regular.name
             )
             Timber.tag("QuotesWorker").i("doWork option = ${option.name}")
             val result = firebaseDataSource.getSelectedQuotes()
@@ -44,17 +44,17 @@ class QuotesWorker constructor(
     private suspend fun showNextQuote(quotes: List<SelectedQuoteDataModel>?, option: ExecutionOption) {
         quotes?.let {
             when (option) {
-                ExecutionOption.REGULAR -> showRegularQuote(it)
-                ExecutionOption.NEXT -> showNextQuote(it)
-                ExecutionOption.PREVIOUS -> showPreviousQuote(it)
+                ExecutionOption.Regular -> showRegularQuote(it)
+                ExecutionOption.Next -> showNextQuote(it)
+                ExecutionOption.Previous -> showPreviousQuote(it)
             }
         }
     }
 
     private fun SelectedQuoteDataModel.toWidgetInfo(): WidgetQuoteInfo {
         return WidgetQuoteInfo(
-            quote =  "",// TODO fix
-            author = "", // TODO fix
+            quote = quote ?: "",
+            author = author ?: "",
             quoteId = id,
             groupId = groupId
         )
@@ -85,7 +85,7 @@ class QuotesWorker constructor(
             )
             updateShownQuote(it)
         }
-        localDataSource.setQuoteChangeOption(ExecutionOption.REGULAR.name)
+        localDataSource.setQuoteChangeOption(ExecutionOption.Regular.name)
     }
 
     private suspend fun showPreviousQuote(quotes: List<SelectedQuoteDataModel>) {
@@ -103,7 +103,7 @@ class QuotesWorker constructor(
             )
             updateShownQuote(it)
         }
-        localDataSource.setQuoteChangeOption(ExecutionOption.REGULAR.name)
+        localDataSource.setQuoteChangeOption(ExecutionOption.Regular.name)
     }
 
     private suspend fun updateShownQuote(quote: SelectedQuoteDataModel) {

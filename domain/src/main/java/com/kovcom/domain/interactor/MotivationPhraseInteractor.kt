@@ -5,6 +5,7 @@ import com.kovcom.domain.model.GroupPhraseModel
 import com.kovcom.domain.model.QuoteModel
 import com.kovcom.domain.repository.MotivationPhraseRepository
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 // TODO remove this class
 class MotivationPhraseInteractor(private val motivationPhraseRepository: MotivationPhraseRepository) {
@@ -23,8 +24,18 @@ class MotivationPhraseInteractor(private val motivationPhraseRepository: Motivat
     }
 
     suspend fun addQuote(groupId: String, quote: String, author: String) {
-        motivationPhraseRepository.addQuote(groupId, quote, author)
-        motivationPhraseRepository.saveSelection(groupId, quote, isSelected = true)
+        val quoteId = UUID.randomUUID().toString()
+        motivationPhraseRepository.addQuote(
+            groupId = groupId,
+            quote = quote,
+            author = author,
+            quoteId = quoteId
+        )
+        motivationPhraseRepository.saveSelection(
+            groupId = groupId,
+            quoteId = quoteId,
+            isSelected = true
+        )
     }
 
     suspend fun updateUserFrequency(id: Long) {
@@ -44,7 +55,7 @@ class MotivationPhraseInteractor(private val motivationPhraseRepository: Motivat
         quoteId: String,
         quote: String,
         author: String?,
-        isSelected: Boolean
+        isSelected: Boolean,
     ) {
         motivationPhraseRepository.saveSelection(
             groupId = groupId,
@@ -57,7 +68,7 @@ class MotivationPhraseInteractor(private val motivationPhraseRepository: Motivat
         groupId: String,
         quoteId: String,
         editedQuote: String,
-        editedAuthor: String
+        editedAuthor: String,
     ) {
         motivationPhraseRepository.editQuote(
             groupId = groupId,
@@ -70,7 +81,7 @@ class MotivationPhraseInteractor(private val motivationPhraseRepository: Motivat
     suspend fun editGroup(
         groupId: String,
         editedName: String,
-        editedDescription: String
+        editedDescription: String,
     ) {
         motivationPhraseRepository.editGroup(
             groupId = groupId,
@@ -78,7 +89,7 @@ class MotivationPhraseInteractor(private val motivationPhraseRepository: Motivat
             editedDescription = editedDescription
         )
     }
-    
+
     suspend fun selectGroup(groupId: String) {
         motivationPhraseRepository.selectGroup(groupId)
     }

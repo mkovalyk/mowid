@@ -53,7 +53,7 @@ class SettingsViewModel (
             is SettingsEvent.OnFrequencyChanged -> {
                 viewModelScope.launch {
                     interactor.updateUserFrequency(event.id)
-                    quotesWorkerManager.execute(ExecutionOption.REGULAR)
+                    quotesWorkerManager.execute(ExecutionOption.Regular)
                     SettingsEffect.ShowToastId(
                         messageId = R.string.label_applied
                     ).sendEffect()

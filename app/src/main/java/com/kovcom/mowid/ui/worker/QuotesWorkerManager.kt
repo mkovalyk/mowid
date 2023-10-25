@@ -6,7 +6,7 @@ interface QuotesWorkerManager {
 }
 
 enum class ExecutionOption {
-    REGULAR,
-    PREVIOUS,
-    NEXT
+    Regular,
+    Previous,
+    Next
 }

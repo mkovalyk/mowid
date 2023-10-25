@@ -41,8 +41,8 @@ class FirebaseDataSourceImpl constructor(
     }
 
     override val selectedGroupsFlow: Flow<ResultDataModel<List<SelectedGroupDataModel>>> =
-        authDataSource.userFlow.flatMapLatest { user ->
-            user.data.let { user ->
+        authDataSource.userFlow.flatMapLatest { userDataModel ->
+            userDataModel.data.let { user ->
                 if (user == null) {
                     Timber.tag(TAG).w("User is null while getting user groups")
                     flowOf(ResultDataModel.success(emptyList()))
@@ -230,53 +230,52 @@ class FirebaseDataSourceImpl constructor(
         quote: SelectedQuoteDataModel,
         isSelected: Boolean,
     ): ResultDataModel<SelectedQuoteDataModel> {
-        mutex.withLock {
-            val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
-            val changed = quote.copy(selectedByToken = token)
-            return suspendCancellableCoroutine { continuation ->
-                val currentDocument = dbInstance.collection(COLLECTION_PERSONAL)
-                    .document(token)
-                    .collection(COLLECTION_SELECTION)
-                    .document(quote.groupId)
-                currentDocument.get().addOnCompleteListener {
-                    if (it.result.exists()) {
-                        if (isSelected) {
-                            currentDocument
-                                .collection(COLLECTION_SELECTED_QUOTES)
-                                .document(quote.id)
-                                .set(changed)
-                                .addOnSuccessListener {
-                                    continuation.resume(ResultDataModel.success(quote)) {}
-                                }
-                                .addOnFailureListener { exception ->
-                                    continuation.resume(ResultDataModel.error(exception)) {}
-                                }
-                            currentDocument.update(
-                                SELECTED_QUOTES_COUNT_FIELD,
-                                FieldValue.increment(1)
-                            )
-                        } else {
-                            currentDocument
-                                .collection(COLLECTION_SELECTED_QUOTES)
-                                .document(quote.id)
-                                .delete()
-                            currentDocument.update(
-                                SELECTED_QUOTES_COUNT_FIELD,
-                                FieldValue.increment(-1)
-                            )
-                        }
+        val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
+        val changed = quote.copy(selectedBy = token)
+        return suspendCancellableCoroutine { continuation ->
+            val currentDocument = dbInstance.collection(COLLECTION_PERSONAL)
+                .document(token)
+                .collection(COLLECTION_SELECTION)
+                .document(quote.groupId)
+            currentDocument.get().addOnCompleteListener {
+                if (it.result.exists()) {
+                    Timber.tag("FirebaseDataSourceImpl").i("Document exists")
+                    if (isSelected) {
+                        currentDocument
+                            .collection(COLLECTION_SELECTED_QUOTES)
+                            .document(quote.id)
+                            .set(changed)
+                            .addOnSuccessListener {
+                                currentDocument.update(
+                                    SELECTED_QUOTES_COUNT_FIELD,
+                                    FieldValue.increment(1)
+                                )
+                                continuation.resume(ResultDataModel.success(quote)) {}
+                            }
+                            .addOnFailureListener { exception ->
+                                continuation.resume(ResultDataModel.error(exception)) {}
+                            }
                     } else {
-                        currentDocument.set(
-                            SelectedGroupDataModel(
-                                groupId = quote.groupId,
-                                selectedQuotesCount = 1
-                            )
-                        ).addOnCompleteListener {
-                            currentDocument
-                                .collection(COLLECTION_SELECTED_QUOTES)
-                                .document(quote.id)
-                                .set(changed)
-                        }
+                        currentDocument
+                            .collection(COLLECTION_SELECTED_QUOTES)
+                            .document(quote.id)
+                            .delete()
+                        currentDocument.update(
+                            SELECTED_QUOTES_COUNT_FIELD,
+                            FieldValue.increment(-1)
+                        )
+                    }
+                } else {
+                    currentDocument.set(
+                        SelectedGroupDataModel(
+                            groupId = quote.groupId,
+                            selectedQuotesCount = 1
+                        )
+                    ).addOnCompleteListener {
+                        currentDocument
+                            .collection(COLLECTION_SELECTED_QUOTES)
+                            .document(quote.id)
+                            .set(changed)
                     }
                 }
             }
@@ -426,6 +425,7 @@ class FirebaseDataSourceImpl constructor(
             .document(userId)
             .collection(COLLECTION_SELECTION)
             .addSnapshotListener { value, error ->
+                println("selectedGroups: $value")
                 if (error != null) {
                     trySend(ResultDataModel.error(error))
                     return@addSnapshotListener
@@ -445,7 +445,6 @@ class FirebaseDataSourceImpl constructor(
         }
     }
 
-    
 
     private fun userQuotesFlow(
         groupId: String?,
@@ -526,7 +525,7 @@ class FirebaseDataSourceImpl constructor(
             }
         }
     }
-    
+
     private fun frequenciesFlow() = callbackFlow {
         val subscription = dbInstance.collection(COLLECTION_FREQUENCY)
             .addSnapshotListener { value, error ->
@@ -547,7 +546,7 @@ class FirebaseDataSourceImpl constructor(
             channel.close()
         }
     }
-    
+
     private fun userFrequenciesFlow(token: String?): Flow<ResultDataModel<Long>> {
         if (token == null) {
             Timber.tag(TAG).w("Token is null while trying to get user frequencies")

@@ -5,11 +5,7 @@ import com.kovcom.data.firebase.source.FirebaseDataSource
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.data.mapper.mapToDomain
 import com.kovcom.data.mapper.toDomain
-import com.kovcom.data.model.GroupDataModel
-import com.kovcom.data.model.QuoteDataModel
-import com.kovcom.data.model.SelectedQuoteDataModel
-import com.kovcom.data.model.Status
-import com.kovcom.data.model.merge
+import com.kovcom.data.model.*
 import com.kovcom.domain.model.FrequenciesModel
 import com.kovcom.domain.model.GroupPhraseModel
 import com.kovcom.domain.model.QuoteModel
@@ -103,11 +99,12 @@ class MotivationPhraseRepositoryImpl(
         )
     }
 
-    override suspend fun addQuote(groupId: String, quote: String, author: String) {
+    override suspend fun addQuote(groupId: String, quote: String, author: String, quoteId: String) {
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
         firebaseDataSource.saveNewQuote(
             groupId,
             QuoteDataModel(
+                id = quoteId,
                 author = author,
                 quote = quote,
                 created = format.format(Date()),

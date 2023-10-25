@@ -23,7 +23,7 @@ class MainViewModel  constructor(
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             interactor.signInSuccess()
             viewModelScope.launch {
-                workerManager.execute(ExecutionOption.REGULAR)
+                workerManager.execute(ExecutionOption.Regular)
             }
             MainEffect.ShowToast(R.string.label_sign_in_success).sendEffect()
         } else {
