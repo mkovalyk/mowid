@@ -3,8 +3,8 @@ package com.kovcom.data.firebase.source
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.kovcom.data.model.ResultDataModel
-import com.kovcom.data.model.UserDataModel
+import com.kovcom.data.model.Result
+import com.kovcom.data.model.UserModel
 import com.kovcom.data.preferences.LocalDataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -19,17 +19,17 @@ class AuthDataSourceImpl  constructor(
     private val localDataSource: LocalDataSource,
 ) : AuthDataSource, CoroutineScope {
 
-    override val userFlow: Flow<ResultDataModel<UserDataModel>> = callbackFlow {
+    override val userFlow: Flow<Result<UserModel>> = callbackFlow {
         val subscription = dbInstance
             .collection(COLLECTION_USER)
             .document(authInstance.currentUser?.uid ?: "_")
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    trySend(ResultDataModel.error(error))
+                    trySend(Result.error(error))
                     return@addSnapshotListener
                 }
-                val userModel = value?.toObject<UserDataModel>()
-                trySend(ResultDataModel.success(userModel))
+                val userModel = value?.toObject<UserModel>()
+                trySend(Result.success(userModel))
             }
 
         awaitClose {
@@ -60,7 +60,7 @@ class AuthDataSourceImpl  constructor(
                     dbInstance.collection(COLLECTION_USER)
                         .document(it.uid)
                         .set(
-                            UserDataModel(
+                            UserModel(
                                 token = UUID.randomUUID().toString(),
                                 fullName = it.displayName,
                                 email = it.email,

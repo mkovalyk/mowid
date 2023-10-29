@@ -1,7 +1,7 @@
 package com.kovcom.data.firebase.source
 
-import com.kovcom.data.model.ResultDataModel
-import com.kovcom.data.model.UserDataModel
+import com.kovcom.data.model.Result
+import com.kovcom.data.model.UserModel
 import kotlinx.coroutines.flow.Flow
 
 interface AuthDataSource {
@@ -10,5 +10,5 @@ interface AuthDataSource {
 
     fun signOutSuccess()
 
-    val userFlow: Flow<ResultDataModel<UserDataModel>>
+    val userFlow: Flow<Result<UserModel>>
 }

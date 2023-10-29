@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.kovcom.data.firebase.source.FirebaseDataSource
-import com.kovcom.data.model.SelectedQuoteDataModel
+import com.kovcom.data.model.SelectedQuoteModel
 import com.kovcom.data.model.Status
 import com.kovcom.data.preferences.LocalDataSource
 import com.kovcom.mowid.ui.feature.widget.QuotesWidgetReceiver
@@ -41,7 +41,7 @@ class QuotesWorker constructor(
 
     }
 
-    private suspend fun showNextQuote(quotes: List<SelectedQuoteDataModel>?, option: ExecutionOption) {
+    private suspend fun showNextQuote(quotes: List<SelectedQuoteModel>?, option: ExecutionOption) {
         quotes?.let {
             when (option) {
                 ExecutionOption.Regular -> showRegularQuote(it)
@@ -51,7 +51,7 @@ class QuotesWorker constructor(
         }
     }
 
-    private fun SelectedQuoteDataModel.toWidgetInfo(): WidgetQuoteInfo {
+    private fun SelectedQuoteModel.toWidgetInfo(): WidgetQuoteInfo {
         return WidgetQuoteInfo(
             quote = quote ?: "",
             author = author ?: "",
@@ -60,7 +60,7 @@ class QuotesWorker constructor(
         )
     }
 
-    private suspend fun showRegularQuote(quotes: List<SelectedQuoteDataModel>) {
+    private suspend fun showRegularQuote(quotes: List<SelectedQuoteModel>) {
         quotes.sortedBy { it.shownAt }.firstOrNull()?.let {
             QuotesWidgetReceiver.updateWidget(
                 context = context,
@@ -70,7 +70,7 @@ class QuotesWorker constructor(
         }
     }
 
-    private suspend fun showNextQuote(quotes: List<SelectedQuoteDataModel>) {
+    private suspend fun showNextQuote(quotes: List<SelectedQuoteModel>) {
         val currentQuote = quotes.sortedBy { it.shownAt }.lastOrNull()
         val currentQuoteIndex = quotes.indexOf(currentQuote)
         val nextQuote = when {
@@ -88,7 +88,7 @@ class QuotesWorker constructor(
         localDataSource.setQuoteChangeOption(ExecutionOption.Regular.name)
     }
 
-    private suspend fun showPreviousQuote(quotes: List<SelectedQuoteDataModel>) {
+    private suspend fun showPreviousQuote(quotes: List<SelectedQuoteModel>) {
         val currentQuote = quotes.sortedBy { it.shownAt }.lastOrNull()
         val currentQuoteIndex = quotes.indexOf(currentQuote)
         val previousQuote = when {
@@ -106,7 +106,7 @@ class QuotesWorker constructor(
         localDataSource.setQuoteChangeOption(ExecutionOption.Regular.name)
     }
 
-    private suspend fun updateShownQuote(quote: SelectedQuoteDataModel) {
+    private suspend fun updateShownQuote(quote: SelectedQuoteModel) {
         firebaseDataSource.updateSelectedQuote(
             groupId = quote.groupId,
             quoteId = quote.id,

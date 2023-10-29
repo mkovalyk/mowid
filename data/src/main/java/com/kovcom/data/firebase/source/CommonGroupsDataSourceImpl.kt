@@ -18,41 +18,41 @@ class CommonGroupsDataSourceImpl  constructor(
     private val currentGroupFlow = MutableStateFlow<String?>(null)
     override val coroutineContext: CoroutineContext = Dispatchers.IO + SupervisorJob()
 
-    override val selectedLocaleFlow: Flow<ResultDataModel<String>> =
+    override val selectedLocaleFlow: Flow<Result<String>> =
         localDataSource.selectedLocale.map {
-            ResultDataModel.success(it)
+            Result.success(it)
         }
 
     override val groupsFlow = selectedLocaleFlow.flatMapLatest {
         if (it.data != null) {
             groupsFlow(it.data)
         } else {
-            flowOf(ResultDataModel.error(it.error ?: Exception("Locale id is null")))
+            flowOf(Result.error(it.error ?: Exception("Locale id is null")))
         }
     }
 
-    override val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>> =
+    override val quotesFlow: Flow<Result<List<QuoteModel>>> =
         selectedLocaleFlow.combine(currentGroupFlow) { locale, groupId ->
             if (groupId == null) {
-                flowOf(ResultDataModel.error(Exception("Group id is null")))
+                flowOf(Result.error(Exception("Group id is null")))
             } else {
                 quotesFlow(groupId, locale.data ?: "")
             }
         }.flattenConcat()
 
-    override val localesFlow: Flow<ResultDataModel<List<LocaleDataModel>>> = callbackFlow {
+    override val localesFlow: Flow<Result<List<LocaleModel>>> = callbackFlow {
         val subscription = dbInstance.collection(COLLECTION_LOCALE)
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    trySend(ResultDataModel.error(error))
+                    trySend(Result.error(error))
                     return@addSnapshotListener
                 }
                 value?.let { snapShot ->
-                    val locales = mutableListOf<LocaleDataModel>()
+                    val locales = mutableListOf<LocaleModel>()
                     for (doc in snapShot) {
                         locales.add(doc.toObject())
                     }
-                    trySend(ResultDataModel.success(locales))
+                    trySend(Result.success(locales))
                 }
             }
         awaitClose {
@@ -61,16 +61,16 @@ class CommonGroupsDataSourceImpl  constructor(
         }
     }
 
-    override suspend fun selectLocale(locale: LocaleDataModel): ResultDataModel<String> {
+    override suspend fun selectLocale(locale: LocaleModel): Result<String> {
         localDataSource.setSelectedLocale(locale.id)
-        return ResultDataModel.success(locale.id)
+        return Result.success(locale.id)
     }
 
     override suspend fun selectGroup(groupId: String) {
         currentGroupFlow.value = groupId
     }
 
-    private fun groupsFlow(selectedLocaleId: String): Flow<ResultDataModel<List<GroupDataModel>>> =
+    private fun groupsFlow(selectedLocaleId: String): Flow<Result<List<GroupModel>>> =
         callbackFlow {
             val subscription =
                 dbInstance.collection(COLLECTION_LOCALE)
@@ -78,15 +78,15 @@ class CommonGroupsDataSourceImpl  constructor(
                     .collection(COLLECTION_GROUPS)
                     .addSnapshotListener { value, error ->
                         if (error != null) {
-                            trySend(ResultDataModel.error(error))
+                            trySend(Result.error(error))
                             return@addSnapshotListener
                         }
                         value?.let { snapShot ->
-                            val groups = mutableListOf<GroupDataModel>()
+                            val groups = mutableListOf<GroupModel>()
                             for (doc in snapShot) {
                                 groups.add(doc.toObject())
                             }
-                            trySend(ResultDataModel.success(groups))
+                            trySend(Result.success(groups))
                         }
                     }
             awaitClose {
@@ -98,7 +98,7 @@ class CommonGroupsDataSourceImpl  constructor(
     private fun quotesFlow(
         groupId: String,
         selectedLocaleId: String,
-    ): Flow<ResultDataModel<List<QuoteDataModel>>> =
+    ): Flow<Result<List<QuoteModel>>> =
         callbackFlow {
             val subscription = dbInstance
                 .collection(COLLECTION_LOCALE)
@@ -108,15 +108,15 @@ class CommonGroupsDataSourceImpl  constructor(
                 .collection(COLLECTION_QUOTES)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
-                        trySend(ResultDataModel.error(error))
+                        trySend(Result.error(error))
                         return@addSnapshotListener
                     }
                     value?.let { snapShot ->
-                        val groups = mutableListOf<QuoteDataModel>()
+                        val groups = mutableListOf<QuoteModel>()
                         for (doc in snapShot) {
                             groups.add(doc.toObject())
                         }
-                        trySend(ResultDataModel.success(groups))
+                        trySend(Result.success(groups))
                     }
                 }
             awaitClose {

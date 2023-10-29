@@ -1,9 +1,9 @@
 package com.kovcom.data.mapper
 
-import com.kovcom.data.model.QuoteDataModel
+import com.kovcom.data.model.QuoteModel
 import com.kovcom.domain.model.Quote
 
-fun QuoteDataModel.mapToDomain(selectedQuotes: Set<String>) = Quote(
+fun QuoteModel.mapToDomain(selectedQuotes: Set<String>) = Quote(
     id = id.orEmpty(),
     author = author.orEmpty(),
     created = created.orEmpty(),

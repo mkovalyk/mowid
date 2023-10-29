@@ -1,10 +1,10 @@
 package com.kovcom.data.mapper
 
-import com.kovcom.data.model.GroupDataModel
-import com.kovcom.data.model.SelectedGroupDataModel
+import com.kovcom.data.model.GroupModel
+import com.kovcom.data.model.SelectedGroupModel
 import com.kovcom.domain.model.Group
 
-fun GroupDataModel.mapToDomain(selectedGroups: List<SelectedGroupDataModel>) = Group(
+fun GroupModel.mapToDomain(selectedGroups: List<SelectedGroupModel>) = Group(
     id = id.orEmpty(),
     name = name.orEmpty(),
     description = description.orEmpty(),
@@ -14,10 +14,10 @@ fun GroupDataModel.mapToDomain(selectedGroups: List<SelectedGroupDataModel>) = G
 )
 
 fun calculateSelectedCount(
-    groupDataModel: GroupDataModel,
-    selectedGroups: List<SelectedGroupDataModel>
+    groupModel: GroupModel,
+    selectedGroups: List<SelectedGroupModel>,
 ): Int {
-    selectedGroups.firstOrNull { groupDataModel.id == it.groupId }?.let { group ->
+    selectedGroups.firstOrNull { groupModel.id == it.groupId }?.let { group ->
         return group.selectedQuotesCount ?: 0
     }
     return 0

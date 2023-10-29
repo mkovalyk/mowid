@@ -1,6 +1,6 @@
 package com.kovcom.data.model
 
-data class SelectedGroupDataModel(
+data class SelectedGroupModel(
     val groupId: String? = null,
     val quoteIds: List<String> = emptyList(),
 ) {

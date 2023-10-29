@@ -1,6 +1,6 @@
 package com.kovcom.data.model
 
-data class UserDataModel(
+data class UserModel(
     val token: String = "",
     val id: String = "",
     val fullName: String? = null,

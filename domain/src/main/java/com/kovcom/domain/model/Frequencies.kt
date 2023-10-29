@@ -10,12 +10,12 @@ data class FrequencyModel(
 )
 
 enum class FrequencyType(val id: Long) {
-    ONCE_A_WEEK(168),
-    ONCE_IN_FIVE_DAYS(120),
-    ONCE_IN_TWO_DAYS(48),
-    ONCE_A_DAY(24),
-    TWICE_A_DAY(12),
-    FOURS_A_DAY(6);
+    OnceAWeek(168),
+    OnceInFiveDays(120),
+    OnceInTwoDays(48),
+    OnceADay(24),
+    TwiceADay(12),
+    FoursADay(6);
 
     companion object {
 

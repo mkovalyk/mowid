@@ -1,25 +1,19 @@
 package com.kovcom.data.firebase.source
 
-import com.kovcom.data.model.FrequencyDataModel
-import com.kovcom.data.model.GroupDataModel
-import com.kovcom.data.model.LocaleDataModel
-import com.kovcom.data.model.QuoteDataModel
-import com.kovcom.data.model.ResultDataModel
-import com.kovcom.data.model.SelectedGroupDataModel
-import com.kovcom.data.model.SelectedQuoteDataModel
+import com.kovcom.data.model.*
 import kotlinx.coroutines.flow.Flow
 
 interface CommonGroupsDataSource {
 
-    val groupsFlow: Flow<ResultDataModel<List<GroupDataModel>>>
+    val groupsFlow: Flow<Result<List<GroupModel>>>
 
-    val quotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>>
+    val quotesFlow: Flow<Result<List<QuoteModel>>>
 
-    val selectedLocaleFlow: Flow<ResultDataModel<String>>
+    val selectedLocaleFlow: Flow<Result<String>>
 
-    val localesFlow: Flow<ResultDataModel<List<LocaleDataModel>>>
+    val localesFlow: Flow<Result<List<LocaleModel>>>
 
-    suspend fun selectLocale(locale: LocaleDataModel): ResultDataModel<String>
+    suspend fun selectLocale(locale: LocaleModel): Result<String>
 
     suspend fun selectGroup(groupId: String)
 }
@@ -27,57 +21,57 @@ interface CommonGroupsDataSource {
 
 interface FirebaseDataSource {
 
-    val userGroupsFlow: Flow<ResultDataModel<List<GroupDataModel>>>
+    val userGroupsFlow: Flow<Result<List<GroupModel>>>
 
-    val selectedGroupsFlow: Flow<ResultDataModel<List<SelectedGroupDataModel>>>
+    val selectedGroupsFlow: Flow<Result<List<SelectedGroupModel>>>
 
-    val selectedQuotesFlow: Flow<ResultDataModel<List<SelectedQuoteDataModel>>>
+    val selectedQuotesFlow: Flow<Result<List<SelectedQuoteModel>>>
 
-    val userQuotesFlow: Flow<ResultDataModel<List<QuoteDataModel>>>
+    val userQuotesFlow: Flow<Result<List<QuoteModel>>>
 
-    val frequenciesFlow: Flow<ResultDataModel<List<FrequencyDataModel>>>
+    val frequenciesFlow: Flow<Result<List<FrequencyModel>>>
 
-    val userFrequencyFlow: Flow<ResultDataModel<Long>>
+    val userFrequencyFlow: Flow<Result<Long>>
 
     fun subscribeAllGroupsQuotes(groupId: String)
 
-    suspend fun getSelectedQuotes(): ResultDataModel<List<SelectedQuoteDataModel>>
+    suspend fun getSelectedQuotes(): Result<List<SelectedQuoteModel>>
 
     suspend fun updateSelectedQuote(groupId: String, quoteId: String, shownTime: Long)
 
-    suspend fun saveNewGroup(group: GroupDataModel): ResultDataModel<GroupDataModel>
+    suspend fun saveNewGroup(group: GroupModel): Result<GroupModel>
 
-    suspend fun updateUserFrequency(settingId: Long): ResultDataModel<Long>
+    suspend fun updateUserFrequency(settingId: Long): Result<Long>
 
     suspend fun saveNewQuote(
         groupId: String,
-        quote: QuoteDataModel,
-    ): ResultDataModel<QuoteDataModel>
+        quote: QuoteModel,
+    ): Result<QuoteModel>
 
     suspend fun deleteQuote(
         groupId: String,
         quoteId: String,
         isSelected: Boolean,
-    ): ResultDataModel<String>
+    ): Result<String>
 
     suspend fun deleteGroup(groupId: String)
     suspend fun selectGroup(groupId: String)
 
     suspend fun saveSelection(
-        quote: SelectedQuoteDataModel,
+        quote: SelectedQuoteModel,
         isSelected: Boolean,
-    ): ResultDataModel<SelectedQuoteDataModel>
+    ): Result<SelectedQuoteModel>
 
     suspend fun editQuote(
         groupId: String,
         quoteId: String,
         editedQuote: String,
         editedAuthor: String,
-    ): ResultDataModel<String>
+    ): Result<String>
 
     suspend fun editGroup(
         groupId: String,
         editedName: String,
         editedDescription: String,
-    ): ResultDataModel<String>
+    ): Result<String>
 }

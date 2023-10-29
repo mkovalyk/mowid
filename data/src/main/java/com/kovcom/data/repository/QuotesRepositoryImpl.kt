@@ -91,7 +91,7 @@ class QuotesRepositoryImpl(
 
     override suspend fun addGroup(name: String, description: String) {
         firebaseDataSource.saveNewGroup(
-            GroupDataModel(
+            GroupModel(
                 name = name,
                 description = description,
                 canBeDeleted = true
@@ -103,7 +103,7 @@ class QuotesRepositoryImpl(
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
         firebaseDataSource.saveNewQuote(
             groupId,
-            QuoteDataModel(
+            QuoteModel(
                 id = quoteId,
                 author = author,
                 quote = quote,
@@ -136,7 +136,7 @@ class QuotesRepositoryImpl(
         isSelected: Boolean,
     ) {
         firebaseDataSource.saveSelection(
-            quote = SelectedQuoteDataModel(
+            quote = SelectedQuoteModel(
                 id = quoteId,
                 groupId = groupId,
             ),

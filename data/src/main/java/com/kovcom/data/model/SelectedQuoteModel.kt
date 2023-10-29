@@ -1,6 +1,6 @@
 package com.kovcom.data.model
 
-data class SelectedQuoteDataModel(
+data class SelectedQuoteModel(
     val id: String = "",
     val groupId: String = "",
     val quote: String? = null,

@@ -33,19 +33,19 @@ class FirebaseDataSourceImpl constructor(
         token.data.let { user ->
             if (user == null) {
                 Timber.tag(TAG).w("User is null while getting user groups")
-                flowOf(ResultDataModel.success(emptyList()))
+                flowOf(Result.success(emptyList()))
             } else {
                 userGroups(token = user.token)
             }
         }
     }
 
-    override val selectedGroupsFlow: Flow<ResultDataModel<List<SelectedGroupDataModel>>> =
+    override val selectedGroupsFlow: Flow<Result<List<SelectedGroupModel>>> =
         authDataSource.userFlow.flatMapLatest { userDataModel ->
             userDataModel.data.let { user ->
                 if (user == null) {
                     Timber.tag(TAG).w("User is null while getting user groups")
-                    flowOf(ResultDataModel.success(emptyList()))
+                    flowOf(Result.success(emptyList()))
                 } else {
                     selectedGroups(userId = user.token)
                 }
@@ -64,7 +64,7 @@ class FirebaseDataSourceImpl constructor(
 
     override val frequenciesFlow = frequenciesFlow()
 
-    override val userFrequencyFlow: Flow<ResultDataModel<Long>> = tokenFlow.flatMapLatest {
+    override val userFrequencyFlow: Flow<Result<Long>> = tokenFlow.flatMapLatest {
         userFrequenciesFlow(it)
     }
 
@@ -77,12 +77,12 @@ class FirebaseDataSourceImpl constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun saveNewGroup(group: GroupDataModel): ResultDataModel<GroupDataModel> {
+    override suspend fun saveNewGroup(group: GroupModel): Result<GroupModel> {
         val token = tokenFlow.first()
 
         if (token == null) {
             Timber.tag(TAG).w("Token is null while saving new group: ${group.name}")
-            return ResultDataModel.error(Exception("Token is null"))
+            return Result.error(Exception("Token is null"))
         }
         return suspendCancellableCoroutine { continuation ->
             val uuid = UUID.randomUUID().toString()
@@ -97,38 +97,38 @@ class FirebaseDataSourceImpl constructor(
                     )
                 )
                 .addOnSuccessListener {
-                    continuation.resume(ResultDataModel.success(group)) {}
+                    continuation.resume(Result.success(group)) {}
                 }
                 .addOnFailureListener { exception ->
                     Timber.tag(TAG).e(exception)
-                    continuation.resume(ResultDataModel.error(exception)) {}
+                    continuation.resume(Result.error(exception)) {}
                 }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun updateUserFrequency(settingId: Long): ResultDataModel<Long> {
-        val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
+    override suspend fun updateUserFrequency(settingId: Long): Result<Long> {
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
         return suspendCancellableCoroutine { continuation ->
             dbInstance.collection(COLLECTION_PERSONAL)
                 .document(token)
                 .set(hashMapOf(FREQUENCY_FIELD to settingId))
                 .addOnSuccessListener {
                     localDataSource.setFrequency(settingId)
-                    continuation.resume(ResultDataModel.success(settingId)) {}
+                    continuation.resume(Result.success(settingId)) {}
                 }
                 .addOnFailureListener { exception ->
-                    continuation.resume(ResultDataModel.error(exception)) {}
+                    continuation.resume(Result.error(exception)) {}
                 }
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun saveNewQuote(
-        groupId: String, quote: QuoteDataModel,
-    ): ResultDataModel<QuoteDataModel> {
+        groupId: String, quote: QuoteModel,
+    ): Result<QuoteModel> {
 
-        val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
 
         mutex.withLock {
             return suspendCancellableCoroutine { continuation ->
@@ -141,16 +141,16 @@ class FirebaseDataSourceImpl constructor(
                     .document(uuid)
                     .set(quote.apply { id = uuid })
                     .addOnSuccessListener {
-                        continuation.resume(ResultDataModel.success(quote)) {}
+                        continuation.resume(Result.success(quote)) {}
                     }
                     .addOnFailureListener { exception ->
-                        continuation.resume(ResultDataModel.error(exception)) {}
+                        continuation.resume(Result.error(exception)) {}
                     }
                 currentDocument.get().addOnCompleteListener {
                     if (!it.result.exists()) {
                         dbInstance.collection(COLLECTION_GROUPS).document(groupId).get()
                             .addOnCompleteListener { snapShot ->
-                                val group = snapShot.result.toObject<GroupDataModel>()
+                                val group = snapShot.result.toObject<GroupModel>()
                                 group?.let { model ->
                                     currentDocument.set(
                                         model.copy(
@@ -171,13 +171,13 @@ class FirebaseDataSourceImpl constructor(
         groupId: String,
         quoteId: String,
         isSelected: Boolean,
-    ): ResultDataModel<String> {
+    ): Result<String> {
 
         val token = tokenFlow.first()
 
         if (token == null) {
             Timber.tag(TAG).w("Token is null while deleting quote: $quoteId.")
-            return ResultDataModel.error(Exception("Token is null"))
+            return Result.error(Exception("Token is null"))
         }
 
         return suspendCancellableCoroutine { continuation ->
@@ -192,10 +192,10 @@ class FirebaseDataSourceImpl constructor(
                 .addOnSuccessListener {
                     currentDocument.update(QUOTES_COUNT_FIELD, FieldValue.increment(-1))
                     if (isSelected) removeQuoteFromSelected(groupId, quoteId, token)
-                    continuation.resume(ResultDataModel.success(quoteId))
+                    continuation.resume(Result.success(quoteId))
                 }
                 .addOnFailureListener { exception ->
-                    continuation.resume(ResultDataModel.error(exception))
+                    continuation.resume(Result.error(exception))
                 }
         }
     }
@@ -227,10 +227,10 @@ class FirebaseDataSourceImpl constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun saveSelection(
-        quote: SelectedQuoteDataModel,
+        quote: SelectedQuoteModel,
         isSelected: Boolean,
-    ): ResultDataModel<SelectedQuoteDataModel> {
-        val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
+    ): Result<SelectedQuoteModel> {
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
         val changed = quote.copy(selectedBy = token)
         return suspendCancellableCoroutine { continuation ->
             val currentDocument = dbInstance.collection(COLLECTION_PERSONAL)
@@ -239,13 +239,13 @@ class FirebaseDataSourceImpl constructor(
                 .document(quote.groupId)
             currentDocument.get().addOnCompleteListener {
                 if (it.result.exists()) {
-                    val current = it.result.toObject<SelectedGroupDataModel>()
+                    val current = it.result.toObject<SelectedGroupModel>()
                     if (isSelected) {
                         currentDocument.update(SELECTED_QUOTES_ID_FIELD,
                                                current?.quoteIds.orEmpty().toMutableList().apply {
                                                    add(quote.id)
                                                })
-                        continuation.resume(ResultDataModel.success(quote)) {}
+                        continuation.resume(Result.success(quote)) {}
 //                        currentDocument
 //                            .collection(COLLECTION_SELECTED_QUOTES)
 //                            .document(quote.id)
@@ -269,11 +269,11 @@ class FirebaseDataSourceImpl constructor(
                             current?.quoteIds.orEmpty().toMutableList().apply {
                                 add(quote.id)
                             })
-                        continuation.resume(ResultDataModel.success(quote)) {}
+                        continuation.resume(Result.success(quote)) {}
                     }
                 } else {
                     currentDocument.set(
-                        SelectedGroupDataModel(
+                        SelectedGroupModel(
                             groupId = quote.groupId,
                             quoteIds = listOf(quote.id),
                         )
@@ -290,25 +290,25 @@ class FirebaseDataSourceImpl constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun getSelectedQuotes(): ResultDataModel<List<SelectedQuoteDataModel>> {
-        val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
+    override suspend fun getSelectedQuotes(): Result<List<SelectedQuoteModel>> {
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
 
         return suspendCancellableCoroutine { continuation ->
             dbInstance.collectionGroup(COLLECTION_SELECTED_QUOTES)
                 .whereEqualTo("selectedBy", token)
                 .get()
                 .addOnSuccessListener { task ->
-                    val quotes = mutableListOf<SelectedQuoteDataModel>()
+                    val quotes = mutableListOf<SelectedQuoteModel>()
                     for (doc in task.documents) {
-                        doc.toObject<SelectedQuoteDataModel>()?.let {
+                        doc.toObject<SelectedQuoteModel>()?.let {
                             quotes.add(it)
                         }
                     }
-                    continuation.resume(ResultDataModel.success(quotes)) {}
+                    continuation.resume(Result.success(quotes)) {}
 
                 }
                 .addOnFailureListener { exception ->
-                    continuation.resume(ResultDataModel.error(exception)) {}
+                    continuation.resume(Result.error(exception)) {}
                 }
         }
     }
@@ -335,8 +335,8 @@ class FirebaseDataSourceImpl constructor(
         quoteId: String,
         editedQuote: String,
         editedAuthor: String,
-    ): ResultDataModel<String> {
-        val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
+    ): Result<String> {
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
         mutex.withLock {
             return suspendCancellableCoroutine { continuation ->
                 val updateMap = hashMapOf<String, String>()
@@ -350,10 +350,10 @@ class FirebaseDataSourceImpl constructor(
                     .document(quoteId)
                     .update(updateMap as Map<String, String>)
                     .addOnSuccessListener {
-                        continuation.resume(ResultDataModel.success(quoteId)) {}
+                        continuation.resume(Result.success(quoteId)) {}
                     }
                     .addOnFailureListener { exception ->
-                        continuation.resume(ResultDataModel.error(exception)) {}
+                        continuation.resume(Result.error(exception)) {}
                     }
             }
         }
@@ -364,8 +364,8 @@ class FirebaseDataSourceImpl constructor(
         groupId: String,
         editedName: String,
         editedDescription: String,
-    ): ResultDataModel<String> {
-        val token = tokenFlow.first() ?: return ResultDataModel.error(Exception("Token is null"))
+    ): Result<String> {
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
         mutex.withLock {
             return suspendCancellableCoroutine { continuation ->
                 val updateMap = hashMapOf<String, String>()
@@ -377,10 +377,10 @@ class FirebaseDataSourceImpl constructor(
                     .document(groupId)
                     .update(updateMap as Map<String, String>)
                     .addOnSuccessListener {
-                        continuation.resume(ResultDataModel.success(groupId)) {}
+                        continuation.resume(Result.success(groupId)) {}
                     }
                     .addOnFailureListener { exception ->
-                        continuation.resume(ResultDataModel.error(exception)) {}
+                        continuation.resume(Result.error(exception)) {}
                     }
             }
         }
@@ -409,16 +409,16 @@ class FirebaseDataSourceImpl constructor(
             .collection(COLLECTION_GROUPS)
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    trySend(ResultDataModel.error(error))
+                    trySend(Result.error(error))
                     return@addSnapshotListener
                 }
 
                 value?.let { snapShot ->
-                    val groups = mutableListOf<GroupDataModel>()
+                    val groups = mutableListOf<GroupModel>()
                     for (doc in snapShot) {
                         groups.add(doc.toObject())
                     }
-                    trySend(ResultDataModel.success<List<GroupDataModel>>(groups))
+                    trySend(Result.success<List<GroupModel>>(groups))
                 }
             }
         awaitClose {
@@ -433,17 +433,17 @@ class FirebaseDataSourceImpl constructor(
             .collection(COLLECTION_SELECTION)
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    trySend(ResultDataModel.error(error))
+                    trySend(Result.error(error))
                     return@addSnapshotListener
                 }
 
                 value?.let { snapShot ->
-                    val groups = mutableListOf<SelectedGroupDataModel>()
+                    val groups = mutableListOf<SelectedGroupModel>()
                     for (doc in snapShot) {
                         groups.add(doc.toObject())
                     }
                     Timber.tag(TAG).i("Selected groups: $groups")
-                    trySend(ResultDataModel.success(groups))
+                    trySend(Result.success(groups))
                 }
             }
         awaitClose {
@@ -457,13 +457,13 @@ class FirebaseDataSourceImpl constructor(
     private fun userQuotesFlow(
         groupId: String?,
         token: String?,
-    ): Flow<ResultDataModel<List<QuoteDataModel>>> {
+    ): Flow<Result<List<QuoteModel>>> {
         if (groupId == null) {
-            return flowOf(ResultDataModel.error(Exception("Group id is null")))
+            return flowOf(Result.error(Exception("Group id is null")))
         }
         if (token == null) {
             Timber.tag(TAG).i("Token is null while getting user quotes")
-            return flowOf(ResultDataModel.success(emptyList()))
+            return flowOf(Result.success(emptyList()))
         }
 
         return callbackFlow {
@@ -474,15 +474,15 @@ class FirebaseDataSourceImpl constructor(
                 .collection(COLLECTION_QUOTES)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
-                        trySend(ResultDataModel.error(error))
+                        trySend(Result.error(error))
                         return@addSnapshotListener
                     }
                     value?.let { snapShot ->
-                        val groups = mutableListOf<QuoteDataModel>()
+                        val groups = mutableListOf<QuoteModel>()
                         for (doc in snapShot) {
                             groups.add(doc.toObject())
                         }
-                        trySend(ResultDataModel.success(groups))
+                        trySend(Result.success(groups))
                     }
                 }
             awaitClose {
@@ -495,14 +495,14 @@ class FirebaseDataSourceImpl constructor(
     private fun selectedQuotes(
         groupId: String?,
         token: String?,
-    ): Flow<ResultDataModel<List<SelectedQuoteDataModel>>> {
+    ): Flow<Result<List<SelectedQuoteModel>>> {
         if (groupId == null) {
-            return flowOf(ResultDataModel.error(Exception("Group id is null")))
+            return flowOf(Result.error(Exception("Group id is null")))
         }
 
         if (token == null) {
             Timber.tag(TAG).i("Token is null while getting selected quotes")
-            return flowOf(ResultDataModel.success(emptyList()))
+            return flowOf(Result.success(emptyList()))
         }
 
         return callbackFlow {
@@ -514,16 +514,16 @@ class FirebaseDataSourceImpl constructor(
                     .collection(COLLECTION_SELECTED_QUOTES)
                     .addSnapshotListener { value, error ->
                         if (error != null) {
-                            trySend(ResultDataModel.error(error))
+                            trySend(Result.error(error))
                             return@addSnapshotListener
                         }
                         value?.let {
-                            val selections = mutableListOf<SelectedQuoteDataModel>()
+                            val selections = mutableListOf<SelectedQuoteModel>()
                             for (doc in value) {
                                 selections.add(doc.toObject())
                             }
                             trySend(
-                                ResultDataModel.success(selections)
+                                Result.success(selections)
                             )
                         }
                     }
@@ -538,15 +538,15 @@ class FirebaseDataSourceImpl constructor(
         val subscription = dbInstance.collection(COLLECTION_FREQUENCY)
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    trySend(ResultDataModel.error(error))
+                    trySend(Result.error(error))
                     return@addSnapshotListener
                 }
                 value?.let { snapShot ->
-                    val setting = mutableListOf<FrequencyDataModel>()
+                    val setting = mutableListOf<FrequencyModel>()
                     for (doc in snapShot) {
                         setting.add(doc.toObject())
                     }
-                    trySend(ResultDataModel.success(setting))
+                    trySend(Result.success(setting))
                 }
             }
         awaitClose {
@@ -555,10 +555,10 @@ class FirebaseDataSourceImpl constructor(
         }
     }
 
-    private fun userFrequenciesFlow(token: String?): Flow<ResultDataModel<Long>> {
+    private fun userFrequenciesFlow(token: String?): Flow<Result<Long>> {
         if (token == null) {
             Timber.tag(TAG).w("Token is null while trying to get user frequencies")
-            return flowOf(ResultDataModel.success(-1))
+            return flowOf(Result.success(-1))
         }
 
         return callbackFlow {
@@ -566,12 +566,12 @@ class FirebaseDataSourceImpl constructor(
                 .document(token)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
-                        trySend(ResultDataModel.error(error))
+                        trySend(Result.error(error))
                         return@addSnapshotListener
                     }
                     val frequency = value?.data?.get(FREQUENCY_FIELD) as? Long
                     localDataSource.setFrequency(frequency ?: DEFAULT_FREQUENCY_VALUE)
-                    trySend(ResultDataModel.success(frequency))
+                    trySend(Result.success(frequency))
                 }
             awaitClose {
                 subscription.remove()
