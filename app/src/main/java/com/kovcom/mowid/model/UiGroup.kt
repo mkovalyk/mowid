@@ -1,17 +1,20 @@
 package com.kovcom.mowid.model
 
-import com.kovcom.domain.model.GroupPhraseModel
+import android.os.Parcelable
+import com.kovcom.domain.model.Group
+import kotlinx.parcelize.Parcelize
 
-data class GroupPhraseUIModel(
+@Parcelize
+data class UiGroup(
     val id: String,
     val name: String,
     val description: String,
     val count: Int,
     val selectedCount: Int,
-    val canBeDeleted: Boolean
-)
+    val canBeDeleted: Boolean,
+) : Parcelable
 
-fun GroupPhraseUIModel.toDomainModel() = GroupPhraseModel(
+fun UiGroup.toDomainModel() = Group(
     id = id,
     name = name,
     description = description,
@@ -20,7 +23,7 @@ fun GroupPhraseUIModel.toDomainModel() = GroupPhraseModel(
     canBeDeleted = canBeDeleted
 )
 
-fun GroupPhraseModel.toUIModel() = GroupPhraseUIModel(
+fun Group.toUIModel() = UiGroup(
     id = id,
     name = name,
     description = description,
@@ -29,6 +32,6 @@ fun GroupPhraseModel.toUIModel() = GroupPhraseUIModel(
     canBeDeleted = canBeDeleted
 )
 
-fun List<GroupPhraseUIModel>.toDomainModel() = map { it.toDomainModel() }
+fun List<UiGroup>.toDomainModel() = map { it.toDomainModel() }
 
-fun List<GroupPhraseModel>.toUIModel() = map { it.toUIModel() }
+fun List<Group>.toUIModel() = map { it.toUIModel() }

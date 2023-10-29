@@ -6,16 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -24,11 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
-import com.kovcom.mowid.model.GroupPhraseUIModel
-import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
-import com.kovcom.mowid.ui.composable.AppDropDownMenu
-import com.kovcom.mowid.ui.composable.AppFloatingActionButton
-import com.kovcom.mowid.ui.composable.AppProgress
+import com.kovcom.mowid.model.UiGroup
+import com.kovcom.mowid.ui.composable.*
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffold
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffoldState
 import com.kovcom.mowid.ui.composable.bottomsheet.rememberBottomSheetScaffoldState
@@ -224,7 +213,7 @@ private fun TopBar(showMenu: MutableState<Boolean>, onNavigateToSettings: () -> 
 fun ScreenContentPreview() {
     MoWidTheme {
         val list = listOf(
-            GroupPhraseUIModel(
+            UiGroup(
                 id = "1",
                 name = "Group 0",
                 description = "Description 0",
@@ -232,7 +221,7 @@ fun ScreenContentPreview() {
                 selectedCount = 5,
                 canBeDeleted = true,
             ),
-            GroupPhraseUIModel(
+            UiGroup(
                 id = "2",
                 name = "Group 1",
                 description = "Description 1",
@@ -240,7 +229,7 @@ fun ScreenContentPreview() {
                 selectedCount = 5,
                 canBeDeleted = true,
             ),
-            GroupPhraseUIModel(
+            UiGroup(
                 id = "3",
                 name = "Group 2",
                 description = "Description 2",

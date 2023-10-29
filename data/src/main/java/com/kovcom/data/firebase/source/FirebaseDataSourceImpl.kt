@@ -239,44 +239,51 @@ class FirebaseDataSourceImpl constructor(
                 .document(quote.groupId)
             currentDocument.get().addOnCompleteListener {
                 if (it.result.exists()) {
-                    Timber.tag("FirebaseDataSourceImpl").i("Document exists")
+                    val current = it.result.toObject<SelectedGroupDataModel>()
                     if (isSelected) {
-                        currentDocument
-                            .collection(COLLECTION_SELECTED_QUOTES)
-                            .document(quote.id)
-                            .set(changed)
-                            .addOnSuccessListener {
-                                currentDocument.update(
-                                    SELECTED_QUOTES_COUNT_FIELD,
-                                    FieldValue.increment(1)
-                                )
-                                continuation.resume(ResultDataModel.success(quote)) {}
-                            }
-                            .addOnFailureListener { exception ->
-                                continuation.resume(ResultDataModel.error(exception)) {}
-                            }
+                        currentDocument.update(SELECTED_QUOTES_ID_FIELD,
+                                               current?.quoteIds.orEmpty().toMutableList().apply {
+                                                   add(quote.id)
+                                               })
+                        continuation.resume(ResultDataModel.success(quote)) {}
+//                        currentDocument
+//                            .collection(COLLECTION_SELECTED_QUOTES)
+//                            .document(quote.id)
+//                            .set(changed)
+//                            .addOnSuccessListener {
+//                                currentDocument.update(
+//                                    SELECTED_QUOTES_COUNT_FIELD,
+//                                    FieldValue.increment(1)
+//                                )
+//                            }
+//                            .addOnFailureListener { exception ->
+//                                continuation.resume(ResultDataModel.error(exception)) {}
+//                            }
                     } else {
-                        currentDocument
-                            .collection(COLLECTION_SELECTED_QUOTES)
-                            .document(quote.id)
-                            .delete()
+//                        currentDocument
+//                            .collection(COLLECTION_SELECTED_QUOTES)
+//                            .document(quote.id)
+//                            .delete()
                         currentDocument.update(
-                            SELECTED_QUOTES_COUNT_FIELD,
-                            FieldValue.increment(-1)
-                        )
+                            SELECTED_QUOTES_ID_FIELD,
+                            current?.quoteIds.orEmpty().toMutableList().apply {
+                                add(quote.id)
+                            })
+                        continuation.resume(ResultDataModel.success(quote)) {}
                     }
                 } else {
                     currentDocument.set(
                         SelectedGroupDataModel(
                             groupId = quote.groupId,
-                            selectedQuotesCount = 1
+                            quoteIds = listOf(quote.id),
                         )
-                    ).addOnCompleteListener {
-                        currentDocument
-                            .collection(COLLECTION_SELECTED_QUOTES)
-                            .document(quote.id)
-                            .set(changed)
-                    }
+                    )
+//                        .addOnCompleteListener {
+//                        currentDocument
+//                            .collection(COLLECTION_SELECTED_QUOTES)
+//                            .document(quote.id)
+//                            .set(changed)
+//                    }
                 }
             }
         }
@@ -425,7 +432,6 @@ class FirebaseDataSourceImpl constructor(
             .document(userId)
             .collection(COLLECTION_SELECTION)
             .addSnapshotListener { value, error ->
-                println("selectedGroups: $value")
                 if (error != null) {
                     trySend(ResultDataModel.error(error))
                     return@addSnapshotListener
@@ -436,10 +442,12 @@ class FirebaseDataSourceImpl constructor(
                     for (doc in snapShot) {
                         groups.add(doc.toObject())
                     }
+                    Timber.tag(TAG).i("Selected groups: $groups")
                     trySend(ResultDataModel.success(groups))
                 }
             }
         awaitClose {
+            Timber.tag(TAG).i("Selected groups subscription closed")
             subscription.remove()
             channel.close()
         }
@@ -585,6 +593,7 @@ class FirebaseDataSourceImpl constructor(
         private const val FREQUENCY_FIELD = "frequency"
         private const val SHOWN_AT_FIELD = "shownAt"
         private const val SELECTED_QUOTES_COUNT_FIELD = "selectedQuotesCount"
+        private const val SELECTED_QUOTES_ID_FIELD = "quotesIds"
         private const val QUOTES_COUNT_FIELD = "quotesCount"
         private const val GROUP_NAME_FIELD = "name"
         private const val GROUP_DESCRIPTION_FIELD = "description"

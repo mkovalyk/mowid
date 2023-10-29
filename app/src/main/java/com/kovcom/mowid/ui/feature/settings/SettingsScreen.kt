@@ -24,7 +24,7 @@ import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EFFECTS_KEY
 import com.kovcom.mowid.base.ui.EVENTS_KEY
-import com.kovcom.mowid.model.FrequencyUIModel
+import com.kovcom.mowid.model.UiFrequency
 import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
 import com.kovcom.mowid.ui.composable.AppProgress
 import com.kovcom.mowid.ui.feature.main.MainEvent
@@ -212,7 +212,7 @@ fun Content(
 fun ScreenContentPreview() {
     MoWidTheme {
         val list = listOf(
-            FrequencyUIModel(
+            UiFrequency(
                 frequencyId = 0,
                 value = R.string.once_a_day,
             )
@@ -220,7 +220,7 @@ fun ScreenContentPreview() {
         ScreenContent(
             state = SettingsState(
                 isLoading = false,
-                selectedFrequency = FrequencyUIModel(
+                selectedFrequency = UiFrequency(
                     frequencyId = 0,
                     value = R.string.once_a_day,
                 ),

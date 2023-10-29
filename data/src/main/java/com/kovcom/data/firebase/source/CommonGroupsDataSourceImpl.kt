@@ -2,29 +2,14 @@ package com.kovcom.data.firebase.source
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.kovcom.data.model.GroupDataModel
-import com.kovcom.data.model.LocaleDataModel
-import com.kovcom.data.model.QuoteDataModel
-import com.kovcom.data.model.ResultDataModel
+import com.kovcom.data.model.*
 import com.kovcom.data.preferences.LocalDataSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flattenConcat
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-
 class CommonGroupsDataSourceImpl  constructor(
     private val dbInstance: FirebaseFirestore,
     private val localDataSource: LocalDataSource,

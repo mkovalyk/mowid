@@ -3,12 +3,12 @@ package com.kovcom.mowid.ui.feature.quotes
 import com.kovcom.mowid.base.ui.Effect
 import com.kovcom.mowid.base.ui.Event
 import com.kovcom.mowid.base.ui.State
-import com.kovcom.mowid.model.QuoteUIModel
+import com.kovcom.mowid.model.UiQuote
 
 data class QuotesState(
     val isLoading: Boolean,
     val deleteDialogInfo: DeleteDialogInfo? = null,
-    val quotes: List<QuoteUIModel>,
+    val quotes: List<UiQuote>,
 ) : State
 
 data class DeleteDialogInfo(

@@ -1,17 +1,17 @@
 package com.kovcom.domain.repository
 
-import com.kovcom.domain.model.FrequenciesModel
-import com.kovcom.domain.model.GroupPhraseModel
-import com.kovcom.domain.model.QuoteModel
+import com.kovcom.domain.model.Frequencies
+import com.kovcom.domain.model.Group
+import com.kovcom.domain.model.Quote
 import kotlinx.coroutines.flow.Flow
 
-interface MotivationPhraseRepository {
+interface QuotesRepository {
 
-    fun getGroupsFlow(): Flow<List<GroupPhraseModel>>
+    fun getGroupsFlow(): Flow<List<Group>>
 
-    fun getQuotes(groupId: String): Flow<List<QuoteModel>>
+    fun getQuotes(groupId: String): Flow<List<Quote>>
 
-    fun getFrequencySettingsFlow(): Flow<FrequenciesModel>
+    fun getFrequencySettingsFlow(): Flow<Frequencies>
 
     suspend fun addGroup(name: String, description: String)
 

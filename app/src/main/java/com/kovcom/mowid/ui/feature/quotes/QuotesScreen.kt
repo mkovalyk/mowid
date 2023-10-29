@@ -20,7 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EFFECTS_KEY
 import com.kovcom.mowid.base.ui.EVENTS_KEY
-import com.kovcom.mowid.model.QuoteUIModel
+import com.kovcom.mowid.model.UiQuote
 import com.kovcom.mowid.ui.composable.*
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffold
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffoldState
@@ -278,7 +278,7 @@ fun ScreenContent(
 fun ScreenContentPreview() {
     MoWidTheme {
         val list = listOf(
-            QuoteUIModel(
+            UiQuote(
                 id = "1",
                 author = "Author 1 ",
                 created = "",
@@ -286,7 +286,7 @@ fun ScreenContentPreview() {
                 isSelected = true,
                 canBeDeleted = true,
             ),
-            QuoteUIModel(
+            UiQuote(
                 id = "2",
                 author = "Author 2 ",
                 created = "",
@@ -294,7 +294,7 @@ fun ScreenContentPreview() {
                 isSelected = true,
                 canBeDeleted = true,
             ),
-            QuoteUIModel(
+            UiQuote(
                 id = "3",
                 author = "Author 3 ",
                 created = "",

@@ -6,10 +6,10 @@ import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.data.mapper.mapToDomain
 import com.kovcom.data.mapper.toDomain
 import com.kovcom.data.model.*
-import com.kovcom.domain.model.FrequenciesModel
-import com.kovcom.domain.model.GroupPhraseModel
-import com.kovcom.domain.model.QuoteModel
-import com.kovcom.domain.repository.MotivationPhraseRepository
+import com.kovcom.domain.model.Frequencies
+import com.kovcom.domain.model.Group
+import com.kovcom.domain.model.Quote
+import com.kovcom.domain.repository.QuotesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import timber.log.Timber
@@ -17,12 +17,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class MotivationPhraseRepositoryImpl(
+class QuotesRepositoryImpl(
     private val firebaseDataSource: FirebaseDataSource,
     private val commonGroupsDataSource: CommonGroupsDataSource,
-) : MotivationPhraseRepository {
+) : QuotesRepository {
 
-    override fun getGroupsFlow(): Flow<List<GroupPhraseModel>> = combine(
+    override fun getGroupsFlow(): Flow<List<Group>> = combine(
         commonGroupsDataSource.groupsFlow,
         firebaseDataSource.userGroupsFlow,
         firebaseDataSource.selectedGroupsFlow
@@ -45,7 +45,7 @@ class MotivationPhraseRepositoryImpl(
         }
     }
 
-    override fun getQuotes(groupId: String): Flow<List<QuoteModel>> {
+    override fun getQuotes(groupId: String): Flow<List<Quote>> {
 
         firebaseDataSource.subscribeAllGroupsQuotes(groupId)
         return combine(
@@ -72,7 +72,7 @@ class MotivationPhraseRepositoryImpl(
         }
     }
 
-    override fun getFrequencySettingsFlow(): Flow<FrequenciesModel> {
+    override fun getFrequencySettingsFlow(): Flow<Frequencies> {
         return combine(
             firebaseDataSource.frequenciesFlow,
             firebaseDataSource.userFrequencyFlow

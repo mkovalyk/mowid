@@ -3,37 +3,31 @@ package com.kovcom.mowid.ui.feature.quotes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl.Companion.TAG
-import com.kovcom.domain.interactor.MotivationPhraseInteractor
+import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.model.toUIModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.UUID
 
-class QuotesViewModel  constructor(
-    private val motivationPhraseInteractor: MotivationPhraseInteractor,
+class QuotesViewModel constructor(
+    private val quotesRepository: QuotesRepository,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<QuotesState, QuotesEvent, QuotesEffect>() {
 
     private val groupId = savedStateHandle.get<String>("group_id").orEmpty()
 
     init {
-        motivationPhraseInteractor.getQuotesListFlow(groupId).onStart {
+        quotesRepository.getQuotes(groupId).onStart {
             setState { copy(isLoading = true) }
         }.flowOn(Dispatchers.IO)
             .onEach { data -> setState { copy(isLoading = false, quotes = data.toUIModel()) } }
             .onCompletion { setState { copy(isLoading = false) } }
             .catch {
                 Timber.tag(TAG).e(it)
-                QuotesEffect.ShowError(
-                    message = it.message.toString()
-                )
+                QuotesEffect.ShowError(message = it.message.toString())
                     .sendEffect()
             }
             .launchIn(viewModelScope)
@@ -41,16 +35,21 @@ class QuotesViewModel  constructor(
 
     private fun deleteQuote(quoteId: String, isSelected: Boolean) {
         viewModelScope.launch {
-            motivationPhraseInteractor.deleteQuote(groupId, quoteId, isSelected)
+            quotesRepository.deleteQuote(groupId, quoteId, isSelected)
         }
     }
 
     override fun handleEvent(event: QuotesEvent) {
         when (event) {
             is QuotesEvent.AddQuoteClicked -> {
+
+                val quoteId = UUID.randomUUID().toString()
                 viewModelScope.launch {
-                    motivationPhraseInteractor.addQuote(
-                        groupId = groupId, quote = event.quote, author = event.author
+                    quotesRepository.addQuote(
+                        groupId = groupId,
+                        quote = event.quote,
+                        author = event.author,
+                        quoteId = quoteId,
                     )
                 }
             }
@@ -58,11 +57,11 @@ class QuotesViewModel  constructor(
             QuotesEvent.HideQuoteModal -> {}
             is QuotesEvent.QuoteItemChecked -> {
                 viewModelScope.launch {
-                    motivationPhraseInteractor.saveSelection(
+                    quotesRepository.saveSelection(
                         groupId = groupId,
                         quoteId = event.quoteId,
-                        quote = event.quote,
-                        author = event.author,
+//                        quote = event.quote,
+//                        author = event.author,
                         isSelected = event.checked
                     )
                 }
@@ -73,7 +72,7 @@ class QuotesViewModel  constructor(
             is QuotesEvent.OnItemDeleted -> deleteQuote(event.id, event.isSelected)
             is QuotesEvent.OnEditClicked -> {
                 viewModelScope.launch {
-                    motivationPhraseInteractor.editQuote(
+                    quotesRepository.editQuote(
                         groupId = groupId,
                         quoteId = event.id,
                         editedQuote = event.editedQuote,

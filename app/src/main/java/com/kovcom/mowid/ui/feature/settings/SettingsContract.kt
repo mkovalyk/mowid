@@ -4,14 +4,14 @@ import androidx.annotation.StringRes
 import com.kovcom.mowid.base.ui.Effect
 import com.kovcom.mowid.base.ui.Event
 import com.kovcom.mowid.base.ui.State
-import com.kovcom.mowid.model.FrequencyUIModel
-import com.kovcom.mowid.model.UserUIModel
+import com.kovcom.mowid.model.UiFrequency
+import com.kovcom.mowid.model.UiUser
 
 data class SettingsState(
     val isLoading: Boolean,
-    val selectedFrequency: FrequencyUIModel?,
-    val frequencies: List<FrequencyUIModel>,
-    val userModel: UserUIModel?
+    val selectedFrequency: UiFrequency?,
+    val frequencies: List<UiFrequency>,
+    val userModel: UiUser?,
 ) : State
 
 sealed class SettingsEvent : Event {

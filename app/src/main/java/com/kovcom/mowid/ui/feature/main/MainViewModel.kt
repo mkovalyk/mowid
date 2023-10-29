@@ -3,7 +3,7 @@ package com.kovcom.mowid.ui.feature.main
 import androidx.core.app.ComponentActivity
 import androidx.lifecycle.viewModelScope
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.kovcom.domain.interactor.UserInteractor
+import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.ui.worker.ExecutionOption
@@ -11,8 +11,8 @@ import com.kovcom.mowid.ui.worker.QuotesWorkerManager
 import kotlinx.coroutines.launch
 
 class MainViewModel  constructor(
-    private val interactor: UserInteractor,
     private val workerManager: QuotesWorkerManager,
+    private val userRepository: UserRepository,
 ) : BaseViewModel<MainState, MainEvent, MainEffect>() {
 
     override fun createInitialState(): MainState = MainState.Loading(state = false)
@@ -21,7 +21,7 @@ class MainViewModel  constructor(
 
     fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
         if (result.resultCode == ComponentActivity.RESULT_OK) {
-            interactor.signInSuccess()
+            userRepository.signInSuccess()
             viewModelScope.launch {
                 workerManager.execute(ExecutionOption.Regular)
             }
@@ -32,7 +32,7 @@ class MainViewModel  constructor(
     }
 
     fun signOutSuccess() {
-        interactor.signOutSuccess()
+        userRepository.signOutSuccess()
     }
 
     fun navigateToQuote(groupId: String, quoteId: String) {

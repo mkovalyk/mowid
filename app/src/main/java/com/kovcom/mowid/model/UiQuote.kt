@@ -1,17 +1,20 @@
 package com.kovcom.mowid.model
 
-import com.kovcom.domain.model.QuoteModel
+import android.os.Parcelable
+import com.kovcom.domain.model.Quote
+import kotlinx.parcelize.Parcelize
 
-data class QuoteUIModel(
+@Parcelize
+data class UiQuote(
     val id: String,
     val author: String,
     val created: String,
     val quote: String,
     val canBeDeleted: Boolean,
-    val isSelected: Boolean
-)
+    val isSelected: Boolean,
+) : Parcelable
 
-fun QuoteUIModel.toDomainModel() = QuoteModel(
+fun UiQuote.toDomainModel() = Quote(
     id = id,
     author = author,
     created = created,
@@ -20,7 +23,7 @@ fun QuoteUIModel.toDomainModel() = QuoteModel(
     canBeDeleted = canBeDeleted
 )
 
-fun QuoteModel.toUIModel() = QuoteUIModel(
+fun Quote.toUIModel() = UiQuote(
     id = id,
     author = author,
     created = created,
@@ -29,6 +32,6 @@ fun QuoteModel.toUIModel() = QuoteUIModel(
     canBeDeleted = canBeDeleted
 )
 
-fun List<QuoteUIModel>.toDomainModel() = map { it.toDomainModel() }
+fun List<UiQuote>.toDomainModel() = map { it.toDomainModel() }
 
-fun List<QuoteModel>.toUIModel() = map { it.toUIModel() }
+fun List<Quote>.toUIModel() = map { it.toUIModel() }

@@ -1,15 +1,15 @@
 package com.kovcom.domain.model
 
-data class FrequenciesModel(
+data class Frequencies(
     val selectedFrequency: FrequencyModel?,
-    val frequencies: List<FrequencyModel>
+    val frequencies: List<FrequencyModel>,
 )
 
 data class FrequencyModel(
-    val frequency: Frequency,
+    val frequency: FrequencyType,
 )
 
-enum class Frequency(val id: Long) {
+enum class FrequencyType(val id: Long) {
     ONCE_A_WEEK(168),
     ONCE_IN_FIVE_DAYS(120),
     ONCE_IN_TWO_DAYS(48),
@@ -18,6 +18,7 @@ enum class Frequency(val id: Long) {
     FOURS_A_DAY(6);
 
     companion object {
-        fun getById(id: Long): Frequency = values().first { it.id == id }
+
+        fun getById(id: Long): FrequencyType = values().first { it.id == id }
     }
 }

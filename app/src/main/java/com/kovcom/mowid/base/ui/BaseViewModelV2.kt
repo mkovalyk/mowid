@@ -2,22 +2,9 @@ package com.kovcom.mowid.base.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import kotlin.system.measureTimeMillis
 
@@ -49,7 +36,7 @@ abstract class BaseViewModelV2<
     private val _event: MutableSharedFlow<UiEvent> = MutableSharedFlow()
     val event = _event.asSharedFlow()
 
-    protected val shouldLog = true
+    protected open val shouldLog = true
 
     abstract fun tag(): String
     abstract fun createInitialState(): UiState

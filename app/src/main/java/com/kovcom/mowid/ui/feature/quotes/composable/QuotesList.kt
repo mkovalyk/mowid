@@ -11,16 +11,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kovcom.mowid.model.QuoteUIModel
+import com.kovcom.mowid.model.UiQuote
 import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun QuotesList(
-    quotes: List<QuoteUIModel>,
+    quotes: List<UiQuote>,
     onCheckedChange: (String, Boolean) -> Unit,
     onItemDeleted: (String, Boolean) -> Unit,
-    onEdit: (id: String, quote: String, author: String) -> Unit
+    onEdit: (id: String, quote: String, author: String) -> Unit,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = 48.dp)
@@ -74,7 +74,7 @@ fun QuotesListPreview() {
     MoWidTheme {
         QuotesList(
             listOf(
-                QuoteUIModel(
+                UiQuote(
                     id = "1",
                     author = "Author 1 ",
                     created = "",
@@ -82,7 +82,7 @@ fun QuotesListPreview() {
                     isSelected = true,
                     canBeDeleted = true,
                 ),
-                QuoteUIModel(
+                UiQuote(
                     id = "2",
                     author = "Author 2 ",
                     created = "",
@@ -90,7 +90,7 @@ fun QuotesListPreview() {
                     isSelected = true,
                     canBeDeleted = true,
                 ),
-                QuoteUIModel(
+                UiQuote(
                     id = "3",
                     author = "Author 3 ",
                     created = "",

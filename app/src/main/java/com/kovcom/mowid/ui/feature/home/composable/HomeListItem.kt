@@ -11,14 +11,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kovcom.mowid.model.GroupPhraseUIModel
+import com.kovcom.mowid.model.UiGroup
 import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun HomeListItem(
-    groupPhrase: GroupPhraseUIModel,
-    onClick: (groupPhrase: GroupPhraseUIModel) -> Unit,
-    onEdit: (id: String, name: String, description: String) -> Unit
+    groupPhrase: UiGroup,
+    onClick: (groupPhrase: UiGroup) -> Unit,
+    onEdit: (id: String, name: String, description: String) -> Unit,
 ) {
 
     Row(
@@ -75,7 +75,7 @@ fun HomeListItem(
 fun HomeListItemPreview() {
     MoWidTheme {
         HomeListItem(
-            GroupPhraseUIModel(
+            UiGroup(
                 id = "1",
                 name = "Group 0",
                 description = "Description 0",

@@ -18,12 +18,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kovcom.mowid.model.QuoteUIModel
+import com.kovcom.mowid.model.UiQuote
 import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun QuoteListItem(
-    quote: QuoteUIModel,
+    quote: UiQuote,
     onCheckChanged: (String, Boolean) -> Unit,
     onEdit: (id: String, quote: String, author: String) -> Unit,
 ) {
@@ -42,7 +42,7 @@ fun QuoteListItem(
 
 @Composable
 fun QuoteListItem(
-    quote: QuoteUIModel,
+    quote: UiQuote,
     checked: Boolean,
     onCheckChanged: (String, Boolean) -> Unit,
     onEdit: (id: String, quote: String, author: String) -> Unit,
@@ -99,7 +99,7 @@ fun QuoteListItem(
 fun QuoteListItemPreview() {
     MoWidTheme {
         QuoteListItem(
-            QuoteUIModel(
+            UiQuote(
                 id = "1",
                 author = "Author",
                 created = "",
@@ -119,7 +119,7 @@ fun QuoteListItemPreview() {
 fun QuoteListItemLongPreview() {
     MoWidTheme {
         QuoteListItem(
-            QuoteUIModel(
+            UiQuote(
                 id = "1",
                 author = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore ",
                 created = "",

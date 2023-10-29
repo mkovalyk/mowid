@@ -11,15 +11,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kovcom.mowid.model.GroupPhraseUIModel
+import com.kovcom.mowid.model.UiGroup
 import com.kovcom.mowid.ui.feature.quotes.composable.SwipeToDeleteBackground
 import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeList(
-    groupPhraseList: List<GroupPhraseUIModel>,
-    onClick: (groupPhrase: GroupPhraseUIModel) -> Unit,
+    groupPhraseList: List<UiGroup>,
+    onClick: (groupPhrase: UiGroup) -> Unit,
     onDelete: (id: String, name: String) -> Unit,
     onEdit: (id: String, name: String, description: String) -> Unit,
     modifier: Modifier = Modifier,
@@ -73,7 +73,7 @@ fun HomeListPreview() {
     MoWidTheme {
         HomeList(
             listOf(
-                GroupPhraseUIModel(
+                UiGroup(
                     id = "1",
                     name = "Group 0",
                     description = "Description 0",
@@ -81,7 +81,7 @@ fun HomeListPreview() {
                     selectedCount = 5,
                     canBeDeleted = true,
                 ),
-                GroupPhraseUIModel(
+                UiGroup(
                     id = "2",
                     name = "Group 1",
                     description = "Description 1",
@@ -89,7 +89,7 @@ fun HomeListPreview() {
                     selectedCount = 5,
                     canBeDeleted = true,
                 ),
-                GroupPhraseUIModel(
+                UiGroup(
                     id = "3",
                     name = "Group 2",
                     description = "Description 2",

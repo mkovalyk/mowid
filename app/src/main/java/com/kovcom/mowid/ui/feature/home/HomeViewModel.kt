@@ -1,21 +1,10 @@
 package com.kovcom.mowid.ui.feature.home
 
-import com.kovcom.domain.repository.MotivationPhraseRepository
+import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
-import com.kovcom.mowid.base.ui.BaseViewModelV2
-import com.kovcom.mowid.base.ui.IntentProcessor
-import com.kovcom.mowid.base.ui.Publisher
-import com.kovcom.mowid.base.ui.Reducer
+import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.model.toUIModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 
 class HomeViewModel constructor(
     intentProcessor: HomeIntentProcessor,
@@ -38,7 +27,7 @@ class HomeViewModel constructor(
 }
 
 class HomeIntentProcessor constructor(
-    private val phraseRepository: MotivationPhraseRepository,
+    private val phraseRepository: QuotesRepository,
     private val userRepository: UserRepository,
 ) : IntentProcessor<HomeState, HomeUserIntent, HomeEffect> {
 

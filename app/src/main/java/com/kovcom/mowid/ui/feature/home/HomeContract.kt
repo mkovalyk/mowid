@@ -1,15 +1,12 @@
 package com.kovcom.mowid.ui.feature.home
 
-import com.kovcom.domain.model.GroupPhraseModel
-import com.kovcom.mowid.base.ui.Effect
-import com.kovcom.mowid.base.ui.Event
-import com.kovcom.mowid.base.ui.State
-import com.kovcom.mowid.base.ui.UserIntent
-import com.kovcom.mowid.model.GroupPhraseUIModel
+import com.kovcom.domain.model.Group
+import com.kovcom.mowid.base.ui.*
+import com.kovcom.mowid.model.UiGroup
 
 data class HomeState(
     val isLoading: Boolean,
-    val groupPhraseList: List<GroupPhraseUIModel>,
+    val groupPhraseList: List<UiGroup>,
     val isLoggedIn: Boolean,
 ) : State
 
@@ -17,7 +14,7 @@ sealed interface HomeUserIntent : UserIntent {
     object Load : HomeUserIntent
     object AddClicked : HomeUserIntent
     data class AddGroupClicked(val name: String, val description: String) : HomeUserIntent
-    data class GroupItemClicked(val groupPhrase: GroupPhraseUIModel) : HomeUserIntent
+    data class GroupItemClicked(val groupPhrase: UiGroup) : HomeUserIntent
     object HideGroupModal : HomeUserIntent
     data class OnEditClicked(
         val id: String,
@@ -42,19 +39,19 @@ sealed interface HomeEvent : Event {
     object ShowLoginScreen : HomeEvent
     data class ShowError(val message: String) : HomeEvent
     data class ShowSnackbar(val message: String) : HomeEvent
-    data class ItemClicked(val groupPhrase: GroupPhraseUIModel) : HomeEvent
+    data class ItemClicked(val groupPhrase: UiGroup) : HomeEvent
     data class ShowRemoveConfirmationDialog(val id: String, val name: String) : HomeEvent
 }
 
 sealed interface HomeEffect : Effect {
     data class Loading(val isLoading: Boolean) : HomeEffect
-    data class Loaded(val information: List<GroupPhraseModel>) : HomeEffect
+    data class Loaded(val information: List<Group>) : HomeEffect
     data class ShowError(val message: String) : HomeEffect
     data class UserLoaded(val isLoggedIn: Boolean) : HomeEffect
     data class ShowEditGroupModal(val id: String, val name: String, val description: String) :
         HomeEffect
 
-    data class OpenDetails(val groupPhrase: GroupPhraseUIModel) : HomeEffect
+    data class OpenDetails(val groupPhrase: UiGroup) : HomeEffect
     data class RemoveGroup(val id: String, val name: String) : HomeEffect
     data class RemoveGroupConfirmed(val name: String) : HomeEffect
     object ShowAddGroupModel : HomeEffect

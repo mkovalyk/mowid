@@ -11,9 +11,9 @@ import com.kovcom.data.di.Const.LOCAL_DATA_STORE
 import com.kovcom.data.firebase.source.*
 import com.kovcom.data.preferences.LocalDataSource
 import com.kovcom.data.preferences.impl.LocalDataSourceImpl
-import com.kovcom.data.repository.MotivationPhraseRepositoryImpl
+import com.kovcom.data.repository.QuotesRepositoryImpl
 import com.kovcom.data.repository.UserRepositoryImpl
-import com.kovcom.domain.repository.MotivationPhraseRepository
+import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
@@ -46,8 +46,8 @@ val dataModule = module {
         androidContext().getSharedPreferences("TestPrefs", android.content.Context.MODE_PRIVATE)
     }
 
-    single<MotivationPhraseRepository> {
-        MotivationPhraseRepositoryImpl(
+    single<QuotesRepository> {
+        QuotesRepositoryImpl(
             get<FirebaseDataSource>(),
             get<CommonGroupsDataSource>()
         )

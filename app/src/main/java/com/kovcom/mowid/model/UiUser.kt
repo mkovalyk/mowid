@@ -1,14 +1,14 @@
 package com.kovcom.mowid.model
 
-import com.kovcom.domain.model.UserModel
+import com.kovcom.domain.model.User
 
-data class UserUIModel(
+data class UiUser(
     val token: String,
     val fullName: String,
     val email: String,
 )
 
-fun UserModel.toUIModel() = UserUIModel(
+fun User.toUIModel() = UiUser(
     token = token,
     fullName = fullName,
     email = email

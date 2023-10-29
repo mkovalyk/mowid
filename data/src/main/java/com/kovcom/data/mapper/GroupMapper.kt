@@ -2,9 +2,9 @@ package com.kovcom.data.mapper
 
 import com.kovcom.data.model.GroupDataModel
 import com.kovcom.data.model.SelectedGroupDataModel
-import com.kovcom.domain.model.GroupPhraseModel
+import com.kovcom.domain.model.Group
 
-fun GroupDataModel.mapToDomain(selectedGroups: List<SelectedGroupDataModel>) = GroupPhraseModel(
+fun GroupDataModel.mapToDomain(selectedGroups: List<SelectedGroupDataModel>) = Group(
     id = id.orEmpty(),
     name = name.orEmpty(),
     description = description.orEmpty(),

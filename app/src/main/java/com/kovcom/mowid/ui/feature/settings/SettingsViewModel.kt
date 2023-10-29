@@ -1,8 +1,8 @@
 package com.kovcom.mowid.ui.feature.settings
 
 import androidx.lifecycle.viewModelScope
-import com.kovcom.domain.interactor.MotivationPhraseInteractor
-import com.kovcom.domain.interactor.UserInteractor
+import com.kovcom.domain.repository.QuotesRepository
+import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.model.toUIModel
@@ -12,15 +12,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class SettingsViewModel (
+class SettingsViewModel(
     private val quotesWorkerManager: QuotesWorkerManager,
-    private val interactor: MotivationPhraseInteractor,
-    private val userInteractor: UserInteractor
+    private val repository: QuotesRepository,
+    private val userRepository: UserRepository,
 ) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>() {
 
     init {
-        interactor.getFrequencySettingsFlow()
-            .combine(userInteractor.getUserFlow()) { frequency, user ->
+        repository.getFrequencySettingsFlow()
+            .combine(userRepository.getUserFlow()) { frequency, user ->
                 frequency to user
             }
             .onStart {
@@ -52,13 +52,14 @@ class SettingsViewModel (
         when (event) {
             is SettingsEvent.OnFrequencyChanged -> {
                 viewModelScope.launch {
-                    interactor.updateUserFrequency(event.id)
+                    repository.updateUserFrequency(event.id)
                     quotesWorkerManager.execute(ExecutionOption.Regular)
                     SettingsEffect.ShowToastId(
                         messageId = R.string.label_applied
                     ).sendEffect()
                 }
             }
+
             SettingsEvent.BackButtonClicked -> {}
         }
     }
