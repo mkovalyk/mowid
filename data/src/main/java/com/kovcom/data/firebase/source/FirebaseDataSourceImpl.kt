@@ -47,15 +47,10 @@ class FirebaseDataSourceImpl constructor(
                     Timber.tag(TAG).w("User is null while getting user groups")
                     flowOf(Result.success(emptyList()))
                 } else {
-                    selectedGroups(userId = user.token)
+                    selectedGroups
                 }
             }
         }
-
-    override val selectedQuotesFlow =
-        currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
-            selectedQuotes(groupId, token.data?.token)
-        }.flattenMerge(1)
 
     override val userQuotesFlow =
         currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
@@ -225,67 +220,45 @@ class FirebaseDataSourceImpl constructor(
         currentGroupFlow.emit(groupId)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun saveSelection(
         quote: SelectedQuoteModel,
         isSelected: Boolean,
     ): Result<SelectedQuoteModel> {
         val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
-        val changed = quote.copy(selectedBy = token)
         return suspendCancellableCoroutine { continuation ->
             val currentDocument = dbInstance.collection(COLLECTION_PERSONAL)
                 .document(token)
                 .collection(COLLECTION_SELECTION)
                 .document(quote.groupId)
-            currentDocument.get().addOnCompleteListener {
-                if (it.result.exists()) {
-                    val current = it.result.toObject<SelectedGroupModel>()
-                    if (isSelected) {
-                        currentDocument.update(SELECTED_QUOTES_ID_FIELD,
-                                               current?.quoteIds.orEmpty().toMutableList().apply {
-                                                   add(quote.id)
-                                               })
+            currentDocument.get()
+                .addOnCompleteListener {
+                    if (it.result.exists()) {
+                        val current = it.result.toObject<SelectedGroupModel>()
+                        val collection = current?.quotesIds.orEmpty().toMutableSet()
+                            .let { items ->
+                                if (isSelected) {
+                                    items.add(quote.id)
+                                } else {
+                                    items.remove(quote.id)
+                                }
+                                items.toList()
+                            }
+                        Timber.tag(TAG).i("Current group: $current")
+                        if (isSelected) {
+                            currentDocument.update(SELECTED_QUOTES_ID_FIELD, collection)
+                        } else {
+                            currentDocument.update(SELECTED_QUOTES_ID_FIELD, collection)
+                        }
                         continuation.resume(Result.success(quote)) {}
-//                        currentDocument
-//                            .collection(COLLECTION_SELECTED_QUOTES)
-//                            .document(quote.id)
-//                            .set(changed)
-//                            .addOnSuccessListener {
-//                                currentDocument.update(
-//                                    SELECTED_QUOTES_COUNT_FIELD,
-//                                    FieldValue.increment(1)
-//                                )
-//                            }
-//                            .addOnFailureListener { exception ->
-//                                continuation.resume(ResultDataModel.error(exception)) {}
-//                            }
                     } else {
-//                        currentDocument
-//                            .collection(COLLECTION_SELECTED_QUOTES)
-//                            .document(quote.id)
-//                            .delete()
-                        currentDocument.update(
-                            SELECTED_QUOTES_ID_FIELD,
-                            current?.quoteIds.orEmpty().toMutableList().apply {
-                                add(quote.id)
-                            })
-                        continuation.resume(Result.success(quote)) {}
-                    }
-                } else {
-                    currentDocument.set(
-                        SelectedGroupModel(
-                            groupId = quote.groupId,
-                            quoteIds = listOf(quote.id),
+                        currentDocument.set(
+                            SelectedGroupModel(
+                                groupId = quote.groupId,
+                                quotesIds = listOf(quote.id),
+                            )
                         )
-                    )
-//                        .addOnCompleteListener {
-//                        currentDocument
-//                            .collection(COLLECTION_SELECTED_QUOTES)
-//                            .document(quote.id)
-//                            .set(changed)
-//                    }
+                    }
                 }
-            }
         }
     }
 
@@ -366,23 +339,21 @@ class FirebaseDataSourceImpl constructor(
         editedDescription: String,
     ): Result<String> {
         val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
-        mutex.withLock {
-            return suspendCancellableCoroutine { continuation ->
-                val updateMap = hashMapOf<String, String>()
-                updateMap[GROUP_NAME_FIELD] = editedName
-                updateMap[GROUP_DESCRIPTION_FIELD] = editedDescription
-                dbInstance.collection(COLLECTION_PERSONAL)
-                    .document(token)
-                    .collection(COLLECTION_GROUPS)
-                    .document(groupId)
-                    .update(updateMap as Map<String, String>)
-                    .addOnSuccessListener {
-                        continuation.resume(Result.success(groupId)) {}
-                    }
-                    .addOnFailureListener { exception ->
-                        continuation.resume(Result.error(exception)) {}
-                    }
-            }
+        return suspendCancellableCoroutine { continuation ->
+            val updateMap = hashMapOf<String, String>()
+            updateMap[GROUP_NAME_FIELD] = editedName
+            updateMap[GROUP_DESCRIPTION_FIELD] = editedDescription
+            dbInstance.collection(COLLECTION_PERSONAL)
+                .document(token)
+                .collection(COLLECTION_GROUPS)
+                .document(groupId)
+                .update(updateMap as Map<String, String>)
+                .addOnSuccessListener {
+                    continuation.resume(Result.success(groupId)) {}
+                }
+                .addOnFailureListener { exception ->
+                    continuation.resume(Result.error(exception)) {}
+                }
         }
     }
 
@@ -427,29 +398,32 @@ class FirebaseDataSourceImpl constructor(
         }
     }
 
-    private fun selectedGroups(userId: String) = callbackFlow {
-        val subscription = dbInstance.collection(COLLECTION_PERSONAL)
-            .document(userId)
-            .collection(COLLECTION_SELECTION)
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    trySend(Result.error(error))
-                    return@addSnapshotListener
-                }
-
-                value?.let { snapShot ->
-                    val groups = mutableListOf<SelectedGroupModel>()
-                    for (doc in snapShot) {
-                        groups.add(doc.toObject())
+    private val selectedGroups = tokenFlow.flatMapLatest {
+        callbackFlow {
+            Timber.tag(TAG).i("Selected groups subscription started")
+            val subscription = dbInstance.collection(COLLECTION_PERSONAL)
+                .document(it.orEmpty())
+                .collection(COLLECTION_SELECTION)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        trySend(Result.error(error))
+                        return@addSnapshotListener
                     }
-                    Timber.tag(TAG).i("Selected groups: $groups")
-                    trySend(Result.success(groups))
+
+                    value?.let { snapShot ->
+                        val groups = mutableListOf<SelectedGroupModel>()
+                        for (doc in snapShot) {
+                            groups.add(doc.toObject())
+                        }
+                        Timber.tag(TAG).i("Selected groups: $groups")
+                        trySend(Result.success(groups))
+                    }
                 }
+            awaitClose {
+                Timber.tag(TAG).i("Selected groups subscription closed")
+                subscription.remove()
+                channel.close()
             }
-        awaitClose {
-            Timber.tag(TAG).i("Selected groups subscription closed")
-            subscription.remove()
-            channel.close()
         }
     }
 
@@ -485,48 +459,6 @@ class FirebaseDataSourceImpl constructor(
                         trySend(Result.success(groups))
                     }
                 }
-            awaitClose {
-                subscription.remove()
-                channel.close()
-            }
-        }
-    }
-
-    private fun selectedQuotes(
-        groupId: String?,
-        token: String?,
-    ): Flow<Result<List<SelectedQuoteModel>>> {
-        if (groupId == null) {
-            return flowOf(Result.error(Exception("Group id is null")))
-        }
-
-        if (token == null) {
-            Timber.tag(TAG).i("Token is null while getting selected quotes")
-            return flowOf(Result.success(emptyList()))
-        }
-
-        return callbackFlow {
-            val subscription =
-                dbInstance.collection(COLLECTION_PERSONAL)
-                    .document(token)
-                    .collection(COLLECTION_SELECTION)
-                    .document(groupId)
-                    .collection(COLLECTION_SELECTED_QUOTES)
-                    .addSnapshotListener { value, error ->
-                        if (error != null) {
-                            trySend(Result.error(error))
-                            return@addSnapshotListener
-                        }
-                        value?.let {
-                            val selections = mutableListOf<SelectedQuoteModel>()
-                            for (doc in value) {
-                                selections.add(doc.toObject())
-                            }
-                            trySend(
-                                Result.success(selections)
-                            )
-                        }
-                    }
             awaitClose {
                 subscription.remove()
                 channel.close()

@@ -3,8 +3,7 @@ package com.kovcom.data.firebase.source
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.kovcom.data.model.Result
-import com.kovcom.data.model.UserModel
+import com.kovcom.data.model.*
 import com.kovcom.data.preferences.LocalDataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
@@ -13,23 +12,24 @@ import kotlinx.coroutines.flow.callbackFlow
 import java.util.UUID
 import kotlin.coroutines.CoroutineContext
 
-class AuthDataSourceImpl  constructor(
+class AuthDataSourceImpl constructor(
     private val dbInstance: FirebaseFirestore,
     private val authInstance: FirebaseAuth,
     private val localDataSource: LocalDataSource,
 ) : AuthDataSource, CoroutineScope {
 
-    override val userFlow: Flow<Result<UserModel>> = callbackFlow {
+    override val userFlow: Flow<Result2<UserModel>> = callbackFlow {
         val subscription = dbInstance
             .collection(COLLECTION_USER)
             .document(authInstance.currentUser?.uid ?: "_")
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    trySend(Result.error(error))
+                    trySend(Result2.Error(error))
                     return@addSnapshotListener
                 }
-                val userModel = value?.toObject<UserModel>()
-                trySend(Result.success(userModel))
+                value?.toObject<UserModel>()?.let {
+                    trySend(Result2.Success(it))
+                }
             }
 
         awaitClose {

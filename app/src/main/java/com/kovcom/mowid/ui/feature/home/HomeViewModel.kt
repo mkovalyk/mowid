@@ -14,7 +14,7 @@ class HomeViewModel constructor(
     intentProcessor,
     reducer,
     publisher,
-    initialUserIntent = HomeUserIntent.Load,
+    alwaysOnFlows = listOf(intentProcessor.devicesFlow, intentProcessor.userFlow),
 ) {
 
     override fun createInitialState(): HomeState = HomeState(
@@ -31,8 +31,24 @@ class HomeIntentProcessor constructor(
     private val userRepository: UserRepository,
 ) : IntentProcessor<HomeState, HomeUserIntent, HomeEffect> {
 
+    val userFlow = userRepository.getUserFlow().map {
+        HomeEffect.UserLoaded(isLoggedIn = it != null)
+    }
+
+    val devicesFlow: Flow<HomeEffect> =
+        phraseRepository.getGroupsFlow()
+            .flatMapLatest {
+                flowOf(HomeEffect.Loading(false), HomeEffect.Loaded(it))
+            }
+            .onStart { emit(HomeEffect.Loading(true)) }
+            .catch {
+                emit(HomeEffect.Loading(false))
+                emit(HomeEffect.ShowError("Error: $it"))
+            }
+            .distinctUntilChanged()
+
     override suspend fun processIntent(intent: HomeUserIntent, currentState: HomeState): Flow<HomeEffect> {
-        val effect = when (intent) {
+        return when (intent) {
             is HomeUserIntent.AddClicked -> {
                 if (currentState.isLoggedIn) {
                     flowOf(HomeEffect.ShowAddGroupModel)
@@ -56,20 +72,6 @@ class HomeIntentProcessor constructor(
                 emit(HomeEffect.OpenDetails(intent.groupPhrase))
             }
 
-            is HomeUserIntent.Load -> flow {
-                phraseRepository.getGroupsFlow()
-                    .onEach { emit(HomeEffect.Loaded(it)) }
-                    .onStart { emit(HomeEffect.Loading(true)) }
-                    .catch {
-                        emit(HomeEffect.Loading(false))
-                        emit(HomeEffect.ShowError("Error: $it"))
-                    }
-                    .collect {
-                        emit(HomeEffect.Loading(false))
-                        emit(HomeEffect.Loaded(it))
-                    }
-            }
-
             is HomeUserIntent.HideGroupModal -> flowOf(HomeEffect.HideGroupModal)
             is HomeUserIntent.OnItemDeleted -> flowOf(
                 HomeEffect.RemoveGroup(
@@ -83,12 +85,10 @@ class HomeIntentProcessor constructor(
                 emit(HomeEffect.RemoveGroupConfirmed(intent.name))
             }
 
+            is HomeUserIntent.SubscribeToList -> emptyFlow()
             is HomeUserIntent.OnEditClicked -> emptyFlow()
             is HomeUserIntent.ShowGroupModal -> emptyFlow()
         }
-        return merge(effect, userRepository.getUserFlow().map {
-            HomeEffect.UserLoaded(isLoggedIn = it != null)
-        })
     }
 }
 

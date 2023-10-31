@@ -18,7 +18,8 @@ abstract class BaseViewModelV2<
     private val intentProcessor: IntentProcessor<UiState, Intent, UiEffect>,
     private val reducer: Reducer<UiEffect, UiState>,
     private val publisher: Publisher<UiEffect, UiEvent, UiState>,
-    initialUserIntent: Intent? = null,
+    initialUserIntents: List<Intent> = emptyList(),
+    alwaysOnFlows: List<Flow<UiEffect>> = emptyList(),
 ) : ViewModel() {
 
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
@@ -44,21 +45,28 @@ abstract class BaseViewModelV2<
     private val tag
         get() = tag()
 
+    private val effectsChannel = Channel<UiEffect>(capacity = MAX_EFFECTS_CAPACITY)
+
     init {
         coroutineScope.launch {
             userIntentQueue.consumeAsFlow().flatMapLatest { intent ->
                 logIntent(intent)
+
                 intentProcessor.processIntent(intent, currentState)
-            }.collectLatest { effect ->
+            }.collectLatest {
+                Timber.tag(tag).i("Collect Latest -> Effect: $it")
+                effectsChannel.trySend(it)
+            }
+        }
+        coroutineScope.launch {
+            effectsChannel.consumeAsFlow().collect { effect ->
                 if (shouldLog) Timber.tag(tag).i("Effect: $effect: $currentState")
 
                 val newState = reduce(currentState, effect)
-                setState(newState).also {
-                    if (shouldLog) Timber.tag(tag).i("Reduce state: $newState")
-                }
+                setState(newState)
                 withContext(Dispatchers.Main) {
                     val event = publisher.publish(effect, newState)
-                    if (shouldLog) Timber.tag(tag).i("Publish State: $effect -> $event. $newState")
+                    if (shouldLog) Timber.tag(tag).i("Publish State: $effect -> $event")
                     if (event != null) {
                         _event.emit(event)
                     }
@@ -66,7 +74,15 @@ abstract class BaseViewModelV2<
             }
         }
 
-        if (initialUserIntent != null) {
+        alwaysOnFlows.forEach { flow ->
+            coroutineScope.launch {
+                flow.collectLatest {
+                    effectsChannel.send(it)
+                }
+            }
+        }
+
+        initialUserIntents.forEach { initialUserIntent ->
             processIntent(initialUserIntent)
         }
     }
@@ -83,7 +99,6 @@ abstract class BaseViewModelV2<
         val duration = measureTimeMillis {
             result = reducer.reduce(effect, currentState)
         }
-        if (shouldLog) Timber.tag(tag).i("reduce[$duration] state: $currentState -> $result")
         return result
     }
 
@@ -100,7 +115,8 @@ abstract class BaseViewModelV2<
 
     companion object {
 
-        const val DEFAULT_INTENT_CAPACITY  = 10
+        const val DEFAULT_INTENT_CAPACITY = 10
+        const val MAX_EFFECTS_CAPACITY = 15
     }
 }
 

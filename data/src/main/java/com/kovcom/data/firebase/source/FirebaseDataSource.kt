@@ -25,8 +25,6 @@ interface FirebaseDataSource {
 
     val selectedGroupsFlow: Flow<Result<List<SelectedGroupModel>>>
 
-    val selectedQuotesFlow: Flow<Result<List<SelectedQuoteModel>>>
-
     val userQuotesFlow: Flow<Result<List<QuoteModel>>>
 
     val frequenciesFlow: Flow<Result<List<FrequencyModel>>>

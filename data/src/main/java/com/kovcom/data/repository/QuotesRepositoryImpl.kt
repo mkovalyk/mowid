@@ -51,7 +51,7 @@ class QuotesRepositoryImpl(
         return combine(
             commonGroupsDataSource.quotesFlow,
             firebaseDataSource.userQuotesFlow,
-            firebaseDataSource.selectedQuotesFlow
+            firebaseDataSource.selectedGroupsFlow
         ) { quotes, userQuotes, selectedQuotes ->
             Timber.tag(TAG).i(
                 "getQuotesFlow. Quotes: ${quotes.data?.size}. userQuotes: ${userQuotes.data?.size} " +
@@ -63,7 +63,7 @@ class QuotesRepositoryImpl(
             }
             when (allQuotes.status) {
                 Status.Success -> {
-                    val selectedIds = selectedQuotes.data.orEmpty().map { it.id }.toSet()
+                    val selectedIds = selectedQuotes.data.orEmpty().flatMap { it.quotesIds.toList() }.toSet()
                     allQuotes.data.orEmpty().map { model -> model.mapToDomain(selectedIds) }
                 }
 
