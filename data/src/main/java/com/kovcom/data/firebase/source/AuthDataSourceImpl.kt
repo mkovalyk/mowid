@@ -1,8 +1,10 @@
 package com.kovcom.data.firebase.source
 
+import android.content.res.Resources.NotFoundException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
+import com.kovcom.data.error.UserNotFoundError
 import com.kovcom.data.model.*
 import com.kovcom.data.preferences.LocalDataSource
 import kotlinx.coroutines.*
@@ -18,7 +20,7 @@ class AuthDataSourceImpl constructor(
     private val localDataSource: LocalDataSource,
 ) : AuthDataSource, CoroutineScope {
 
-    override val userFlow: Flow<Result2<UserModel>> = callbackFlow {
+    override val userFlow: Flow<Result2<UserModelBase>> = callbackFlow {
         val subscription = dbInstance
             .collection(COLLECTION_USER)
             .document(authInstance.currentUser?.uid ?: "_")
@@ -27,8 +29,11 @@ class AuthDataSourceImpl constructor(
                     trySend(Result2.Error(error))
                     return@addSnapshotListener
                 }
-                value?.toObject<UserModel>()?.let {
-                    trySend(Result2.Success(it))
+                val user = value?.toObject<UserModelBase.UserModel>()
+                if (user == null) {
+                    trySend(Result2.Success(UserModelBase.Empty))
+                } else {
+                    trySend(Result2.Success(user))
                 }
             }
 
@@ -60,7 +65,7 @@ class AuthDataSourceImpl constructor(
                     dbInstance.collection(COLLECTION_USER)
                         .document(it.uid)
                         .set(
-                            UserModel(
+                            UserModelBase.UserModel(
                                 token = UUID.randomUUID().toString(),
                                 fullName = it.displayName,
                                 email = it.email,

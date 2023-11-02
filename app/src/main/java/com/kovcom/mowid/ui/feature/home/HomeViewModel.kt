@@ -14,7 +14,7 @@ class HomeViewModel constructor(
     intentProcessor,
     reducer,
     publisher,
-    alwaysOnFlows = listOf(intentProcessor.devicesFlow, intentProcessor.userFlow),
+    alwaysOnFlows = listOf(intentProcessor.quotesFlow, intentProcessor.userFlow),
 ) {
 
     override fun createInitialState(): HomeState = HomeState(
@@ -35,7 +35,7 @@ class HomeIntentProcessor constructor(
         HomeEffect.UserLoaded(isLoggedIn = it != null)
     }
 
-    val devicesFlow: Flow<HomeEffect> =
+    val quotesFlow: Flow<HomeEffect> =
         phraseRepository.getGroupsFlow()
             .flatMapLatest {
                 flowOf(HomeEffect.Loading(false), HomeEffect.Loaded(it))
@@ -85,7 +85,6 @@ class HomeIntentProcessor constructor(
                 emit(HomeEffect.RemoveGroupConfirmed(intent.name))
             }
 
-            is HomeUserIntent.SubscribeToList -> emptyFlow()
             is HomeUserIntent.OnEditClicked -> emptyFlow()
             is HomeUserIntent.ShowGroupModal -> emptyFlow()
         }

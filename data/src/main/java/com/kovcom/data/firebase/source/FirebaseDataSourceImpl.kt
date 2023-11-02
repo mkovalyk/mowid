@@ -27,34 +27,45 @@ class FirebaseDataSourceImpl constructor(
 
     private val currentGroupFlow = MutableStateFlow<String?>(null)
 
-    private val tokenFlow = authDataSource.userFlow.map { it.data?.token }
-
-    override val userGroupsFlow = authDataSource.userFlow.flatMapLatest { token ->
-        token.data.let { user ->
-            if (user == null) {
-                Timber.tag(TAG).w("User is null while getting user groups")
-                flowOf(Result.success(emptyList()))
-            } else {
-                userGroups(token = user.token)
+    private val tokenFlow = authDataSource.userFlow.map {
+        when (it.data) {
+            is UserModelBase.Empty -> {
+                Timber.tag(TAG).w("User is empty while getting token")
+                null
+            }
+            is UserModelBase.UserModel -> {
+                it.data.token
+            }
+            null -> {
+                Timber.tag(TAG).w("User is null while getting token")
+                null
             }
         }
     }
 
+    override val userGroupsFlow =
+        tokenFlow.flatMapLatest { token ->
+            if (token == null) {
+                Timber.tag(TAG).w("User is null while getting token groups")
+                flowOf(Result.success(emptyList()))
+            } else {
+                userGroups(token = token)
+            }
+    }
+
     override val selectedGroupsFlow: Flow<Result<List<SelectedGroupModel>>> =
-        authDataSource.userFlow.flatMapLatest { userDataModel ->
-            userDataModel.data.let { user ->
-                if (user == null) {
-                    Timber.tag(TAG).w("User is null while getting user groups")
-                    flowOf(Result.success(emptyList()))
-                } else {
-                    selectedGroups
-                }
+        tokenFlow.flatMapLatest { token ->
+            if (token == null) {
+                Timber.tag(TAG).w("User is null while getting user groups")
+                flowOf(Result.success(emptyList()))
+            } else {
+                selectedGroups
             }
         }
 
     override val userQuotesFlow =
-        currentGroupFlow.combine(authDataSource.userFlow) { groupId, token ->
-            userQuotesFlow(groupId, token.data?.token)
+        currentGroupFlow.combine(tokenFlow) { groupId, token ->
+            userQuotesFlow(groupId, token)
         }.flattenMerge(1)
 
     override val frequenciesFlow = frequenciesFlow()

@@ -11,9 +11,6 @@ data class HomeState(
 ) : State
 
 sealed interface HomeUserIntent : UserIntent {
-    object SubscribeToList : HomeUserIntent
-
-    //    object SubscribeToUser: HomeUserIntent
     object AddClicked : HomeUserIntent
     data class AddGroupClicked(val name: String, val description: String) : HomeUserIntent
     data class GroupItemClicked(val groupPhrase: UiGroup) : HomeUserIntent
