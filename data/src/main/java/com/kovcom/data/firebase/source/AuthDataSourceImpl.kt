@@ -1,10 +1,8 @@
 package com.kovcom.data.firebase.source
 
-import android.content.res.Resources.NotFoundException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.kovcom.data.error.UserNotFoundError
 import com.kovcom.data.model.*
 import com.kovcom.data.preferences.LocalDataSource
 import kotlinx.coroutines.*

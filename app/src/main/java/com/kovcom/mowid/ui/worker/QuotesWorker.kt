@@ -27,8 +27,8 @@ class QuotesWorker constructor(
             val option = ExecutionOption.valueOf(
                 quoteOption ?: ExecutionOption.Regular.name
             )
-            Timber.tag("QuotesWorker").i("doWork option = ${option.name}")
             val result = firebaseDataSource.getSelectedQuotes()
+            Timber.tag("QuotesWorker").i("doWork option = ${option.name}. Result: $result")
             when (result.status) {
                 Status.Success -> {
                     showNextQuote(result.data, option)

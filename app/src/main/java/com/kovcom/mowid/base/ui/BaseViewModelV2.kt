@@ -19,7 +19,7 @@ abstract class BaseViewModelV2<
     private val reducer: Reducer<UiEffect, UiState>,
     private val publisher: Publisher<UiEffect, UiEvent, UiState>,
     initialUserIntents: List<Intent> = emptyList(),
-    alwaysOnFlows: List<Flow<UiEffect>> = emptyList(),
+    dataProviders: List<DataProvider<UiEffect>> = emptyList(),
 ) : ViewModel() {
 
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
@@ -74,9 +74,9 @@ abstract class BaseViewModelV2<
             }
         }
 
-        alwaysOnFlows.forEach { flow ->
+        dataProviders.forEach { flow ->
             coroutineScope.launch {
-                flow.collectLatest {
+                flow.observe().collectLatest {
                     effectsChannel.send(it)
                 }
             }
@@ -118,6 +118,11 @@ abstract class BaseViewModelV2<
         const val DEFAULT_INTENT_CAPACITY = 10
         const val MAX_EFFECTS_CAPACITY = 15
     }
+}
+
+interface DataProvider<E : Effect> {
+
+    fun observe(): Flow<E>
 }
 
 interface IntentProcessor<S : State, Intent : UserIntent, E : Effect> {

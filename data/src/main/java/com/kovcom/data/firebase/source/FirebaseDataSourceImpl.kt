@@ -28,14 +28,13 @@ class FirebaseDataSourceImpl constructor(
     private val currentGroupFlow = MutableStateFlow<String?>(null)
 
     private val tokenFlow = authDataSource.userFlow.map {
-        when (it.data) {
+        when (val data = it.data) {
             is UserModelBase.Empty -> {
                 Timber.tag(TAG).w("User is empty while getting token")
                 null
             }
-            is UserModelBase.UserModel -> {
-                it.data.token
-            }
+
+            is UserModelBase.UserModel -> data.token
             null -> {
                 Timber.tag(TAG).w("User is null while getting token")
                 null
@@ -288,6 +287,7 @@ class FirebaseDataSourceImpl constructor(
                             quotes.add(it)
                         }
                     }
+                    println("QQQQ: quotes: $quotes")
                     continuation.resume(Result.success(quotes)) {}
 
                 }

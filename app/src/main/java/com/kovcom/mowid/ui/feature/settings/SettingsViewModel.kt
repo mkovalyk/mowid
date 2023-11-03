@@ -20,7 +20,7 @@ class SettingsViewModel(
 
     init {
         repository.getFrequencySettingsFlow()
-            .combine(userRepository.getUserFlow()) { frequency, user ->
+            .combine(userRepository.userFlow) { frequency, user ->
                 frequency to user
             }
             .onStart {

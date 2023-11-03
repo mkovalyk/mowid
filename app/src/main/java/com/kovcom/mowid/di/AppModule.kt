@@ -28,13 +28,24 @@ val appModule = module {
             get<WorkManager>(), get<LocalDataSource>()
         )
     }
+    single<UserProvider> {
+        UserProvider(
+            get<UserRepository>()
+        )
+    }
+    single<QuotesDataProvider> {
+        QuotesDataProvider(
+            get<QuotesRepository>()
+        )
+    }
+
     viewModel {
         HomeViewModel(
-            HomeIntentProcessor(
-                get<QuotesRepository>(), get<UserRepository>()
-            ),
+            HomeIntentProcessor(get<QuotesRepository>()),
             HomeReducer(),
             HomePublisher(),
+            get<QuotesDataProvider>(),
+            get<UserProvider>(),
         )
     }
     viewModel {

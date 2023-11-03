@@ -50,7 +50,13 @@ class QuotesWidgetReceiver : GlanceAppWidgetReceiver() {
 
         suspend fun updateWidget(context: Context, info: WidgetQuoteInfo) {
             val glanceId =
-                GlanceAppWidgetManager(context).getGlanceIds(QuotesWidget::class.java).last()
+                GlanceAppWidgetManager(context).getGlanceIds(QuotesWidget::class.java).lastOrNull()
+
+            if (glanceId == null) {
+                Timber.tag("QuotesWidgetReceiver").e("updateWidget: glanceId is null")
+                return
+            }
+
             updateAppWidgetState(context, glanceId) { prefs ->
                 prefs[QuotesWidget.groupIdPreference] = info.groupId
                 prefs[QuotesWidget.quoteIdPreference] = info.quoteId

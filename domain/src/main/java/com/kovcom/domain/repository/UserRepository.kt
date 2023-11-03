@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
-    fun getUserFlow(): Flow<User?>
+    val userFlow: Flow<User?>
 
     fun signInSuccess()
 

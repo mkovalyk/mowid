@@ -10,11 +10,13 @@ class HomeViewModel constructor(
     intentProcessor: HomeIntentProcessor,
     reducer: HomeReducer,
     publisher: HomePublisher,
+    groupsDataProvider: QuotesDataProvider,
+    userProvider: UserProvider,
 ) : BaseViewModelV2<HomeState, HomeEvent, HomeEffect, HomeUserIntent>(
     intentProcessor,
     reducer,
     publisher,
-    alwaysOnFlows = listOf(intentProcessor.quotesFlow, intentProcessor.userFlow),
+    dataProviders = listOf(groupsDataProvider, userProvider)
 ) {
 
     override fun createInitialState(): HomeState = HomeState(
@@ -26,17 +28,12 @@ class HomeViewModel constructor(
     override fun tag(): String = "HomeViewModel"
 }
 
-class HomeIntentProcessor constructor(
-    private val phraseRepository: QuotesRepository,
-    private val userRepository: UserRepository,
-) : IntentProcessor<HomeState, HomeUserIntent, HomeEffect> {
+class QuotesDataProvider(
+    private val quotesRepository: QuotesRepository,
+) : DataProvider<HomeEffect> {
 
-    val userFlow = userRepository.getUserFlow().map {
-        HomeEffect.UserLoaded(isLoggedIn = it != null)
-    }
-
-    val quotesFlow: Flow<HomeEffect> =
-        phraseRepository.getGroupsFlow()
+    override fun observe(): Flow<HomeEffect> {
+        return quotesRepository.getGroupsFlow()
             .flatMapLatest {
                 flowOf(HomeEffect.Loading(false), HomeEffect.Loaded(it))
             }
@@ -46,6 +43,23 @@ class HomeIntentProcessor constructor(
                 emit(HomeEffect.ShowError("Error: $it"))
             }
             .distinctUntilChanged()
+    }
+}
+
+class UserProvider(
+    private val userRepository: UserRepository,
+) : DataProvider<HomeEffect> {
+
+    override fun observe(): Flow<HomeEffect> {
+        return userRepository.userFlow.map {
+            HomeEffect.UserLoaded(isLoggedIn = it != null)
+        }
+    }
+}
+
+class HomeIntentProcessor constructor(
+    private val quotesRepository: QuotesRepository,
+) : IntentProcessor<HomeState, HomeUserIntent, HomeEffect> {
 
     override suspend fun processIntent(intent: HomeUserIntent, currentState: HomeState): Flow<HomeEffect> {
         return when (intent) {
@@ -58,7 +72,7 @@ class HomeIntentProcessor constructor(
             }
 
             is HomeUserIntent.AddGroupClicked -> {
-                phraseRepository.addGroup(
+                quotesRepository.addGroup(
                     name = intent.name, description = intent.description
                 )
                 flowOf(
@@ -68,7 +82,7 @@ class HomeIntentProcessor constructor(
             }
 
             is HomeUserIntent.GroupItemClicked -> flow {
-                phraseRepository.selectGroup(intent.groupPhrase.id)
+                quotesRepository.selectGroup(intent.groupPhrase.id)
                 emit(HomeEffect.OpenDetails(intent.groupPhrase))
             }
 
@@ -81,7 +95,7 @@ class HomeIntentProcessor constructor(
             )
 
             is HomeUserIntent.RemoveGroupConfirmed -> flow {
-                phraseRepository.deleteGroup(intent.id)
+                quotesRepository.deleteGroup(intent.id)
                 emit(HomeEffect.RemoveGroupConfirmed(intent.name))
             }
 
