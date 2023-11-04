@@ -1,8 +1,6 @@
 package com.kovcom.domain.repository
 
-import com.kovcom.domain.model.Frequencies
-import com.kovcom.domain.model.Group
-import com.kovcom.domain.model.Quote
+import com.kovcom.domain.model.*
 import kotlinx.coroutines.flow.Flow
 
 interface QuotesRepository {
@@ -28,6 +26,7 @@ interface QuotesRepository {
     suspend fun saveSelection(
         groupId: String,
         quoteId: String,
+        groupType: GroupType,
         isSelected: Boolean,
     )
 

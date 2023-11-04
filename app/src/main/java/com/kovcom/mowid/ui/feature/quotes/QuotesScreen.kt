@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EFFECTS_KEY
 import com.kovcom.mowid.base.ui.EVENTS_KEY
@@ -239,7 +240,8 @@ fun ScreenContent(
                                         quoteId = id,
                                         quote = quote?.quote ?: "",
                                         author = quote?.author,
-                                        checked = checked
+                                        checked = checked,
+                                        groupType = if (quote?.canBeDeleted == true) GroupType.Personal else GroupType.Common
                                     )
                                 )
                             },

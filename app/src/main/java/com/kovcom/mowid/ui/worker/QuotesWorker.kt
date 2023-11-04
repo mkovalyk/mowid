@@ -43,6 +43,11 @@ class QuotesWorker constructor(
 
     private suspend fun showNextQuote(quotes: List<SelectedQuoteModel>?, option: ExecutionOption) {
         quotes?.let {
+            val item = it.firstOrNull()
+            if (item == null) {
+                Timber.tag("QuotesWorker").i("showNextQuote: item is null")
+                return
+            }
             when (option) {
                 ExecutionOption.Regular -> showRegularQuote(it)
                 ExecutionOption.Next -> showNextQuote(it)
@@ -53,21 +58,41 @@ class QuotesWorker constructor(
 
     private fun SelectedQuoteModel.toWidgetInfo(): WidgetQuoteInfo {
         return WidgetQuoteInfo(
-            quote = quote ?: "",
-            author = author ?: "",
+            quote = quote ?: "Default",
+            author = author ?: "Author",
             quoteId = id,
             groupId = groupId
-        )
+        ).also {
+            Timber.tag("QuotesWorker").i("toWidgetInfo: $it")
+        }
+    }
+
+    private suspend fun getAndUpdateWidgetInfo(item: SelectedQuoteModel) {
+        firebaseDataSource.getQuoteById(item.groupId, item.groupType, item.id).let { result ->
+
+            val updated = item.copy(
+                quote = result.data?.quote,
+                author = result.data?.author
+            )
+            when (result.status) {
+                Status.Success -> {
+                    QuotesWidgetReceiver.updateWidget(
+                        context = context,
+                        info = updated.toWidgetInfo()
+                    )
+                    updateShownQuote(updated)
+                }
+
+                Status.Error -> {
+                    Timber.tag("QuotesWorker").i("showNextQuote: error = ${result.error}")
+                }
+            }
+        }
+
     }
 
     private suspend fun showRegularQuote(quotes: List<SelectedQuoteModel>) {
-        quotes.sortedBy { it.shownAt }.firstOrNull()?.let {
-            QuotesWidgetReceiver.updateWidget(
-                context = context,
-                info = it.toWidgetInfo()
-            )
-            updateShownQuote(it)
-        }
+        quotes.sortedBy { it.shownAt }.firstOrNull()?.let { getAndUpdateWidgetInfo(it) }
     }
 
     private suspend fun showNextQuote(quotes: List<SelectedQuoteModel>) {
@@ -78,13 +103,7 @@ class QuotesWorker constructor(
             currentQuoteIndex >= 0 -> quotes[currentQuoteIndex + 1]
             else -> null
         }
-        nextQuote?.let {
-            QuotesWidgetReceiver.updateWidget(
-                context = context,
-                info = it.toWidgetInfo()
-            )
-            updateShownQuote(it)
-        }
+        nextQuote?.let { getAndUpdateWidgetInfo(it) }
         localDataSource.setQuoteChangeOption(ExecutionOption.Regular.name)
     }
 
@@ -96,13 +115,7 @@ class QuotesWorker constructor(
             currentQuoteIndex > 0 -> quotes[currentQuoteIndex - 1]
             else -> null
         }
-        previousQuote?.let {
-            QuotesWidgetReceiver.updateWidget(
-                context = context,
-                info = it.toWidgetInfo()
-            )
-            updateShownQuote(it)
-        }
+        previousQuote?.let { getAndUpdateWidgetInfo(it) }
         localDataSource.setQuoteChangeOption(ExecutionOption.Regular.name)
     }
 

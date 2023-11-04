@@ -1,6 +1,7 @@
 package com.kovcom.data.firebase.source
 
 import com.kovcom.data.model.*
+import com.kovcom.domain.model.GroupType
 import kotlinx.coroutines.flow.Flow
 
 interface CommonGroupsDataSource {
@@ -35,6 +36,8 @@ interface FirebaseDataSource {
 
     suspend fun getSelectedQuotes(): Result<List<SelectedQuoteModel>>
 
+    suspend fun getQuoteById(groupId: String, groupType: GroupType, quoteId: String): Result<QuoteModel>
+
     suspend fun updateSelectedQuote(groupId: String, quoteId: String, shownTime: Long)
 
     suspend fun saveNewGroup(group: GroupModel): Result<GroupModel>
@@ -57,6 +60,7 @@ interface FirebaseDataSource {
 
     suspend fun saveSelection(
         quote: SelectedQuoteModel,
+        groupType: GroupType,
         isSelected: Boolean,
     ): Result<SelectedQuoteModel>
 

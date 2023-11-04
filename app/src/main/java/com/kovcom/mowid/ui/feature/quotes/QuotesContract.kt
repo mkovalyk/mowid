@@ -1,5 +1,6 @@
 package com.kovcom.mowid.ui.feature.quotes
 
+import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.base.ui.Effect
 import com.kovcom.mowid.base.ui.Event
 import com.kovcom.mowid.base.ui.State
@@ -19,6 +20,7 @@ data class DeleteDialogInfo(
 sealed interface QuotesEvent : Event {
     data class QuoteItemChecked(
         val quoteId: String,
+        val groupType: GroupType,
         val checked: Boolean,
         val quote: String,
         val author: String?,

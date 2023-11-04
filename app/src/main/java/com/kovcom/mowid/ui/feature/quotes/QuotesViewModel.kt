@@ -60,7 +60,8 @@ class QuotesViewModel constructor(
                     quotesRepository.saveSelection(
                         groupId = groupId,
                         quoteId = event.quoteId,
-                        isSelected = event.checked
+                        isSelected = event.checked,
+                        groupType = event.groupType
                     )
                 }
             }

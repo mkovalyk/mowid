@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.kovcom.data.model.*
 import com.kovcom.data.preferences.LocalDataSource
+import com.kovcom.domain.model.GroupType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
@@ -50,7 +51,7 @@ class FirebaseDataSourceImpl constructor(
             } else {
                 userGroups(token = token)
             }
-    }
+        }
 
     override val selectedGroupsFlow: Flow<Result<List<SelectedGroupModel>>> =
         tokenFlow.flatMapLatest { token ->
@@ -232,6 +233,7 @@ class FirebaseDataSourceImpl constructor(
 
     override suspend fun saveSelection(
         quote: SelectedQuoteModel,
+        groupType: GroupType,
         isSelected: Boolean,
     ): Result<SelectedQuoteModel> {
         val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
@@ -247,9 +249,12 @@ class FirebaseDataSourceImpl constructor(
                         val collection = current?.quotesIds.orEmpty().toMutableSet()
                             .let { items ->
                                 if (isSelected) {
-                                    items.add(quote.id)
+                                    items.add(SelectedQuoteModelV2(quote.id))
                                 } else {
-                                    items.remove(quote.id)
+                                    items.firstOrNull { item -> item.quoteId == quote.id }
+                                        ?.let {
+                                            items.remove(it)
+                                        }
                                 }
                                 items.toList()
                             }
@@ -264,7 +269,8 @@ class FirebaseDataSourceImpl constructor(
                         currentDocument.set(
                             SelectedGroupModel(
                                 groupId = quote.groupId,
-                                quotesIds = listOf(quote.id),
+                                quotesIds = listOf(SelectedQuoteModelV2(quote.id)),
+                                groupType = groupType,
                             )
                         )
                     }
@@ -272,28 +278,86 @@ class FirebaseDataSourceImpl constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    data class WidgetGroupInfo(
+        val groupId: String,
+        val groupType: GroupType,
+        val quoteId: String,
+        val shownAt: Long,
+    )
+
     override suspend fun getSelectedQuotes(): Result<List<SelectedQuoteModel>> {
         val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
 
         return suspendCancellableCoroutine { continuation ->
-            dbInstance.collectionGroup(COLLECTION_SELECTED_QUOTES)
-                .whereEqualTo("selectedBy", token)
+            dbInstance.collection(COLLECTION_PERSONAL)
+                .document(token)
+                .collection(COLLECTION_SELECTION)
                 .get()
                 .addOnSuccessListener { task ->
-                    val quotes = mutableListOf<SelectedQuoteModel>()
+                    val groups = mutableListOf<SelectedGroupModel>()
                     for (doc in task.documents) {
-                        doc.toObject<SelectedQuoteModel>()?.let {
-                            quotes.add(it)
+                        doc.toObject<SelectedGroupModel>()?.let {
+                            groups.add(it)
                         }
                     }
-                    println("QQQQ: quotes: $quotes")
-                    continuation.resume(Result.success(quotes)) {}
+                    val mapped = groups.flatMap { group ->
+                        group.quotesIds
+                            .map {
+                                SelectedQuoteModel(
+                                    groupId = group.groupId,
+                                    groupType = group.groupType,
+                                    id = it.quoteId,
+                                    shownAt = it.shownAt
+                                )
+                            }
+                    }
+                        .sortedBy { it.shownAt }
+
+                    println("QQQQ: quotes: $mapped")
+
+                    continuation.resume(Result.success(mapped))
+                }
+        }
+    }
+
+    override suspend fun getQuoteById(
+        groupId: String,
+        groupType: GroupType,
+        quoteId: String,
+    ): Result<QuoteModel> {
+        when (groupType) {
+            GroupType.Common -> {
+                return suspendCancellableCoroutine { continuation ->
+                    dbInstance.collection(COLLECTION_GROUPS)
+                        .document(groupId)
+                        .collection(COLLECTION_QUOTES)
+                        .document(quoteId)
+                        .get()
+                        .addOnSuccessListener { task ->
+                            val quote = task.toObject<QuoteModel>()
+                            continuation.resume(Result.success(quote)) {}
+                        }
 
                 }
-                .addOnFailureListener { exception ->
-                    continuation.resume(Result.error(exception)) {}
+            }
+
+            GroupType.Personal -> {
+                val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
+                return suspendCancellableCoroutine { continuation ->
+                    dbInstance.collection(COLLECTION_PERSONAL)
+                        .document(token)
+                        .collection(COLLECTION_GROUPS)
+                        .document(groupId)
+                        .collection(COLLECTION_QUOTES)
+                        .document(quoteId)
+                        .get()
+                        .addOnSuccessListener { task ->
+                            val quote = task.toObject<QuoteModel>()
+                            continuation.resume(Result.success(quote)) {}
+                        }
                 }
+
+            }
         }
     }
 
@@ -303,14 +367,30 @@ class FirebaseDataSourceImpl constructor(
         shownTime: Long,
     ) {
         val token = tokenFlow.first() ?: return
+        return suspendCancellableCoroutine { continuation ->
 
-        dbInstance.collection(COLLECTION_PERSONAL)
-            .document(token)
-            .collection(COLLECTION_SELECTION)
-            .document(groupId)
-            .collection(COLLECTION_SELECTED_QUOTES)
-            .document(quoteId)
-            .update(SHOWN_AT_FIELD, shownTime)
+            dbInstance.collection(COLLECTION_PERSONAL)
+                .document(token)
+                .collection(COLLECTION_SELECTION)
+                .document(groupId)
+                .get()
+                .addOnSuccessListener { task ->
+                    val group = task.toObject<SelectedGroupModel>()
+                    val quotes = group?.quotesIds.orEmpty().toMutableSet()
+                    quotes.firstOrNull { it.quoteId == quoteId }?.let {
+                        quotes.remove(it)
+                        quotes.add(it.copy(shownAt = shownTime))
+                    }
+                    dbInstance.collection(COLLECTION_PERSONAL)
+                        .document(token)
+                        .collection(COLLECTION_SELECTION)
+                        .document(groupId)
+                        .update(SELECTED_QUOTES_ID_FIELD, quotes.toList())
+                        .addOnSuccessListener {
+                            continuation.resume(Unit)
+                        }
+                }
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

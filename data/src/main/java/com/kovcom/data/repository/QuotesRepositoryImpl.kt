@@ -6,9 +6,7 @@ import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.data.mapper.mapToDomain
 import com.kovcom.data.mapper.toDomain
 import com.kovcom.data.model.*
-import com.kovcom.domain.model.Frequencies
-import com.kovcom.domain.model.Group
-import com.kovcom.domain.model.Quote
+import com.kovcom.domain.model.*
 import com.kovcom.domain.repository.QuotesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -63,7 +61,8 @@ class QuotesRepositoryImpl(
             }
             when (allQuotes.status) {
                 Status.Success -> {
-                    val selectedIds = selectedQuotes.data.orEmpty().flatMap { it.quotesIds.toList() }.toSet()
+                    val selectedIds = selectedQuotes.data.orEmpty().flatMap { it.quotesIds.map { quote -> quote.quoteId }.toList() }.toSet()
+                    println("selectedIds: $selectedIds")
                     allQuotes.data.orEmpty().map { model -> model.mapToDomain(selectedIds) }
                 }
 
@@ -94,7 +93,7 @@ class QuotesRepositoryImpl(
             GroupModel(
                 name = name,
                 description = description,
-                canBeDeleted = true
+                groupType = GroupType.Personal,
             )
         )
     }
@@ -110,6 +109,14 @@ class QuotesRepositoryImpl(
                 created = format.format(Date()),
                 canBeDeleted = true
             )
+        )
+        firebaseDataSource.saveSelection(
+            quote = SelectedQuoteModel(
+                id = quoteId,
+                groupId = groupId,
+            ),
+            isSelected = true,
+            groupType = GroupType.Personal
         )
     }
 
@@ -133,6 +140,7 @@ class QuotesRepositoryImpl(
     override suspend fun saveSelection(
         groupId: String,
         quoteId: String,
+        groupType: GroupType,
         isSelected: Boolean,
     ) {
         firebaseDataSource.saveSelection(
@@ -140,7 +148,8 @@ class QuotesRepositoryImpl(
                 id = quoteId,
                 groupId = groupId,
             ),
-            isSelected = isSelected
+            isSelected = isSelected,
+            groupType = groupType,
         )
     }
 

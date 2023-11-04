@@ -53,7 +53,7 @@ class QuotesWidgetReceiver : GlanceAppWidgetReceiver() {
                 GlanceAppWidgetManager(context).getGlanceIds(QuotesWidget::class.java).lastOrNull()
 
             if (glanceId == null) {
-                Timber.tag("QuotesWidgetReceiver").e("updateWidget: glanceId is null")
+                Timber.tag("QuotesWidgetReceiver").e("updateWidget: glanceId is null. Quote: $info")
                 return
             }
 

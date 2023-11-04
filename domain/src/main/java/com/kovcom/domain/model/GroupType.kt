@@ -1,4 +1,4 @@
-package com.kovcom.data.model
+package com.kovcom.domain.model
 
 enum class GroupType {
     Common,

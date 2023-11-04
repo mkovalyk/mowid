@@ -5,9 +5,9 @@ import com.kovcom.domain.model.Quote
 
 fun QuoteModel.mapToDomain(selectedQuotes: Set<String>) = Quote(
     id = id.orEmpty(),
-    author = author.orEmpty(),
+    author = author,
     created = created.orEmpty(),
-    quote = quote.orEmpty(),
-    canBeDeleted = canBeDeleted ?: false,
+    quote = quote,
+    canBeDeleted = canBeDeleted,
     isSelected = selectedQuotes.contains(id)
 )
