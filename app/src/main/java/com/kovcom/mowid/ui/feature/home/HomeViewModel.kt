@@ -87,7 +87,7 @@ class HomeIntentProcessor constructor(
             }
 
             is HomeUserIntent.HideGroupModal -> flowOf(HomeEffect.HideGroupModal)
-            is HomeUserIntent.OnItemDeleted -> flowOf(
+            is HomeUserIntent.OnItemDelete -> flowOf(
                 HomeEffect.RemoveGroup(
                     id = intent.id,
                     name = intent.name

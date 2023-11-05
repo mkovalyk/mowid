@@ -3,9 +3,11 @@ package com.kovcom.mowid.ui.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.kovcom.data.firebase.source.CommonGroupsDataSource
 import com.kovcom.data.firebase.source.FirebaseDataSource
 import com.kovcom.data.model.SelectedQuoteModel
 import com.kovcom.data.preferences.LocalDataSource
+import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.ui.feature.widget.QuotesWidgetReceiver
 import com.kovcom.mowid.ui.feature.widget.WidgetQuoteInfo
 import kotlinx.coroutines.flow.first
@@ -17,6 +19,7 @@ class QuotesWorker constructor(
     private val context: Context,
     workParams: WorkerParameters,
     private val firebaseDataSource: FirebaseDataSource,
+    private val commonGroupsDataSource: CommonGroupsDataSource,
     private val localDataSource: LocalDataSource,
 ) : CoroutineWorker(context, workParams) {
 
@@ -42,11 +45,6 @@ class QuotesWorker constructor(
 
     private suspend fun showNextQuote(quotes: List<SelectedQuoteModel>?, option: ExecutionOption) {
         quotes?.let {
-            val item = it.firstOrNull()
-            if (item == null) {
-                Timber.tag("QuotesWorker").i("showNextQuote: item is null")
-                return
-            }
             when (option) {
                 ExecutionOption.Regular -> showRegularQuote(it)
                 ExecutionOption.Next -> showNextQuote(it)
@@ -67,8 +65,15 @@ class QuotesWorker constructor(
     }
 
     private suspend fun getAndUpdateWidgetInfo(item: SelectedQuoteModel) {
-        firebaseDataSource.getQuoteById(item.groupId, item.groupType, item.id).let { result ->
+        when (item.groupType) {
+            GroupType.Common -> {
+                commonGroupsDataSource.getQuoteById(item.groupId, item.id)
+            }
 
+            GroupType.Personal -> {
+                firebaseDataSource.getQuoteById(item.groupId, item.id)
+            }
+        }.let { result ->
             val updated = item.copy(
                 quote = result.data?.quote,
                 author = result.data?.author

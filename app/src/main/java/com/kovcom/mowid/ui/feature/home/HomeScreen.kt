@@ -173,7 +173,7 @@ private fun HomeScreenContent(
                     sendIntent(HomeUserIntent.GroupItemClicked(it))
                 },
                 onDelete = { id, name ->
-                    sendIntent(HomeUserIntent.OnItemDeleted(id, name))
+                    sendIntent(HomeUserIntent.OnItemDelete(id, name))
                 },
                 onEdit = { id, name, description ->
 //                    bottomSheetUIState.value = BottomSheetUIState.EditGroupBottomSheet(

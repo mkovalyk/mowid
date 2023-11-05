@@ -1,6 +1,7 @@
 package com.kovcom.mowid.di
 
 import androidx.work.WorkManager
+import com.kovcom.data.firebase.source.CommonGroupsDataSource
 import com.kovcom.data.firebase.source.FirebaseDataSource
 import com.kovcom.data.preferences.LocalDataSource
 import com.kovcom.domain.repository.QuotesRepository
@@ -71,6 +72,7 @@ val appModule = module {
             androidContext(),
             params.get(),
             get<FirebaseDataSource>(),
+            get<CommonGroupsDataSource>(),
             get<LocalDataSource>()
         )
     }

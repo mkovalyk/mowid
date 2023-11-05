@@ -24,8 +24,8 @@ sealed interface HomeUserIntent : UserIntent {
     data class ShowGroupModal(val id: String, val name: String, val description: String) :
         HomeUserIntent
 
-    data class OnItemDeleted(val id: String, val name: String) : HomeUserIntent
-    data class RemoveGroupConfirmed(val id:String, val name: String) : HomeUserIntent
+    data class OnItemDelete(val id: String, val name: String) : HomeUserIntent
+    data class RemoveGroupConfirmed(val id: String, val name: String) : HomeUserIntent
 }
 
 sealed interface HomeEvent : Event {

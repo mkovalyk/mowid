@@ -17,6 +17,8 @@ interface CommonGroupsDataSource {
     suspend fun selectLocale(locale: LocaleModel): Result<String>
 
     suspend fun selectGroup(groupId: String)
+
+    suspend fun getQuoteById(groupId: String, quoteId: String): Result<QuoteModel>
 }
 
 
@@ -36,7 +38,7 @@ interface FirebaseDataSource {
 
     suspend fun getSelectedQuotes(): Result<List<SelectedQuoteModel>>
 
-    suspend fun getQuoteById(groupId: String, groupType: GroupType, quoteId: String): Result<QuoteModel>
+    suspend fun getQuoteById(groupId: String, quoteId: String): Result<QuoteModel>
 
     suspend fun updateSelectedQuote(groupId: String, quoteId: String, shownTime: Long)
 

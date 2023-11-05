@@ -8,9 +8,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-class CommonGroupsDataSourceImpl  constructor(
+class CommonGroupsDataSourceImpl constructor(
     private val dbInstance: FirebaseFirestore,
     private val localDataSource: LocalDataSource,
 ) : CommonGroupsDataSource, CoroutineScope {
@@ -23,10 +24,10 @@ class CommonGroupsDataSourceImpl  constructor(
             Result.success(it)
         }
 
-    override val groupsFlow = selectedLocaleFlow.flatMapLatest { result -> 
-        result.data?.let{
+    override val groupsFlow = selectedLocaleFlow.flatMapLatest { result ->
+        result.data?.let {
             groupsFlow(it)
-        }?: flowOf(Result.error(result.error ?: Exception("Locale id is null")))
+        } ?: flowOf(Result.error(result.error ?: Exception("Locale id is null")))
 
     }
 
@@ -67,6 +68,28 @@ class CommonGroupsDataSourceImpl  constructor(
 
     override suspend fun selectGroup(groupId: String) {
         currentGroupFlow.value = groupId
+    }
+
+    override suspend fun getQuoteById(groupId: String, quoteId: String): Result<QuoteModel> {
+        selectedLocaleFlow.firstOrNull()?.data?.let { locale ->
+            return suspendCancellableCoroutine { continuation ->
+
+                dbInstance.collection(COLLECTION_LOCALE)
+                    .document(locale)
+                    .collection(COLLECTION_GROUPS)
+                    .document(groupId)
+                    .collection(COLLECTION_QUOTES)
+                    .document(quoteId)
+                    .get()
+                    .addOnSuccessListener { task ->
+                        task.toObject<QuoteModel>()?.let {
+                            continuation.resume(Result.success(it))
+                        } ?: continuation.resume(Result.error(Exception("Quote is null")))
+                    }
+
+            }
+        } ?: return Result.error(Exception("Locale id is null"))
+
     }
 
     private fun groupsFlow(selectedLocaleId: String): Flow<Result<List<GroupModel>>> =
