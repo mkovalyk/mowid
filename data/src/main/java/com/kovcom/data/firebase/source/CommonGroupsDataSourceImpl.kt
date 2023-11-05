@@ -23,12 +23,11 @@ class CommonGroupsDataSourceImpl  constructor(
             Result.success(it)
         }
 
-    override val groupsFlow = selectedLocaleFlow.flatMapLatest {
-        if (it.data != null) {
-            groupsFlow(it.data)
-        } else {
-            flowOf(Result.error(it.error ?: Exception("Locale id is null")))
-        }
+    override val groupsFlow = selectedLocaleFlow.flatMapLatest { result -> 
+        result.data?.let{
+            groupsFlow(it)
+        }?: flowOf(Result.error(result.error ?: Exception("Locale id is null")))
+
     }
 
     override val quotesFlow: Flow<Result<List<QuoteModel>>> =

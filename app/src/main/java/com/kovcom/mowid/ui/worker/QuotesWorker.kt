@@ -5,7 +5,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.kovcom.data.firebase.source.FirebaseDataSource
 import com.kovcom.data.model.SelectedQuoteModel
-import com.kovcom.data.model.Status
 import com.kovcom.data.preferences.LocalDataSource
 import com.kovcom.mowid.ui.feature.widget.QuotesWidgetReceiver
 import com.kovcom.mowid.ui.feature.widget.WidgetQuoteInfo
@@ -29,13 +28,13 @@ class QuotesWorker constructor(
             )
             val result = firebaseDataSource.getSelectedQuotes()
             Timber.tag("QuotesWorker").i("doWork option = ${option.name}. Result: $result")
-            when (result.status) {
-                Status.Success -> {
+            when (result) {
+                is com.kovcom.data.model.Result.Success -> {
                     showNextQuote(result.data, option)
                     Result.success()
                 }
 
-                Status.Error -> Result.failure()
+                is com.kovcom.data.model.Result.Error -> Result.failure()
             }
         }.first()
 
@@ -74,8 +73,8 @@ class QuotesWorker constructor(
                 quote = result.data?.quote,
                 author = result.data?.author
             )
-            when (result.status) {
-                Status.Success -> {
+            when (result) {
+                is com.kovcom.data.model.Result.Success -> {
                     QuotesWidgetReceiver.updateWidget(
                         context = context,
                         info = updated.toWidgetInfo()
@@ -83,7 +82,7 @@ class QuotesWorker constructor(
                     updateShownQuote(updated)
                 }
 
-                Status.Error -> {
+                is com.kovcom.data.model.Result.Error -> {
                     Timber.tag("QuotesWorker").i("showNextQuote: error = ${result.error}")
                 }
             }

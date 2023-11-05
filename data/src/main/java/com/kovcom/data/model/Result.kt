@@ -1,38 +1,44 @@
 package com.kovcom.data.model
 
-data class Result<out T>(
-    val status: Status,
-    val data: T? = null,
-    val error: Throwable? = null,
-) {
+sealed class Result<out T> {
+    data class Success<T>(val value: T) : Result<T>()
+    data class Error<T>(val throwable: Throwable) : Result<T>()
+
+    val data: T?
+        get() = when (this) {
+            is Success -> value
+            is Error -> null
+        }
+    
+    val error: Throwable?
+        get() = when (this) {
+            is Error -> throwable
+            is Success -> null
+        }
 
     companion object {
 
-        fun <T> success(data: T?): Result<T> {
-            return Result(status = Status.Success, data = data)
+        fun <T> success(data: T): Result<T> {
+            return Success(data)
         }
 
-        fun <T> error(error: Throwable): Result<T> {
-            return Result(status = Status.Error, error = error)
+        fun <T> error(ex: Throwable): Result<T> {
+            return Error(ex)
         }
     }
 }
 
 fun <T> Result<List<T>>.merge(model: Result<List<T>>): Result<List<T>> =
-    if (this.status == Status.Success && model.status == Status.Success) {
+    if (this is Result.Success && model is Result.Success) {
         Result.success(this.data.orEmpty() + model.data.orEmpty())
     } else {
         Result.error(
-            if (this.status == Status.Error) {
-                error
+            if (this is Result.Error) {
+                throwable
+            } else if (model is Result.Error) {
+                model.throwable
             } else {
-                model.error
-            } ?: Exception("Unknown exception")
+                Exception("Unknown exception")
+            }
         )
     }
-
-
-enum class Status {
-    Success,
-    Error
-}

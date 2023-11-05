@@ -28,18 +28,18 @@ class QuotesRepositoryImpl(
 
         Timber.tag(TAG).i(
             "getGroupsFlow. Groups: ${groups.data?.size}. userGroups: ${userGroups.data?.size} " +
-                "selectedGroups: ${selectedGroups.data?.size}"
+                    "selectedGroups: ${selectedGroups.data?.size}"
         )
         val allGroups = groups.merge(userGroups)
-        if (selectedGroups.status == Status.Error) {
+        if (selectedGroups is Result.Error) {
             throw selectedGroups.error ?: Exception("Unknown exception")
         }
-        when (allGroups.status) {
-            Status.Success -> allGroups.data?.distinctBy { it.id }
+        when (allGroups) {
+            is Result.Success -> allGroups.data?.distinctBy { it.id }
                 ?.map { model -> model.mapToDomain(selectedGroups.data.orEmpty()) }
                 ?: emptyList()
 
-            Status.Error -> throw allGroups.error ?: Exception("Unknown exception")
+            is Result.Error -> throw allGroups.error ?: Exception("Unknown exception")
         }
     }
 
@@ -53,20 +53,21 @@ class QuotesRepositoryImpl(
         ) { quotes, userQuotes, selectedQuotes ->
             Timber.tag(TAG).i(
                 "getQuotesFlow. Quotes: ${quotes.data?.size}. userQuotes: ${userQuotes.data?.size} " +
-                    " selectedQuotes: ${selectedQuotes.data?.size}"
+                        " selectedQuotes: ${selectedQuotes.data?.size}"
             )
             val allQuotes = quotes.merge(userQuotes)
-            if (selectedQuotes.status == Status.Error) {
+            if (selectedQuotes is Result.Error) {
                 throw selectedQuotes.error ?: Exception("Unknown exception")
             }
-            when (allQuotes.status) {
-                Status.Success -> {
-                    val selectedIds = selectedQuotes.data.orEmpty().flatMap { it.quotesIds.map { quote -> quote.quoteId }.toList() }.toSet()
+            when (allQuotes) {
+                is Result.Success -> {
+                    val selectedIds = selectedQuotes.data.orEmpty()
+                        .flatMap { it.quotesIds.map { quote -> quote.quoteId }.toList() }.toSet()
                     println("selectedIds: $selectedIds")
                     allQuotes.data.orEmpty().map { model -> model.mapToDomain(selectedIds) }
                 }
 
-                Status.Error -> throw allQuotes.error ?: Exception("Unknown exception")
+                is Result.Error -> throw allQuotes.error ?: Exception("Unknown exception")
             }
         }
     }
@@ -76,10 +77,10 @@ class QuotesRepositoryImpl(
             firebaseDataSource.frequenciesFlow,
             firebaseDataSource.userFrequencyFlow
         ) { settings, userSettings ->
-            if (settings.status == Status.Error) {
+            if (settings is Result.Error) {
                 throw settings.error ?: Exception("Unknown exception")
             }
-            if (userSettings.status == Status.Error) {
+            if (userSettings is Result.Error) {
                 throw userSettings.error ?: Exception("Unknown exception")
             }
             settings.data?.toDomain(

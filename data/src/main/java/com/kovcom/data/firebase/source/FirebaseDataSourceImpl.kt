@@ -43,11 +43,11 @@ class FirebaseDataSourceImpl constructor(
         }
     }
 
-    override val userGroupsFlow =
+    override val userGroupsFlow: Flow<Result<List<GroupModel>>> =
         tokenFlow.flatMapLatest { token ->
             if (token == null) {
                 Timber.tag(TAG).w("User is null while getting token groups")
-                flowOf(Result.success(emptyList()))
+                flowOf(Result.success(emptyList<GroupModel>()))
             } else {
                 userGroups(token = token)
             }
@@ -334,8 +334,9 @@ class FirebaseDataSourceImpl constructor(
                         .document(quoteId)
                         .get()
                         .addOnSuccessListener { task ->
-                            val quote = task.toObject<QuoteModel>()
-                            continuation.resume(Result.success(quote)) {}
+                            task.toObject<QuoteModel>()?.let {
+                                continuation.resume(Result.success(it))
+                            } ?: continuation.resume(Result.error(Exception("Quote is null")))
                         }
 
                 }
@@ -352,8 +353,9 @@ class FirebaseDataSourceImpl constructor(
                         .document(quoteId)
                         .get()
                         .addOnSuccessListener { task ->
-                            val quote = task.toObject<QuoteModel>()
-                            continuation.resume(Result.success(quote)) {}
+                            task.toObject<QuoteModel>()?.let {
+                                continuation.resume(Result.success(it))
+                            } ?: continuation.resume(Result.error(Exception("Quote is null")))
                         }
                 }
 
@@ -464,8 +466,7 @@ class FirebaseDataSourceImpl constructor(
             }
     }
 
-
-    private fun userGroups(token: String) = callbackFlow {
+    private fun userGroups(token: String): Flow<Result<List<GroupModel>>> = callbackFlow {
         val subscription = dbInstance.collection(COLLECTION_PERSONAL)
             .document(token)
             .collection(COLLECTION_GROUPS)
@@ -517,7 +518,6 @@ class FirebaseDataSourceImpl constructor(
             }
         }
     }
-
 
     private fun userQuotesFlow(
         groupId: String?,
@@ -592,8 +592,9 @@ class FirebaseDataSourceImpl constructor(
                         trySend(Result.error(error))
                         return@addSnapshotListener
                     }
-                    val frequency = value?.data?.get(FREQUENCY_FIELD) as? Long
-                    localDataSource.setFrequency(frequency ?: DEFAULT_FREQUENCY_VALUE)
+                    val frequency =
+                        value?.data?.get(FREQUENCY_FIELD) as? Long ?: DEFAULT_FREQUENCY_VALUE
+                    localDataSource.setFrequency(frequency)
                     trySend(Result.success(frequency))
                 }
             awaitClose {

@@ -18,20 +18,20 @@ class AuthDataSourceImpl constructor(
     private val localDataSource: LocalDataSource,
 ) : AuthDataSource, CoroutineScope {
 
-    override val userFlow: Flow<Result2<UserModelBase>> = callbackFlow {
+    override val userFlow: Flow<Result<UserModelBase>> = callbackFlow {
         val subscription = dbInstance
             .collection(COLLECTION_USER)
             .document(authInstance.currentUser?.uid ?: "_")
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    trySend(Result2.Error(error))
+                    trySend(Result.Error(error))
                     return@addSnapshotListener
                 }
                 val user = value?.toObject<UserModelBase.UserModel>()
                 if (user == null) {
-                    trySend(Result2.Success(UserModelBase.Empty))
+                    trySend(Result.Success(UserModelBase.Empty))
                 } else {
-                    trySend(Result2.Success(user))
+                    trySend(Result.Success(user))
                 }
             }
 

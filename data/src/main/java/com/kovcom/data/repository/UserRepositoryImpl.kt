@@ -2,7 +2,7 @@ package com.kovcom.data.repository
 
 import com.kovcom.data.firebase.source.AuthDataSource
 import com.kovcom.data.mapper.toDomain
-import com.kovcom.data.model.Result2
+import com.kovcom.data.model.Result
 import com.kovcom.data.model.UserModelBase
 import com.kovcom.domain.repository.UserRepository
 import kotlinx.coroutines.flow.map
@@ -14,7 +14,7 @@ class UserRepositoryImpl constructor(
 
     override val userFlow = authDataSource.userFlow.map {
         when (it) {
-            is Result2.Success -> when (val data = it.data) {
+            is Result.Success -> when (val data = it.data) {
                 is UserModelBase.UserModel -> data.toDomain()
 
                 is UserModelBase.Empty,
@@ -22,7 +22,7 @@ class UserRepositoryImpl constructor(
                 -> null
             }
 
-            is Result2.Error -> throw it.error
+            is Result.Error -> throw it.throwable
         }
     }
 
