@@ -100,7 +100,9 @@ class QuotesRepositoryImpl(
     }
 
     override suspend fun addQuote(groupId: String, quote: String, author: String, quoteId: String) {
+        Timber.tag(TAG).i("addQuote: $quoteId -> $groupId -> $quote -> $author")
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
+        
         firebaseDataSource.saveNewQuote(
             groupId,
             QuoteModel(
@@ -129,8 +131,11 @@ class QuotesRepositoryImpl(
         firebaseDataSource.deleteQuote(groupId, quoteId, isSelected)
     }
 
-    override suspend fun deleteGroup(id: String) {
-        firebaseDataSource.deleteGroup(id)
+    override suspend fun deleteGroup(id: String, groupType: GroupType) {
+        when(groupType) {
+            GroupType.Personal -> firebaseDataSource.deleteGroup(id)
+            GroupType.Common -> Unit // TODO might
+        }
     }
 
     override suspend fun selectGroup(groupId: String) {

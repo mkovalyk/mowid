@@ -19,7 +19,7 @@ interface QuotesRepository {
 
     suspend fun deleteQuote(groupId: String, quoteId: String, isSelected: Boolean)
 
-    suspend fun deleteGroup(id: String)
+    suspend fun deleteGroup(id: String, groupType: GroupType)
 
     suspend fun selectGroup(groupId: String)
 

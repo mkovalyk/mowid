@@ -2,6 +2,8 @@ package com.kovcom.mowid.model
 
 import android.os.Parcelable
 import com.kovcom.domain.model.Group
+import com.kovcom.domain.model.GroupType
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -11,8 +13,12 @@ data class UiGroup(
     val description: String,
     val count: Int,
     val selectedCount: Int,
-    val canBeDeleted: Boolean,
-) : Parcelable
+    val groupType: GroupType,
+) : Parcelable {
+
+    @IgnoredOnParcel
+    val canBeDeleted: Boolean = groupType == GroupType.Personal
+}
 
 fun UiGroup.toDomainModel() = Group(
     id = id,
@@ -20,7 +26,7 @@ fun UiGroup.toDomainModel() = Group(
     description = description,
     count = count,
     selectedCount = selectedCount,
-    canBeDeleted = canBeDeleted
+    groupType = groupType,
 )
 
 fun Group.toUIModel() = UiGroup(
@@ -29,7 +35,7 @@ fun Group.toUIModel() = UiGroup(
     description = description,
     count = count,
     selectedCount = selectedCount,
-    canBeDeleted = canBeDeleted
+    groupType = groupType,
 )
 
 fun List<UiGroup>.toDomainModel() = map { it.toDomainModel() }

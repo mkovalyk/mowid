@@ -11,6 +11,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.model.UiGroup
 import com.kovcom.mowid.ui.theme.MoWidTheme
 
@@ -81,7 +82,7 @@ fun HomeListItemPreview() {
                 description = "Description 0",
                 count = 10,
                 selectedCount = 5,
-                canBeDeleted = true,
+                groupType = GroupType.Common,
             ),
             onClick = {},
             onEdit = { _, _, _ -> }

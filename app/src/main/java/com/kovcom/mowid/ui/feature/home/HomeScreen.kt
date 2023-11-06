@@ -6,18 +6,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiGroup
-import com.kovcom.mowid.ui.composable.*
+import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
+import com.kovcom.mowid.ui.composable.AppDropDownMenu
+import com.kovcom.mowid.ui.composable.AppFloatingActionButton
+import com.kovcom.mowid.ui.composable.AppProgress
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffold
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffoldState
 import com.kovcom.mowid.ui.composable.bottomsheet.rememberBottomSheetScaffoldState
@@ -74,11 +86,10 @@ fun HomeScreen(
 
                 is HomeEvent.ShowError -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 is HomeEvent.ShowSnackbar -> {
-                    Toast.makeText(context, "Snackbar: ${event.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 }
 
                 is HomeEvent.ItemClicked -> onNavigateToQuotes(event.groupPhrase.id)
-                is HomeEvent.ShowRemoveConfirmationDialog -> TODO()
                 is HomeEvent.ShowAddGroupModal -> {
                     if (bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
                         bottomSheetScaffoldState.bottomSheetState.expand()
@@ -172,9 +183,11 @@ private fun HomeScreenContent(
                 onClick = {
                     sendIntent(HomeUserIntent.GroupItemClicked(it))
                 },
-                onDelete = { id, name ->
-                    sendIntent(HomeUserIntent.OnItemDelete(id, name))
+                onDelete = { item ->
+                    sendIntent(HomeUserIntent.OnItemDelete(item.id, item.groupType, item.name))
                 },
+                dialogType = state.dialogType,
+                sendIntent = sendIntent,
                 onEdit = { id, name, description ->
 //                    bottomSheetUIState.value = BottomSheetUIState.EditGroupBottomSheet(
 //                        id = id,
@@ -219,7 +232,7 @@ fun ScreenContentPreview() {
                 description = "Description 0",
                 count = 10,
                 selectedCount = 5,
-                canBeDeleted = true,
+                groupType = GroupType.Personal,
             ),
             UiGroup(
                 id = "2",
@@ -227,7 +240,7 @@ fun ScreenContentPreview() {
                 description = "Description 1",
                 count = 10,
                 selectedCount = 5,
-                canBeDeleted = true,
+                groupType = GroupType.Personal,
             ),
             UiGroup(
                 id = "3",
@@ -235,7 +248,7 @@ fun ScreenContentPreview() {
                 description = "Description 2",
                 count = 10,
                 selectedCount = 5,
-                canBeDeleted = true,
+                groupType = GroupType.Common,
             )
         )
 

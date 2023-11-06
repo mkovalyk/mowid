@@ -2,9 +2,21 @@ package com.kovcom.mowid.ui.feature.home
 
 import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
-import com.kovcom.mowid.base.ui.*
+import com.kovcom.mowid.base.ui.BaseViewModelV2
+import com.kovcom.mowid.base.ui.DataProvider
+import com.kovcom.mowid.base.ui.IntentProcessor
+import com.kovcom.mowid.base.ui.Publisher
+import com.kovcom.mowid.base.ui.Reducer
 import com.kovcom.mowid.model.toUIModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 class HomeViewModel constructor(
     intentProcessor: HomeIntentProcessor,
@@ -90,17 +102,20 @@ class HomeIntentProcessor constructor(
             is HomeUserIntent.OnItemDelete -> flowOf(
                 HomeEffect.RemoveGroup(
                     id = intent.id,
-                    name = intent.name
+                    name = intent.name,
+                    groupType = intent.groupType
                 )
             )
 
             is HomeUserIntent.RemoveGroupConfirmed -> flow {
-                quotesRepository.deleteGroup(intent.id)
+                quotesRepository.deleteGroup(intent.id, intent.groupType)
                 emit(HomeEffect.RemoveGroupConfirmed(intent.name))
+                emit(HomeEffect.DismissRemoveGroupConfirmation)
             }
 
             is HomeUserIntent.OnEditClicked -> emptyFlow()
             is HomeUserIntent.ShowGroupModal -> emptyFlow()
+            is HomeUserIntent.HideGroupConfirmationDialog -> flowOf(HomeEffect.DismissRemoveGroupConfirmation)
         }
     }
 }
@@ -124,12 +139,24 @@ class HomeReducer : Reducer<HomeEffect, HomeState> {
             is HomeEffect.ShowLoginScreen,
             is HomeEffect.HideGroupModal,
             is HomeEffect.OpenDetails,
-            is HomeEffect.RemoveGroup,
             is HomeEffect.RemoveGroupConfirmed,
             -> state
 
             is HomeEffect.UserLoaded -> state.copy(
                 isLoggedIn = effect.isLoggedIn
+            )
+
+            is HomeEffect.RemoveGroup,
+            -> state.copy(
+                dialogType = HomeState.DialogType.RemoveGroupConfirmation(
+                    id = effect.id,
+                    name = effect.name,
+                    groupType = effect.groupType,
+                )
+            )
+
+            is HomeEffect.DismissRemoveGroupConfirmation -> state.copy(
+                dialogType = HomeState.DialogType.None
             )
         }
     }
@@ -145,19 +172,18 @@ class HomePublisher : Publisher<HomeEffect, HomeEvent, HomeState> {
             is HomeEffect.ShowLoginScreen -> HomeEvent.ShowLoginScreen
             is HomeEffect.HideGroupModal -> HomeEvent.HideGroupModal
             is HomeEffect.OpenDetails -> HomeEvent.ItemClicked(effect.groupPhrase)
-            is HomeEffect.RemoveGroup -> HomeEvent.ShowRemoveConfirmationDialog(
-                effect.id,
-                effect.name
-            )
 
             is HomeEffect.RemoveGroupConfirmed -> HomeEvent.ShowSnackbar("Group ${effect.name} removed")
             is HomeEffect.ShowAddGroupModel -> HomeEvent.ShowAddGroupModal
 
+            is HomeEffect.RemoveGroup,
             is HomeEffect.Loaded,
             is HomeEffect.Loading,
             is HomeEffect.ShowEditGroupModal,
             is HomeEffect.UserLoaded,
+            is HomeEffect.DismissRemoveGroupConfirmation,
             -> null
+
         }
     }
 

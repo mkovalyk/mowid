@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.*
 const val EFFECTS_KEY = "effects_key"
 const val EVENTS_KEY = "event_key"
 
+@Deprecated("Use BaseViewModelV2 instead")
 abstract class BaseViewModel<
-    State : com.kovcom.mowid.base.ui.State,
-    Event : com.kovcom.mowid.base.ui.Event,
-    Effect : com.kovcom.mowid.base.ui.Effect,
-    > : ViewModel() {
+        State : com.kovcom.mowid.base.ui.State,
+        Event : com.kovcom.mowid.base.ui.Event,
+        Effect : com.kovcom.mowid.base.ui.Effect,
+        > : ViewModel() {
 
     private var eventJob: Job? = null
 
@@ -59,7 +60,6 @@ abstract class BaseViewModel<
 
     }
 
-
     fun publishEvent(event: Event) {
         val newEvent = event
         if (eventJob?.isActive != true) {
@@ -81,7 +81,6 @@ abstract class BaseViewModel<
         }
     }
 
-    
     protected fun Effect.sendEffect() {
         viewModelScope.launch { _effect.send(this@sendEffect) }
     }

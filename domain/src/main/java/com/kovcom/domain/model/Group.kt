@@ -6,5 +6,5 @@ data class Group(
     val description: String,
     val count: Int,
     val selectedCount: Int,
-    val canBeDeleted: Boolean,
+    val groupType: GroupType,
 )

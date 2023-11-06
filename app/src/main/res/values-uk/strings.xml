@@ -14,6 +14,10 @@
     <string name="label_group">Група</string>
     <string name="label_description">Опис</string>
 
+    <string name="label_delete_group">Видалити групу?</string>
+    <string name="label_delete_group_message">Ви впевнені, що хочете видалити групи?</string>
+
+
     <!--    Delete quote-->
     <string name="label_delete_quote">Видалити цитату?</string>
     <string name="label_delete_quote_message">Ви впевнені, що хочете видалити цитату?</string>
