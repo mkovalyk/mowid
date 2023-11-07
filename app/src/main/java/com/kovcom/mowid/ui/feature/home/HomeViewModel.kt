@@ -2,21 +2,9 @@ package com.kovcom.mowid.ui.feature.home
 
 import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
-import com.kovcom.mowid.base.ui.BaseViewModelV2
-import com.kovcom.mowid.base.ui.DataProvider
-import com.kovcom.mowid.base.ui.IntentProcessor
-import com.kovcom.mowid.base.ui.Publisher
-import com.kovcom.mowid.base.ui.Reducer
+import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.model.toUIModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 
 class HomeViewModel constructor(
     intentProcessor: HomeIntentProcessor,
@@ -33,7 +21,7 @@ class HomeViewModel constructor(
 
     override fun createInitialState(): HomeState = HomeState(
         isLoading = true,
-        groupPhraseList = emptyList(),
+        groupList = emptyList(),
         isLoggedIn = false,
     )
 
@@ -125,7 +113,7 @@ class HomeReducer : Reducer<HomeEffect, HomeState> {
     override fun reduce(effect: HomeEffect, state: HomeState): HomeState {
         return when (effect) {
             is HomeEffect.Loaded -> state.copy(
-                groupPhraseList = effect.information.map { it.toUIModel() }
+                groupList = effect.information.map { it.toUIModel() }
             )
 
             is HomeEffect.Loading -> state.copy(
@@ -152,11 +140,21 @@ class HomeReducer : Reducer<HomeEffect, HomeState> {
                     id = effect.id,
                     name = effect.name,
                     groupType = effect.groupType,
-                )
+                ),
+                groupList = state.groupList.map {
+                    if (it.id == effect.id) {
+                        it.copy(isSwipeToDeleteOpened = true)
+                    } else {
+                        it
+                    }
+                }
             )
 
             is HomeEffect.DismissRemoveGroupConfirmation -> state.copy(
-                dialogType = HomeState.DialogType.None
+                dialogType = HomeState.DialogType.None,
+                groupList = state.groupList.map {
+                    it.copy(isSwipeToDeleteOpened = false)
+                }
             )
         }
     }

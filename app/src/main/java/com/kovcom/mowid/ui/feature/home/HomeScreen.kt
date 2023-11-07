@@ -6,16 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -26,10 +18,7 @@ import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiGroup
-import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
-import com.kovcom.mowid.ui.composable.AppDropDownMenu
-import com.kovcom.mowid.ui.composable.AppFloatingActionButton
-import com.kovcom.mowid.ui.composable.AppProgress
+import com.kovcom.mowid.ui.composable.*
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffold
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffoldState
 import com.kovcom.mowid.ui.composable.bottomsheet.rememberBottomSheetScaffoldState
@@ -178,7 +167,7 @@ private fun HomeScreenContent(
         when {
             state.isLoading -> AppProgress()
             else -> HomeList(
-                groupPhraseList = state.groupPhraseList,
+                groupPhraseList = state.groupList,
                 modifier = Modifier.padding(padding),
                 onClick = {
                     sendIntent(HomeUserIntent.GroupItemClicked(it))
@@ -255,7 +244,7 @@ fun ScreenContentPreview() {
         ScreenContent(
             state = HomeState(
                 isLoading = false,
-                groupPhraseList = list,
+                groupList = list,
                 isLoggedIn = true,
             ),
             sendEvent = {},

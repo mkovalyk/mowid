@@ -5,19 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDismissState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,6 +46,12 @@ fun HomeList(
                     },
                     positionalThreshold = { 200.dp.toPx() }
                 )
+                LaunchedEffect(item) {
+                    if (!item.isSwipeToDeleteOpened) {
+                        dismissState.reset()
+                    }
+                }
+
                 if (item.canBeDeleted) {
                     SwipeToDismiss(
                         modifier = Modifier.animateItemPlacement(),
@@ -87,25 +82,25 @@ fun HomeList(
         when (dialogType) {
             is HomeState.DialogType.RemoveGroupConfirmation -> {
                 AlertDialog(onDismissRequest = {},
-                    confirmButton = {
-                        TextButton(onClick = {
-                            sendIntent(
-                                HomeUserIntent.RemoveGroupConfirmed(
-                                    id = dialogType.id,
-                                    name = dialogType.name,
-                                    groupType = dialogType.groupType,
-                                )
-                            )
-                        }) {
-                            Text(text = stringResource(id = R.string.label_delete))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { sendIntent(HomeUserIntent.HideGroupConfirmationDialog) }) {
-                            Text(text = stringResource(id = R.string.label_cancel))
-                        }
-                    },
-                    text = { Text(text = stringResource(id = R.string.label_delete_group_message)) }
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    sendIntent(
+                                        HomeUserIntent.RemoveGroupConfirmed(
+                                            id = dialogType.id,
+                                            name = dialogType.name,
+                                            groupType = dialogType.groupType,
+                                        )
+                                    )
+                                }) {
+                                    Text(text = stringResource(id = R.string.label_delete))
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { sendIntent(HomeUserIntent.HideGroupConfirmationDialog) }) {
+                                    Text(text = stringResource(id = R.string.label_cancel))
+                                }
+                            },
+                            text = { Text(text = stringResource(id = R.string.label_delete_group_message)) }
                 )
             }
 

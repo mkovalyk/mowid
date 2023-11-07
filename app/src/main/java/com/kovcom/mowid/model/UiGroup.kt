@@ -14,6 +14,7 @@ data class UiGroup(
     val count: Int,
     val selectedCount: Int,
     val groupType: GroupType,
+    val isSwipeToDeleteOpened: Boolean = false,
 ) : Parcelable {
 
     @IgnoredOnParcel

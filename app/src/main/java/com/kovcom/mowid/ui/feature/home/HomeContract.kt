@@ -2,15 +2,12 @@ package com.kovcom.mowid.ui.feature.home
 
 import com.kovcom.domain.model.Group
 import com.kovcom.domain.model.GroupType
-import com.kovcom.mowid.base.ui.Effect
-import com.kovcom.mowid.base.ui.Event
-import com.kovcom.mowid.base.ui.State
-import com.kovcom.mowid.base.ui.UserIntent
+import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.model.UiGroup
 
 data class HomeState(
     val isLoading: Boolean,
-    val groupPhraseList: List<UiGroup>,
+    val groupList: List<UiGroup>,
     val isLoggedIn: Boolean,
     val dialogType: DialogType = DialogType.None,
 ) : State {
