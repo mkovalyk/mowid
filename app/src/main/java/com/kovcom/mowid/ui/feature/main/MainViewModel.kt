@@ -5,15 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.BaseViewModel
+import com.kovcom.mowid.base.ui.BaseViewModelV2
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
 import kotlinx.coroutines.launch
 
-class MainViewModel  constructor(
+class MainViewModel constructor(
     private val workerManager: QuotesWorkerManager,
     private val userRepository: UserRepository,
-) : BaseViewModel<MainState, MainEvent, MainEffect>() {
+) : BaseViewModelV2<MainState, MainEvent, MainEffect, MainUserIntent>() {
 
     override fun createInitialState(): MainState = MainState.Loading(state = false)
 
