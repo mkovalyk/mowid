@@ -24,7 +24,7 @@ fun AppNavigation(activityViewModel: MainViewModel) {
             route = Navigation.Route.Home.route
         ) {
             HomeScreenDestination(
-                sendMainEvent = activityViewModel::publishEvent,
+                sendMainEvent = activityViewModel::processIntent,
                 onNavigateToQuotes = { groupId ->
                     navController.navigate(route = Navigation.Route.Quotes.createRoute(groupId))
                 },
@@ -62,9 +62,11 @@ fun AppNavigation(activityViewModel: MainViewModel) {
                     )
                 }
 
-                MainEvent.SignIn,
-                MainEvent.SignOut,
+                is MainEvent.ShowToast,
+                is MainEvent.SignIn,
+                is MainEvent.SignOut,
                 -> {
+                    // do nothing
                 }
             }
         }

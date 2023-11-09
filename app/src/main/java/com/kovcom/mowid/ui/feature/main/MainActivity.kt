@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -16,32 +17,30 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.BaseActivity
 import com.kovcom.mowid.ui.navigation.AppNavigation
 import com.kovcom.mowid.ui.theme.MoWidTheme
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
-class MainActivity : BaseActivity<MainState, MainEvent, MainEffect, MainViewModel>() {
+class MainActivity : ComponentActivity() {
 
-    override val viewModel: MainViewModel by viewModel()
+    private val viewModel: MainViewModel by viewModel()
 
-    private val groupId: String?
-        get() = intent?.getStringExtra(GROUP_ID)
+    private val groupId: String? by lazy(LazyThreadSafetyMode.NONE) { intent.getStringExtra(GROUP_ID) }
 
-    private val quoteId: String?
-        get() = intent?.getStringExtra(QUOTE_ID)
+    private val quoteId: String? by lazy(LazyThreadSafetyMode.NONE) { intent.getStringExtra(QUOTE_ID) }
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
-        this.viewModel.onSignInResult(res)
+        this.viewModel.processIntent(MainUserIntent.SignInSuccess(res))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        subscribeOnEvent()
+//        subscribeOnEvent()
         setContent {
             MoWidTheme {
                 Surface(
@@ -58,40 +57,39 @@ class MainActivity : BaseActivity<MainState, MainEvent, MainEffect, MainViewMode
                         val groupId = groupId
                         val quoteId = quoteId
                         if (groupId != null && quoteId != null) {
-                            viewModel.navigateToQuote(groupId, quoteId)
+                            viewModel.processIntent(
+                                MainUserIntent.NavigateToQuote(
+                                    groupId = groupId,
+                                    quoteId = quoteId
+                                )
+                            )
                         }
                     }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                repeatOnLifecycle(state = Lifecycle.State.STARTED) {
+                    viewModel.event.onEach {
+                        when (it) {
+                            is MainEvent.NavigateToQuote -> {
+//                            // do nothing. It is handled in AppNavigation
+                            }
+
+                            is MainEvent.ShowToast -> {
+                                Toast.makeText(this@MainActivity, it.messageId, Toast.LENGTH_LONG)
+                                    .show()
+                            }
+                            is MainEvent.SignIn -> signIn()
+                            is MainEvent.SignOut -> signOut()
+                        }
+                    }.collect()
                 }
             }
         }
     }
 
-    override fun handleEffect(effect: MainEffect) {
-        when (effect) {
-            is MainEffect.ShowToast -> {
-                Timber.i("effect.messageId: ${effect.messageId}")
-                Toast.makeText(this, getString(effect.messageId), Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    private fun subscribeOnEvent() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.event.collect {
-                    when (it) {
-                        is MainEvent.SignIn -> createSignInIntent()
-                        is MainEvent.SignOut -> signOut()
-                        is MainEvent.NavigateToQuote -> {
-                            // do nothing. It is handled in AppNavigation
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun createSignInIntent() {
+    private fun signIn() {
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build(),
@@ -109,8 +107,9 @@ class MainActivity : BaseActivity<MainState, MainEvent, MainEffect, MainViewMode
         AuthUI.getInstance()
             .signOut(this)
             .addOnCompleteListener {
-                viewModel.signOutSuccess()
-                Toast.makeText(this, getString(R.string.label_sign_out_success), Toast.LENGTH_LONG).show()
+                viewModel.processIntent(MainUserIntent.SignOutSuccess)
+                Toast.makeText(this, getString(R.string.label_sign_out_success), Toast.LENGTH_LONG)
+                    .show()
             }
     }
 

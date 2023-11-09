@@ -37,29 +37,6 @@ abstract class BaseViewModel<
         subscribeOnEvent()
     }
 
-    suspend fun main(): Unit = coroutineScope {
-        val flow = MutableSharedFlow<String>()
-
-        launch {
-            flow.collect {
-                println("First listener: $it")
-            }
-        }
-        launch {
-            flow.collect {
-                println("Second listener: $it")
-            }
-        }
-
-        launch {
-            delay(1000)
-            flow.emit("First")
-            flow.emit("Second")
-
-        }
-
-    }
-
     fun publishEvent(event: Event) {
         val newEvent = event
         if (eventJob?.isActive != true) {

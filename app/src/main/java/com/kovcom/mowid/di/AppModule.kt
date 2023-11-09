@@ -51,8 +51,12 @@ val appModule = module {
     }
     viewModel {
         MainViewModel(
-            get<QuotesWorkerManager>(),
-            get<UserRepository>(),
+            MainViewModel.MainIntentProcessor(
+                get<UserRepository>(),
+                get<QuotesWorkerManager>()
+            ),
+            MainViewModel.MainEventReducer(),
+            MainViewModel.MainEventPublisher()
         )
     }
 

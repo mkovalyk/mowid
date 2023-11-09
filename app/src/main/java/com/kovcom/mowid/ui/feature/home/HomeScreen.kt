@@ -25,7 +25,7 @@ import com.kovcom.mowid.ui.composable.bottomsheet.rememberBottomSheetScaffoldSta
 import com.kovcom.mowid.ui.feature.bottomsheet.BottomSheet
 import com.kovcom.mowid.ui.feature.bottomsheet.BottomSheetUIState
 import com.kovcom.mowid.ui.feature.home.composable.HomeList
-import com.kovcom.mowid.ui.feature.main.MainEvent
+import com.kovcom.mowid.ui.feature.main.MainUserIntent
 import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.onEach
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    sendMainEvent: (MainEvent) -> Unit,
+    sendMainEvent: (MainUserIntent) -> Unit,
     onNavigateToQuotes: (id: String) -> Unit,
     onNavigateToSettings: () -> Unit,
 ) {
@@ -70,7 +70,7 @@ fun HomeScreen(
                 }
 
                 is HomeEvent.ShowLoginScreen -> {
-                    sendMainEvent(MainEvent.SignIn)
+                    sendMainEvent(MainUserIntent.SignIn)
                 }
 
                 is HomeEvent.ShowError -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()

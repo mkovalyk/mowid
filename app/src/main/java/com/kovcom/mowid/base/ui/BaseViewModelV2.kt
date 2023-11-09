@@ -35,7 +35,7 @@ abstract class BaseViewModelV2<
         get() = _uiState.value
 
     private val _event: MutableSharedFlow<UiEvent> = MutableSharedFlow()
-    val event = _event.asSharedFlow()
+    val event: Flow<UiEvent> = _event.asSharedFlow()
 
     protected open val shouldLog = true
 

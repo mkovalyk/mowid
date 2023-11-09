@@ -28,10 +28,12 @@ import com.kovcom.mowid.model.UiFrequency
 import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
 import com.kovcom.mowid.ui.composable.AppProgress
 import com.kovcom.mowid.ui.feature.main.MainEvent
+import com.kovcom.mowid.ui.feature.main.MainUserIntent
 import com.kovcom.mowid.ui.feature.main.MainViewModel
 import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 private const val SIGN_IN_TAG = "SIGN_IN_TAG"
 private const val SIGN_OUT_TAG = "SIGN_OUT_TAG"
@@ -72,7 +74,7 @@ fun SettingsScreen(
 
     ScreenContent(
         state = state,
-        sendMainEvent = activityViewModel::publishEvent,
+        sendMainEvent = activityViewModel::processIntent,
         sendEvent = viewModel::publishEvent
     )
 }
@@ -80,7 +82,7 @@ fun SettingsScreen(
 @Composable
 fun ScreenContent(
     state: SettingsState,
-    sendMainEvent: (MainEvent) -> Unit,
+    sendMainEvent: (MainUserIntent) -> Unit,
     sendEvent: (SettingsEvent) -> Unit,
 ) {
 
@@ -111,7 +113,7 @@ fun ScreenContent(
 fun Content(
     padding: PaddingValues,
     state: SettingsState,
-    sendMainEvent: (MainEvent) -> Unit,
+    sendMainEvent: (MainUserIntent) -> Unit,
     sendEvent: (SettingsEvent) -> Unit,
 ) {
 
@@ -194,10 +196,10 @@ fun Content(
             Spacer(modifier = Modifier.weight(1f))
             ClickableText(text = userInfoLabel, onClick = { offset ->
                 userInfoLabel.getStringAnnotations(offset, offset).firstOrNull()?.let { span ->
-                    Log.d("SettingScreen", "Clicked on ${span.tag}")
+                    Timber.d("SettingScreen", "Clicked on ${span.tag}")
                     when (span.tag) {
-                        SIGN_IN_TAG -> sendMainEvent(MainEvent.SignIn)
-                        SIGN_OUT_TAG -> sendMainEvent(MainEvent.SignOut)
+                        SIGN_IN_TAG -> sendMainEvent(MainUserIntent.SignIn)
+                        SIGN_OUT_TAG -> sendMainEvent(MainUserIntent.SignOut)
                         USER_NAME_TAG -> {}
                     }
                 }

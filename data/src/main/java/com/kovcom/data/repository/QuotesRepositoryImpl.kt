@@ -5,8 +5,15 @@ import com.kovcom.data.firebase.source.FirebaseDataSource
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.data.mapper.mapToDomain
 import com.kovcom.data.mapper.toDomain
-import com.kovcom.data.model.*
-import com.kovcom.domain.model.*
+import com.kovcom.data.model.GroupModel
+import com.kovcom.data.model.QuoteModel
+import com.kovcom.data.model.Result
+import com.kovcom.data.model.SelectedQuoteModel
+import com.kovcom.data.model.merge
+import com.kovcom.domain.model.Frequencies
+import com.kovcom.domain.model.Group
+import com.kovcom.domain.model.GroupType
+import com.kovcom.domain.model.Quote
 import com.kovcom.domain.repository.QuotesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -63,7 +70,6 @@ class QuotesRepositoryImpl(
                 is Result.Success -> {
                     val selectedIds = selectedQuotes.data.orEmpty()
                         .flatMap { it.quotesIds.map { quote -> quote.quoteId }.toList() }.toSet()
-                    println("selectedIds: $selectedIds")
                     allQuotes.data.orEmpty().map { model -> model.mapToDomain(selectedIds) }
                 }
 
