@@ -3,6 +3,7 @@ package com.kovcom.mowid
 import android.app.Application
 import com.kovcom.data.di.dataModule
 import com.kovcom.mowid.di.appModule
+import com.kovcom.mowid.ui.feature.settings.settingsModule
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +26,8 @@ class MoWidApplication : Application() {
             workManagerFactory()
             modules(
                 dataModule,
-                appModule
+                appModule,
+                settingsModule,
             )
         }
 

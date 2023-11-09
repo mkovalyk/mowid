@@ -1,73 +1,119 @@
 package com.kovcom.mowid.ui.feature.settings
 
-import androidx.lifecycle.viewModelScope
 import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.BaseViewModel
+import com.kovcom.mowid.base.ui.BaseViewModelV2
+import com.kovcom.mowid.base.ui.DataProvider
+import com.kovcom.mowid.base.ui.IntentProcessor
+import com.kovcom.mowid.base.ui.Publisher
+import com.kovcom.mowid.base.ui.Reducer
 import com.kovcom.mowid.model.toUIModel
+import com.kovcom.mowid.ui.feature.settings.SettingsContract.Effect
+import com.kovcom.mowid.ui.feature.settings.SettingsContract.Event
+import com.kovcom.mowid.ui.feature.settings.SettingsContract.Intent
+import com.kovcom.mowid.ui.feature.settings.SettingsContract.State
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onStart
 
 class SettingsViewModel(
-    private val quotesWorkerManager: QuotesWorkerManager,
+    intentProcessor: IntentProcessor<State, Intent, Effect>,
+    reducer: Reducer<Effect, State>,
+    publisher: Publisher<Effect, Event, State>,
+    dataProviders: List<DataProvider<Effect>>,
+) : BaseViewModelV2<State, Event, Effect, Intent>(
+    intentProcessor, reducer, publisher,
+    dataProviders = dataProviders,
+) {
+
+    override fun tag(): String = "SettingsViewModel"
+    override fun createInitialState() = State()
+}
+
+class IntentProcessor(
     private val repository: QuotesRepository,
-    private val userRepository: UserRepository,
-) : BaseViewModel<SettingsState, SettingsEvent, SettingsEffect>() {
+    private val quotesWorkerManager: QuotesWorkerManager,
+) : IntentProcessor<State, Intent, Effect> {
 
-    init {
-        repository.getFrequencySettingsFlow()
-            .combine(userRepository.userFlow) { frequency, user ->
-                frequency to user
-            }
-            .onStart {
-                setState { copy(isLoading = true) }
-            }
-            .flowOn(Dispatchers.IO)
-            .onEach { data ->
-                setState {
-                    copy(
-                        isLoading = false,
-                        selectedFrequency = data.first.selectedFrequency?.toUIModel(),
-                        frequencies = data.first.frequencies.toUIModel().sortedBy { it.frequencyId },
-                        userModel = data.second?.toUIModel()
-                    )
-                }
-            }
-            .onCompletion {
-                setState { copy(isLoading = false) }
-            }
-            .catch {
-                SettingsEffect.ShowToast(
-                    message = it.message.toString()
-                ).sendEffect()
-            }
-            .launchIn(viewModelScope)
-    }
-
-    override fun handleEvent(event: SettingsEvent) {
-        when (event) {
-            is SettingsEvent.OnFrequencyChanged -> {
-                viewModelScope.launch {
-                    repository.updateUserFrequency(event.id)
+    override suspend fun processIntent(
+        intent: Intent,
+        currentState: State,
+    ): Flow<Effect> {
+        return when (intent) {
+            is Intent.FrequencyChanged -> {
+                flow {
+                    repository.updateUserFrequency(intent.id)
                     quotesWorkerManager.execute(ExecutionOption.Regular)
-                    SettingsEffect.ShowToastId(
-                        messageId = R.string.label_applied
-                    ).sendEffect()
+                    emit(Effect.FrequencyChanged(intent.id))
                 }
             }
-
-            SettingsEvent.BackButtonClicked -> {}
         }
     }
+}
 
-    override fun createInitialState(): SettingsState = SettingsState(
-        isLoading = true,
-        selectedFrequency = null,
-        frequencies = emptyList(),
-        userModel = null,
-    )
+class FrequencyDataProvider(
+    private val repository: QuotesRepository,
+) : DataProvider<Effect> {
+
+    override fun observe(): Flow<Effect> {
+        return repository.getFrequencySettingsFlow()
+            .flatMapLatest {
+                flowOf(Effect.Loading(false), Effect.FrequenciesLoaded(it.frequencies))
+            }
+            .onStart { emit(Effect.Loading(true)) }
+            .catch {
+                emit(Effect.Error(it.message.toString()))
+            }
+    }
+}
+
+class UserDataProvider(
+    private val repository: UserRepository,
+) : DataProvider<Effect> {
+
+    override fun observe(): Flow<Effect> {
+        return repository.userFlow.flatMapLatest {
+            flowOf(Effect.Loading(false), Effect.UserLoaded(it))
+        }
+            .onStart { emit(Effect.Loading(true)) }
+            .catch {
+                emit(Effect.Error(it.message.toString()))
+            }
+    }
+}
+
+class Reducer : Reducer<Effect, State> {
+
+    override fun reduce(effect: Effect, state: State): State {
+        return when (effect) {
+            is Effect.Loading -> state.copy(isLoading = effect.isLoading)
+            is Effect.FrequenciesLoaded -> state.copy(frequencies = effect.frequencies.toUIModel())
+            is Effect.UserLoaded -> state.copy(userModel = effect.user?.toUIModel())
+            is Effect.FrequencyChanged -> state.copy(selectedFrequency = state.frequencies
+                .find { it.frequencyId == effect.id })
+
+            is Effect.Error -> state
+        }
+    }
+}
+
+class Publisher : Publisher<Effect, Event, State> {
+
+    override fun publish(effect: Effect, currentState: State): Event? {
+        return when (effect) {
+            is Effect.FrequenciesLoaded,
+            is Effect.UserLoaded,
+            is Effect.Loading,
+            -> null
+
+            is Effect.FrequencyChanged -> Event.ShowToastId(R.string.label_applied)
+            is Effect.Error -> Event.ShowToast(effect.message)
+        }
+    }
 }

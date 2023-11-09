@@ -64,13 +64,6 @@ val appModule = module {
         QuotesViewModel(get<QuotesRepository>(), get())
     }
 
-    viewModel {
-        SettingsViewModel(
-            get<QuotesWorkerManager>(),
-            get<QuotesRepository>(),
-            get<UserRepository>(),
-        )
-    }
     worker { params ->
         QuotesWorker(
             androidContext(),

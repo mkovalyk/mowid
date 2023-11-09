@@ -30,6 +30,8 @@ import com.kovcom.mowid.ui.composable.AppProgress
 import com.kovcom.mowid.ui.feature.main.MainEvent
 import com.kovcom.mowid.ui.feature.main.MainUserIntent
 import com.kovcom.mowid.ui.feature.main.MainViewModel
+import com.kovcom.mowid.ui.feature.settings.SettingsContract.Intent
+import com.kovcom.mowid.ui.feature.settings.SettingsContract.State
 import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -45,29 +47,15 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBackClicked: () -> Unit,
 ) {
-    val state: SettingsState by viewModel.uiState.collectAsStateWithLifecycle()
+    val state: State by viewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-
-    LaunchedEffect(EFFECTS_KEY) {
-        viewModel.effect.onEach { effect ->
-            when (effect) {
-                is SettingsEffect.ShowToast -> Toast.makeText(
-                    context, effect.message, Toast.LENGTH_SHORT
-                ).show()
-
-                is SettingsEffect.ShowToastId -> Toast.makeText(
-                    context, effect.messageId, Toast.LENGTH_SHORT
-                ).show()
-            }
-        }.collect()
-    }
 
     LaunchedEffect(EVENTS_KEY) {
         viewModel.event.onEach { event ->
             when (event) {
-                SettingsEvent.BackButtonClicked -> onBackClicked()
-                is SettingsEvent.OnFrequencyChanged -> {}
+                is SettingsContract.Event.ShowToast -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                is SettingsContract.Event.ShowToastId -> Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
         }.collect()
     }
@@ -75,21 +63,23 @@ fun SettingsScreen(
     ScreenContent(
         state = state,
         sendMainEvent = activityViewModel::processIntent,
-        sendEvent = viewModel::publishEvent
+        sendEvent = viewModel::processIntent,
+        onBackClicked = onBackClicked,
     )
 }
 
 @Composable
 fun ScreenContent(
-    state: SettingsState,
+    state: State,
     sendMainEvent: (MainUserIntent) -> Unit,
-    sendEvent: (SettingsEvent) -> Unit,
+    sendEvent: (Intent) -> Unit,
+    onBackClicked: () -> Unit,
 ) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(topBar = {
             AppCenterAlignedTopAppBar(title = stringResource(id = R.string.title_settings), navigationIcon = {
-                IconButton(onClick = { sendEvent(SettingsEvent.BackButtonClicked) }) {
+                IconButton(onClick = onBackClicked) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack, contentDescription = "Back"
                     )
@@ -112,9 +102,9 @@ fun ScreenContent(
 @OptIn(ExperimentalMaterial3Api::class)
 fun Content(
     padding: PaddingValues,
-    state: SettingsState,
+    state: State,
     sendMainEvent: (MainUserIntent) -> Unit,
-    sendEvent: (SettingsEvent) -> Unit,
+    sendEvent: (Intent) -> Unit,
 ) {
 
     val userInfoLabel = buildAnnotatedString {
@@ -183,7 +173,7 @@ fun Content(
 
             Button(onClick = {
                 sendEvent(
-                    SettingsEvent.OnFrequencyChanged(
+                    Intent.FrequencyChanged(
                         selectedFrequency?.frequencyId
                             ?: FirebaseDataSourceImpl.DEFAULT_FREQUENCY_VALUE
                     )
@@ -220,7 +210,7 @@ fun ScreenContentPreview() {
             )
         )
         ScreenContent(
-            state = SettingsState(
+            state = State(
                 isLoading = false,
                 selectedFrequency = UiFrequency(
                     frequencyId = 0,
@@ -231,6 +221,7 @@ fun ScreenContentPreview() {
             ),
             sendMainEvent = {},
             sendEvent = {},
+            onBackClicked = {},
         )
     }
 }
