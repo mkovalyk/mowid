@@ -36,11 +36,12 @@ fun AppNavigation(activityViewModel: MainViewModel) {
             arguments = listOf(
                 navArgument(name = GROUP_ID) {
                     type = NavType.StringType
-                }
+                },
             )
         ) { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getString(GROUP_ID).orEmpty()
             QuotesScreenDestination(
-                groupName = "",
+                groupId = groupId,
                 onBackClicked = { navController.navigateUp() },
                 onNavigateToSettings = { navController.navigate(Navigation.Route.Settings.route) }
             )

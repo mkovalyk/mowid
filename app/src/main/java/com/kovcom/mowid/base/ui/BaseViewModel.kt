@@ -11,9 +11,9 @@ const val EVENTS_KEY = "event_key"
 
 @Deprecated("Use BaseViewModelV2 instead")
 abstract class BaseViewModel<
-        State : com.kovcom.mowid.base.ui.State,
-        Event : com.kovcom.mowid.base.ui.Event,
-        Effect : com.kovcom.mowid.base.ui.Effect,
+        State : IState,
+        Event : IEvent,
+        Effect : IEffect,
         > : ViewModel() {
 
     private var eventJob: Job? = null

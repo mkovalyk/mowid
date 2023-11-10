@@ -10,9 +10,9 @@ import kotlin.system.measureTimeMillis
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class BaseViewModelV2<
-    UiState : State,
-    UiEvent : Event,
-    UiEffect : Effect,
+    UiState : IState,
+    UiEvent : IEvent,
+    UiEffect : IEffect,
     Intent : UserIntent,
     >(
     private val intentProcessor: IntentProcessor<UiState, Intent, UiEffect>,
@@ -54,19 +54,19 @@ abstract class BaseViewModelV2<
 
                 intentProcessor.processIntent(intent, currentState)
             }.collectLatest {
-                Timber.tag(tag).i("Collect Latest -> Effect: $it")
+                Timber.tag(tag).i("Collect Latest -> IEffect: $it")
                 effectsChannel.trySend(it)
             }
         }
         coroutineScope.launch {
             effectsChannel.consumeAsFlow().collect { effect ->
-                if (shouldLog) Timber.tag(tag).i("Effect: $effect: $currentState")
+                if (shouldLog) Timber.tag(tag).i("IEffect: $effect: $currentState")
 
                 val newState = reduce(currentState, effect)
                 setState(newState)
                 withContext(Dispatchers.Main) {
                     val event = publisher.publish(effect, newState)
-                    if (shouldLog) Timber.tag(tag).i("Publish State: $effect -> $event")
+                    if (shouldLog) Timber.tag(tag).i("Publish IState: $effect -> $event")
                     if (event != null) {
                         _event.emit(event)
                     }
@@ -120,22 +120,22 @@ abstract class BaseViewModelV2<
     }
 }
 
-interface DataProvider<E : Effect> {
+interface DataProvider<E : IEffect> {
 
     fun observe(): Flow<E>
 }
 
-interface IntentProcessor<S : State, Intent : UserIntent, E : Effect> {
+interface IntentProcessor<S : IState, Intent : UserIntent, E : IEffect> {
 
     suspend fun processIntent(intent: Intent, currentState: S): Flow<E>
 }
 
-interface Reducer<UiEffect : Effect, S : State> {
+interface Reducer<UiEffect : IEffect, S : IState> {
 
     fun reduce(effect: UiEffect, state: S): S
 }
 
-interface Publisher<UiEffect : Effect, E : Event, S : State> {
+interface Publisher<UiEffect : IEffect, E : IEvent, S : IState> {
 
     fun publish(effect: UiEffect, currentState: S): E?
 }

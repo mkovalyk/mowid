@@ -55,7 +55,7 @@ enum class BottomSheetValue {
 }
 
 /**
- * State of the persistent bottom sheet in [BottomSheetScaffold].
+ * IState of the persistent bottom sheet in [BottomSheetScaffold].
  *
  * @param initialValue The initial value of the state.
  * @param animationSpec The default animation that will be used to animate to a new state.
@@ -153,7 +153,7 @@ fun rememberBottomSheetState(
 }
 
 /**
- * State of the [BottomSheetScaffold] composable.
+ * IState of the [BottomSheetScaffold] composable.
  *
  * @param drawerState The state of the navigation drawer.
  * @param bottomSheetState The state of the persistent bottom sheet.

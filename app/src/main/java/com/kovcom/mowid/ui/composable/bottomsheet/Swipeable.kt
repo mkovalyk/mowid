@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.*
 
 /**
- * State of the [swipeable] modifier.
+ * IState of the [swipeable] modifier.
  *
  * This contains necessary information about any ongoing swipe or animation and provides methods
  * to change the state either immediately or by starting an animation. To create and remember a

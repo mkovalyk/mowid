@@ -79,7 +79,7 @@ enum class BottomDrawerValue {
 }
 
 /**
- * State of the [ModalDrawer] composable.
+ * IState of the [ModalDrawer] composable.
  *
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
@@ -198,7 +198,7 @@ class DrawerState(
 }
 
 /**
- * State of the [BottomDrawer] composable.
+ * IState of the [BottomDrawer] composable.
  *
  * @param initialValue The initial value of the state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.

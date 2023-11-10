@@ -1,8 +1,8 @@
 package com.kovcom.mowid.base.ui
 
-interface State
+interface IState
 
-interface Event
+interface IEvent
 
 interface UserIntent {
 
@@ -15,4 +15,4 @@ enum class Priority {
     High,
 }
 
-interface Effect
+interface IEffect

@@ -10,7 +10,7 @@ data class HomeState(
     val groupList: List<UiGroup>,
     val isLoggedIn: Boolean,
     val dialogType: DialogType = DialogType.None,
-) : State {
+) : IState {
 
     sealed class DialogType {
         data class RemoveGroupConfirmation(
@@ -47,7 +47,7 @@ sealed interface HomeUserIntent : UserIntent {
     object HideGroupConfirmationDialog : HomeUserIntent
 }
 
-sealed interface HomeEvent : Event {
+sealed interface HomeEvent : IEvent {
     data class OnItemDeleted(val name: String) : HomeEvent
     data class ShowGroupModal(val id: String, val name: String, val description: String) :
         HomeEvent
@@ -61,7 +61,7 @@ sealed interface HomeEvent : Event {
     data class ItemClicked(val groupPhrase: UiGroup) : HomeEvent
 }
 
-sealed interface HomeEffect : Effect {
+sealed interface HomeEffect : IEffect {
     data class Loading(val isLoading: Boolean) : HomeEffect
     data class Loaded(val information: List<Group>) : HomeEffect
     data class ShowError(val message: String) : HomeEffect

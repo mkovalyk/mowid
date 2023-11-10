@@ -3,6 +3,7 @@ package com.kovcom.mowid
 import android.app.Application
 import com.kovcom.data.di.dataModule
 import com.kovcom.mowid.di.appModule
+import com.kovcom.mowid.ui.feature.quotes.quotesModule
 import com.kovcom.mowid.ui.feature.settings.settingsModule
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
@@ -28,6 +29,7 @@ class MoWidApplication : Application() {
                 dataModule,
                 appModule,
                 settingsModule,
+                quotesModule,
             )
         }
 

@@ -1,17 +1,18 @@
 package com.kovcom.mowid.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kovcom.mowid.ui.feature.quotes.QuotesScreen
 import com.kovcom.mowid.ui.feature.quotes.QuotesViewModel
+import com.kovcom.mowid.ui.feature.quotes.QuotesViewModel2
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun QuotesScreenDestination(
-    groupName: String,
+    groupId: String,
     onBackClicked: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
 ) {
-    val viewModel: QuotesViewModel = koinViewModel()
-    QuotesScreen(viewModel, groupName, onBackClicked, onNavigateToSettings)
+    val viewModel: QuotesViewModel2 = koinViewModel { parametersOf(groupId) }
+    QuotesScreen(viewModel, "", onBackClicked, onNavigateToSettings)
 }
