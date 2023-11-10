@@ -17,7 +17,7 @@ sealed class BottomSheetUIState(
     open val textField1: String = "",
     open val textField2: String = "",
 ) {
-    object AddGroupBottomSheet : BottomSheetUIState(
+    data object AddGroupBottomSheet : BottomSheetUIState(
         header = R.string.title_add_group,
         hint1 = R.string.label_group,
         hint2 = R.string.label_description,
@@ -25,7 +25,7 @@ sealed class BottomSheetUIState(
         isSecondFieldMandatory = true,
     )
 
-    object AddQuoteBottomSheet : BottomSheetUIState(
+    data object AddQuoteBottomSheet : BottomSheetUIState(
         header = R.string.title_add_quote,
         hint1 = R.string.label_quote,
         hint2 = R.string.label_author,

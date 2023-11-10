@@ -19,16 +19,16 @@ data class HomeState(
             val name: String,
         ) : DialogType()
 
-        object LoginToProceed : DialogType()
-        object None : DialogType()
+        data object LoginToProceed : DialogType()
+        data object None : DialogType()
     }
 }
 
 sealed interface HomeUserIntent : UserIntent {
-    object AddClicked : HomeUserIntent
+    data object AddClicked : HomeUserIntent
     data class AddGroupClicked(val name: String, val description: String) : HomeUserIntent
     data class GroupItemClicked(val groupPhrase: UiGroup) : HomeUserIntent
-    object HideGroupModal : HomeUserIntent
+    data object HideGroupModal : HomeUserIntent
     data class OnEditClicked(
         val id: String,
         val editedName: String,
@@ -44,7 +44,7 @@ sealed interface HomeUserIntent : UserIntent {
     data class RemoveGroupConfirmed(val id: String, val groupType: GroupType, val name: String) :
         HomeUserIntent
 
-    object HideGroupConfirmationDialog : HomeUserIntent
+    data object HideGroupConfirmationDialog : HomeUserIntent
 }
 
 sealed interface HomeEvent : IEvent {
@@ -52,10 +52,10 @@ sealed interface HomeEvent : IEvent {
     data class ShowGroupModal(val id: String, val name: String, val description: String) :
         HomeEvent
 
-    object ShowAddGroupModal : HomeEvent
+    data object ShowAddGroupModal : HomeEvent
 
-    object HideGroupModal : HomeEvent
-    object ShowLoginScreen : HomeEvent
+    data object HideGroupModal : HomeEvent
+    data object ShowLoginScreen : HomeEvent
     data class ShowError(val message: String) : HomeEvent
     data class ShowSnackbar(val message: String) : HomeEvent
     data class ItemClicked(val groupPhrase: UiGroup) : HomeEvent
@@ -72,9 +72,9 @@ sealed interface HomeEffect : IEffect {
     data class OpenDetails(val groupPhrase: UiGroup) : HomeEffect
     data class RemoveGroup(val id: String, val groupType: GroupType, val name: String) : HomeEffect
     data class RemoveGroupConfirmed(val name: String) : HomeEffect
-    object DismissRemoveGroupConfirmation : HomeEffect
-    object ShowAddGroupModel : HomeEffect
-    object ShowLoginScreen : HomeEffect
-    object ShowGroupCreatedMessage : HomeEffect
-    object HideGroupModal : HomeEffect
+    data object DismissRemoveGroupConfirmation : HomeEffect
+    data object ShowAddGroupModel : HomeEffect
+    data object ShowLoginScreen : HomeEffect
+    data object ShowGroupCreatedMessage : HomeEffect
+    data object HideGroupModal : HomeEffect
 }

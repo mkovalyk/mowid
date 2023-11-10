@@ -25,9 +25,9 @@ sealed interface QuotesEvent : IEvent {
         val author: String?,
     ) : QuotesEvent
 
-    object ShowQuoteModal : QuotesEvent
-    object HideQuoteModal : QuotesEvent
-    object BackButtonClicked : QuotesEvent
+    data object ShowQuoteModal : QuotesEvent
+    data object HideQuoteModal : QuotesEvent
+    data object BackButtonClicked : QuotesEvent
     data class AddQuoteClicked(val quote: String, val author: String) : QuotesEvent
     data class OnItemDeleted(val id: String, val isSelected: Boolean) : QuotesEvent
     data class ShowDeleteConfirmationDialog(val id: String, val isSelected: Boolean) : QuotesEvent
@@ -37,7 +37,7 @@ sealed interface QuotesEvent : IEvent {
         val editedAuthor: String,
     ) : QuotesEvent
 
-    object HideDeleteConfirmationDialog : QuotesEvent
+    data object HideDeleteConfirmationDialog : QuotesEvent
 }
 
 sealed class QuotesEffect : IEffect {

@@ -8,6 +8,6 @@ sealed class UserModelBase{
         val fullName: String? = null,
         val email: String? = null,
     ) : UserModelBase()
-    object Empty : UserModelBase()
+    data object Empty : UserModelBase()
 }
 

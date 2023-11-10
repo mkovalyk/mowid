@@ -76,7 +76,7 @@ fun AppNavigation(activityViewModel: MainViewModel) {
 }
 
 object Navigation {
-    object Args {
+    data object Args {
 
         const val GROUP_ID = "group_id"
         const val GROUP_NAME = "group_name"
@@ -84,12 +84,12 @@ object Navigation {
     }
 
     sealed class Route(val route: String) {
-        object Home : Route("Home")
-        object Quotes : Route("Quotes/{$GROUP_ID}") {
+        data object Home : Route("Home")
+        data object Quotes : Route("Quotes/{$GROUP_ID}") {
 
             fun createRoute(groupId: String) = "Quotes/$groupId"
         }
 
-        object Settings : Route("Settings")
+        data object Settings : Route("Settings")
     }
 }
