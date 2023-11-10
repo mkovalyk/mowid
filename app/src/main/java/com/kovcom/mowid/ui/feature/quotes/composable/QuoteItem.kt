@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -24,7 +27,7 @@ import com.kovcom.mowid.ui.theme.MoWidTheme
 @Composable
 fun QuoteListItem(
     quote: UiQuote,
-    onCheckChanged: (String, Boolean) -> Unit,
+    onCheckChanged: (uiQuote:UiQuote) -> Unit,
     onEdit: (id: String, quote: String, author: String) -> Unit,
 ) {
     var checkedState by rememberSaveable { mutableStateOf(quote.isSelected) }
@@ -34,7 +37,7 @@ fun QuoteListItem(
         checked = checkedState,
         onCheckChanged = { id, checked ->
             checkedState = checked
-            onCheckChanged(id, checked)
+            onCheckChanged(quote)
         },
         onEdit = onEdit
     )
@@ -51,7 +54,9 @@ fun QuoteListItem(
     Row(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.onPrimary)
-            .clickable(enabled = !quote.canBeDeleted, onClick = { onCheckChanged(quote.id, !checked) })
+            .clickable(
+                enabled = !quote.canBeDeleted,
+                onClick = { onCheckChanged(quote.id, !checked) })
             .pointerInput(quote) {
                 if (quote.canBeDeleted) {
                     detectTapGestures(

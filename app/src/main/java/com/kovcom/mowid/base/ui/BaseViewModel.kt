@@ -5,60 +5,140 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
+import kotlin.system.measureTimeMillis
 
-const val EFFECTS_KEY = "effects_key"
-const val EVENTS_KEY = "event_key"
-
-@Deprecated("Use BaseViewModelV2 instead")
+@OptIn(ExperimentalCoroutinesApi::class)
 abstract class BaseViewModel<
-        State : IState,
-        Event : IEvent,
-        Effect : IEffect,
-        > : ViewModel() {
+        UiState : IState,
+        UiEvent : IEvent,
+        UiEffect : IEffect,
+        Intent : UserIntent,
+        >(
+    private val intentProcessor: IntentProcessor<UiState, Intent, UiEffect>,
+    private val reducer: Reducer<UiEffect, UiState>,
+    private val publisher: Publisher<UiEffect, UiEvent, UiState>,
+    initialUserIntents: List<Intent> = emptyList(),
+    dataProviders: List<DataProvider<UiEffect>> = emptyList(),
+) : ViewModel() {
 
-    private var eventJob: Job? = null
+    private val coroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
 
-    protected abstract fun handleEvent(event: Event)
+    private val initialState: UiState by lazy { createInitialState() }
 
-    abstract fun createInitialState(): State
+    private val userIntentQueue: Channel<Intent> = Channel(capacity = DEFAULT_INTENT_CAPACITY)
 
-    private val initialState: State by lazy { createInitialState() }
+    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(initialState)
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    private val _uiState: MutableStateFlow<State> = MutableStateFlow(initialState)
-    val uiState = _uiState.asStateFlow()
+    private val currentState: UiState
+        get() = _uiState.value
 
-    private val _event: MutableSharedFlow<Event> = MutableSharedFlow()
-    val event = _event.asSharedFlow()
+    private val _event: MutableSharedFlow<UiEvent> = MutableSharedFlow()
+    val event: Flow<UiEvent> = _event.asSharedFlow()
 
-    private val _effect: Channel<Effect> = Channel()
-    val effect = _effect.receiveAsFlow()
+    protected open val shouldLog = true
+
+    abstract fun tag(): String
+    abstract fun createInitialState(): UiState
+
+    private val tag
+        get() = tag()
+
+    private val effectsChannel = Channel<UiEffect>(capacity = MAX_EFFECTS_CAPACITY)
 
     init {
-        subscribeOnEvent()
-    }
+        coroutineScope.launch {
+            userIntentQueue.consumeAsFlow().flatMapLatest { intent ->
+                logIntent(intent)
 
-    fun publishEvent(event: Event) {
-        val newEvent = event
-        if (eventJob?.isActive != true) {
-            eventJob = viewModelScope.launch {
-                _event.emit(newEvent)
-                delay(100)
+                intentProcessor.processIntent(intent, currentState)
+            }.collectLatest {
+                Timber.tag(tag).i("Collect Latest -> IEffect: $it")
+                effectsChannel.trySend(it)
             }
+        }
+        coroutineScope.launch {
+            effectsChannel.consumeAsFlow().collect { effect ->
+                if (shouldLog) Timber.tag(tag).i("IEffect: $effect: $currentState")
+
+                val newState = reduce(currentState, effect)
+                setState(newState)
+                withContext(Dispatchers.Main) {
+                    val event = publisher.publish(effect, newState)
+                    if (shouldLog) Timber.tag(tag).i("Publish IState: $effect -> $event")
+                    if (event != null) {
+                        _event.emit(event)
+                    }
+                }
+            }
+        }
+
+        dataProviders.forEach { flow ->
+            coroutineScope.launch {
+                flow.observe().collectLatest {
+                    effectsChannel.send(it)
+                }
+            }
+        }
+
+        initialUserIntents.forEach { initialUserIntent ->
+            processIntent(initialUserIntent)
         }
     }
 
-    protected fun setState(proceed: State.() -> State) {
-        val newState = _uiState.value.proceed()
+    private fun logIntent(intent: Intent) {
+        if (shouldLog) {
+            Timber.tag(tag).i("------------------------------------")
+            Timber.tag(tag).i("Process intent: $intent")
+        }
+    }
+
+    private fun reduce(currentState: UiState, effect: UiEffect): UiState {
+        var result: UiState
+        val duration = measureTimeMillis {
+            result = reducer.reduce(effect, currentState)
+        }
+        return result
+    }
+
+    fun processIntent(intent: Intent) {
+        // TODO handle highPriority intents
+        viewModelScope.launch {
+            userIntentQueue.send(intent)
+        }
+    }
+
+    private fun setState(newState: UiState) {
         _uiState.value = newState
     }
 
-    private fun subscribeOnEvent() {
-        viewModelScope.launch {
-            event.collect { handleEvent(it) }
-        }
-    }
+    companion object {
 
-    protected fun Effect.sendEffect() {
-        viewModelScope.launch { _effect.send(this@sendEffect) }
+        const val DEFAULT_INTENT_CAPACITY = 10
+        const val MAX_EFFECTS_CAPACITY = 15
     }
 }
+
+interface DataProvider<E : IEffect> {
+
+    fun observe(): Flow<E>
+}
+
+interface IntentProcessor<S : IState, Intent : UserIntent, E : IEffect> {
+
+    suspend fun processIntent(intent: Intent, currentState: S): Flow<E>
+}
+
+interface Reducer<UiEffect : IEffect, S : IState> {
+
+    fun reduce(effect: UiEffect, state: S): S
+}
+
+interface Publisher<UiEffect : IEffect, E : IEvent, S : IState> {
+
+    fun publish(effect: UiEffect, currentState: S): E?
+}
+
+const val EVENTS_KEY = "event_key"

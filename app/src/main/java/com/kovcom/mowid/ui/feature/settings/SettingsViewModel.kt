@@ -3,7 +3,7 @@ package com.kovcom.mowid.ui.feature.settings
 import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.BaseViewModelV2
+import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.base.ui.DataProvider
 import com.kovcom.mowid.base.ui.IntentProcessor
 import com.kovcom.mowid.base.ui.Publisher
@@ -27,7 +27,7 @@ class SettingsViewModel(
     reducer: Reducer<Effect, State>,
     publisher: Publisher<Effect, Event, State>,
     dataProviders: List<DataProvider<Effect>>,
-) : BaseViewModelV2<State, Event, Effect, Intent>(
+) : BaseViewModel<State, Event, Effect, Intent>(
     intentProcessor, reducer, publisher,
     dataProviders = dataProviders,
 ) {

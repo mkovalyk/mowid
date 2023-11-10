@@ -7,8 +7,8 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val quotesModule = module {
-    viewModel<QuotesViewModel2> { params -> 
-        QuotesViewModel2(
+    viewModel<QuotesViewModel> { params -> 
+        QuotesViewModel(
             get(),
             IntentProcessor(get<QuotesRepository>()),
             Reducer(),

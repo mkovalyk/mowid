@@ -55,23 +55,36 @@ object QuotesContract {
     sealed interface Intent : UserIntent {
         data class LoadGroup(val id: String) : Intent
         data class AddQuoteClicked(val quote: String, val author: String) : Intent
-        data object HideQuoteModal : Intent 
-        data class QuoteChecked(val quote: UiQuote) : Intent
-        data class DeleteQuote( val id:String,
-                                val isSelected:Boolean ) : Intent
-        data class QuoteDeletionConfirmed(val quote: UiQuote) : Intent
-        data class QuoteEditConfirmed(val id: String, val quote: String, val author: String) : Intent
-        data object HideDeleteConfirmationDialog: Intent
+        data object HideQuoteModal : Intent
+        data class QuoteChecked(val quote: UiQuote, val groupType: GroupType) : Intent
+        data class DeleteQuote(
+            val id: String,
+            val isSelected: Boolean,
+        ) : Intent
+
+        data class QuoteDeletionConfirmed(
+            val id: String,
+            val isSelected: Boolean,
+        ) : Intent
+
+        data class QuoteEditConfirmed(val id: String, val quote: String, val author: String) :
+            Intent
+
+        data object HideDeleteConfirmationDialog : Intent
+        data object ShowQuoteModal : Intent
     }
 
     sealed interface Effect : IEffect {
         data class ShowError(val message: String) : Effect
         data class ShowQuote(val quote: UiQuote) : Effect
-        data class ShowDeleteConfirmationDialog(val quote: UiQuote) : Effect
+        data class ShowDeleteConfirmationDialog(val info: DeleteDialogInfo) : Effect
+        data object HideDeleteConfirmationDialog : Effect
         data class Loading(val isLoading: Boolean) : Effect
         data class QuotesLoaded(val quotes: List<Quote>) : Effect
-        data object ShowAddQuoteModal : Effect
-        data class GroupLoaded(val group: Group?): Effect
+        data object ShowQuoteModal : Effect
+        data object HideQuoteModal : Effect
+
+        data class GroupLoaded(val group: Group?) : Effect
     }
 
     sealed interface Event : IEvent {
@@ -79,7 +92,8 @@ object QuotesContract {
         data class ShowErrorRes(@StringRes val resId: Int) : Event
         data class ShowError(val message: String) : Event
         data class ShowQuote(val quote: UiQuote) : Event
-        data object ShowAddQuoteModal: Event
+        data object ShowQuoteModal: Event
+        data object HideQuoteModal: Event
     }
 }
 

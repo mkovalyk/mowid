@@ -8,8 +8,6 @@ import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.ui.feature.home.*
 import com.kovcom.mowid.ui.feature.main.MainViewModel
-import com.kovcom.mowid.ui.feature.quotes.QuotesViewModel
-import com.kovcom.mowid.ui.feature.settings.SettingsViewModel
 import com.kovcom.mowid.ui.worker.QuotesWorker
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
 import com.kovcom.mowid.ui.worker.QuotesWorkerManagerImpl
@@ -58,10 +56,6 @@ val appModule = module {
             MainViewModel.MainEventReducer(),
             MainViewModel.MainEventPublisher()
         )
-    }
-
-    viewModel {
-        QuotesViewModel(get<QuotesRepository>(), get())
     }
 
     worker { params ->

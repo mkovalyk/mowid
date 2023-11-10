@@ -4,7 +4,7 @@ import androidx.core.app.ComponentActivity
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.BaseViewModelV2
+import com.kovcom.mowid.base.ui.BaseViewModel
 import com.kovcom.mowid.base.ui.IntentProcessor
 import com.kovcom.mowid.base.ui.Publisher
 import com.kovcom.mowid.base.ui.Reducer
@@ -19,7 +19,7 @@ class MainViewModel constructor(
     intentProcessor: IntentProcessor<MainState, MainUserIntent, MainEffect>,
     reducer: Reducer<MainEffect, MainState>,
     publisher: Publisher<MainEffect, MainEvent, MainState>,
-) : BaseViewModelV2<MainState, MainEvent, MainEffect, MainUserIntent>(
+) : BaseViewModel<MainState, MainEvent, MainEffect, MainUserIntent>(
     intentProcessor, reducer,
     publisher
 ) {

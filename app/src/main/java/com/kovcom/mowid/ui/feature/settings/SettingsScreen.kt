@@ -1,10 +1,8 @@
 package com.kovcom.mowid.ui.feature.settings
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -22,12 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.EFFECTS_KEY
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiFrequency
 import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
 import com.kovcom.mowid.ui.composable.AppProgress
-import com.kovcom.mowid.ui.feature.main.MainEvent
 import com.kovcom.mowid.ui.feature.main.MainUserIntent
 import com.kovcom.mowid.ui.feature.main.MainViewModel
 import com.kovcom.mowid.ui.feature.settings.SettingsContract.Intent

@@ -12,7 +12,7 @@ class HomeViewModel constructor(
     publisher: HomePublisher,
     groupsDataProvider: QuotesDataProvider,
     userProvider: UserProvider,
-) : BaseViewModelV2<HomeState, HomeEvent, HomeEffect, HomeUserIntent>(
+) : BaseViewModel<HomeState, HomeEvent, HomeEffect, HomeUserIntent>(
     intentProcessor,
     reducer,
     publisher,
