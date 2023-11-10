@@ -2,17 +2,17 @@
 
 - [ ] Integrate Dynodict
 - [x] All user's groups/list don't have any relation to language
-- [ ] User can change the group only between his own
-- [ ] After editing, back action doesn't work/ any bottom sheet opening
+- [x] After editing, back action doesn't work/ any bottom sheet opening
 - [x] Auto select after creation - that is why User creates a new quote
-- [ ] Delete should show confirmation and show snackbar after to prevent accidental removal
-- [ ] Update Kotlin to 1.9.0
+- [x] Delete should show confirmation and show snackbar after to prevent accidental removal
+- [x] Update Kotlin to 1.9.0
 - [x] Confirmation on group deletion
 - [x] Introduce concept of language
+- [x] After editing, back action doesn't work/ any bottom sheet opening
+- [x] Deprecate BaseViewModel and use BaseViewModel2
 - [ ] Possible to change group for some quote
 - [ ] Extract the versions to a separate file
 - [ ] Make sure user is loaded right after signingIn
 - [ ] It should be notified about the problem with any Action
-- [ ] Deprecate BaseViewModel and use BaseViewModel2
 - [ ] Attach language to a list of predefined languages
 

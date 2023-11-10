@@ -4,16 +4,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,8 +27,7 @@ fun QuotesList(
         items(
             items = quotes,
             key = { quoteModel -> quoteModel.id }
-        ) { item ->
-            val currentItem by rememberUpdatedState(item)
+        ) { currentItem ->
             val dismissState = rememberDismissState(
                 confirmValueChange = {
                     if (it == DismissValue.DismissedToStart) {
@@ -46,14 +38,20 @@ fun QuotesList(
                 positionalThreshold = { 200.dp.toPx() }
             )
 
-            if (item.canBeDeleted) {
+            LaunchedEffect(currentItem) {
+                if (!currentItem.isExpanded) {
+                    dismissState.reset()
+                }
+            }
+
+            if (currentItem.canBeDeleted) {
                 SwipeToDismiss(
                     modifier = Modifier.animateItemPlacement(),
                     state = dismissState,
                     background = { SwipeToDeleteBackground() },
                     dismissContent = {
                         QuoteListItem(
-                            quote = item,
+                            quote = currentItem,
                             onCheckChanged = onCheckedChange,
                             onEdit = onEdit
                         )
@@ -62,7 +60,7 @@ fun QuotesList(
                 )
             } else {
                 QuoteListItem(
-                    quote = item,
+                    quote = currentItem,
                     onCheckChanged = onCheckedChange,
                     onEdit = onEdit
                 )

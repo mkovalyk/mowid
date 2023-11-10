@@ -12,6 +12,7 @@ data class UiQuote(
     val quote: String,
     val canBeDeleted: Boolean,
     val isSelected: Boolean,
+    val isExpanded: Boolean = false,
 ) : Parcelable
 
 fun UiQuote.toDomainModel() = Quote(

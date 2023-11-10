@@ -4,27 +4,13 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -35,10 +21,7 @@ import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiQuote
-import com.kovcom.mowid.ui.composable.AppCenterAlignedTopAppBar
-import com.kovcom.mowid.ui.composable.AppDropDownMenu
-import com.kovcom.mowid.ui.composable.AppFloatingActionButton
-import com.kovcom.mowid.ui.composable.AppProgress
+import com.kovcom.mowid.ui.composable.*
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffold
 import com.kovcom.mowid.ui.composable.bottomsheet.BottomSheetScaffoldState
 import com.kovcom.mowid.ui.composable.bottomsheet.rememberBottomSheetScaffoldState
@@ -133,7 +116,14 @@ fun QuotesScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.processIntent(Intent.HideDeleteConfirmationDialog) }) {
+                TextButton(onClick = {
+                    viewModel.processIntent(
+                        Intent.HideDeleteConfirmationDialog(
+                            id = info.id,
+                            isSelected = info.isSelected
+                        )
+                    )
+                }) {
                     Text(text = stringResource(id = R.string.label_cancel))
                 }
             },
@@ -233,7 +223,7 @@ fun ScreenContent(
 
                         else -> QuotesList(
                             quotes = state.quotes,
-                            onCheckedChange = { quote->
+                            onCheckedChange = { quote ->
                                 sendIntent(
                                     Intent.QuoteChecked(
                                         quote = quote,

@@ -3,8 +3,7 @@ package com.kovcom.mowid.ui.feature.quotes
 import androidx.lifecycle.SavedStateHandle
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl.Companion.TAG
 import com.kovcom.domain.repository.QuotesRepository
-import com.kovcom.mowid.base.ui.BaseViewModel
-import com.kovcom.mowid.base.ui.DataProvider
+import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.base.ui.IntentProcessor
 import com.kovcom.mowid.base.ui.Publisher
 import com.kovcom.mowid.base.ui.Reducer
@@ -13,14 +12,7 @@ import com.kovcom.mowid.ui.feature.quotes.QuotesContract.Effect
 import com.kovcom.mowid.ui.feature.quotes.QuotesContract.Event
 import com.kovcom.mowid.ui.feature.quotes.QuotesContract.Intent
 import com.kovcom.mowid.ui.feature.quotes.QuotesContract.State
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 class QuotesViewModel(
@@ -36,15 +28,12 @@ class QuotesViewModel(
     dataProviders = dataProviders,
 ) {
 
-    private val groupId = savedStateHandle.get<String>("group_id").orEmpty()
-
     override fun tag() = "QuotesViewModel"
 
     override fun createInitialState() = State()
 }
 
-class IntentProcessor(private val quotesRepository: QuotesRepository) :
-    IntentProcessor<State, Intent, Effect> {
+class IntentProcessor(private val quotesRepository: QuotesRepository) : IntentProcessor<State, Intent, Effect> {
 
     override suspend fun processIntent(
         intent: Intent,
@@ -55,8 +44,7 @@ class IntentProcessor(private val quotesRepository: QuotesRepository) :
             is Intent.DeleteQuote -> flowOf(
                 Effect.ShowDeleteConfirmationDialog(
                     DeleteDialogInfo(
-                        intent.id,
-                        intent.isSelected
+                        intent.id, intent.isSelected
                     )
                 )
             )
@@ -99,13 +87,20 @@ class IntentProcessor(private val quotesRepository: QuotesRepository) :
 
             is Intent.LoadGroup -> {
                 quotesRepository.getGroupsFlow()
-                    .map { it.firstOrNull { it.id == intent.id } }
+                    .map { list -> list.firstOrNull { it.id == intent.id } }
                     .map { Effect.GroupLoaded(it) }
             }
 
-            Intent.HideDeleteConfirmationDialog -> flowOf(Effect.HideDeleteConfirmationDialog)
-            Intent.HideQuoteModal -> flowOf(Effect.HideQuoteModal)
-            Intent.ShowQuoteModal -> flowOf(Effect.ShowQuoteModal)
+            is Intent.HideDeleteConfirmationDialog -> flowOf(
+                Effect.HideDeleteConfirmationDialog(
+                    info = DeleteDialogInfo(
+                        id = intent.id, isSelected = intent.isSelected
+                    )
+                )
+            )
+
+            is Intent.HideQuoteModal -> flowOf(Effect.HideQuoteModal)
+            is Intent.ShowQuoteModal -> flowOf(Effect.ShowQuoteModal)
         }
     }
 }
@@ -116,9 +111,26 @@ class Reducer : Reducer<Effect, State> {
         return when (effect) {
             is Effect.Loading -> state.copy(isLoading = effect.isLoading)
             is Effect.QuotesLoaded -> state.copy(quotes = effect.quotes.toUIModel())
-            is Effect.ShowDeleteConfirmationDialog -> state.copy(deleteDialogInfo = effect.info)
+            is Effect.ShowDeleteConfirmationDialog -> {
+                state.copy(deleteDialogInfo = effect.info,
+                           quotes = state.quotes.map {
+                               if (it.id == effect.info.id) {
+                                   it.copy(isExpanded = true)
+                               } else {
+                                   it
+                               }
+                           })
+            }
+
             is Effect.GroupLoaded -> state.copy(group = effect.group)
-            is Effect.HideDeleteConfirmationDialog -> state.copy(deleteDialogInfo = null)
+            is Effect.HideDeleteConfirmationDialog -> state.copy(deleteDialogInfo = null, quotes
+            = state.quotes.map {
+                if (it.id == effect.info.id) {
+                    it.copy(isExpanded = false)
+                } else {
+                    it
+                }
+            })
 
             is Effect.ShowError,
             is Effect.ShowQuote,
@@ -157,20 +169,16 @@ class QuotesProvider(
 ) : DataProvider<Effect> {
 
     override fun observe(): Flow<Effect> {
-        val quotes: Flow<Effect> =
-            quotesRepository.getQuotes(groupId).flatMapLatest {
-                flowOf(
-                    Effect.QuotesLoaded(it),
-                    Effect.Loading(false)
-                )
-            }
-        return quotes
-            .onStart {
-                emit(Effect.Loading(true))
-            }
-            .catch {
-                Timber.tag(TAG).e(it)
-                emit(Effect.ShowError(message = it.message.toString()))
-            }
+        val quotes: Flow<Effect> = quotesRepository.getQuotes(groupId).flatMapLatest {
+            flowOf(
+                Effect.QuotesLoaded(it), Effect.Loading(false)
+            )
+        }
+        return quotes.onStart {
+            emit(Effect.Loading(true))
+        }.catch {
+            Timber.tag(TAG).e(it)
+            emit(Effect.ShowError(message = it.message.toString()))
+        }
     }
 }

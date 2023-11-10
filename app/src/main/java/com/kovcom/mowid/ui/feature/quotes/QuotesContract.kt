@@ -4,10 +4,7 @@ import androidx.annotation.StringRes
 import com.kovcom.domain.model.Group
 import com.kovcom.domain.model.GroupType
 import com.kovcom.domain.model.Quote
-import com.kovcom.mowid.base.ui.IEffect
-import com.kovcom.mowid.base.ui.IEvent
-import com.kovcom.mowid.base.ui.IState
-import com.kovcom.mowid.base.ui.UserIntent
+import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.model.UiQuote
 
 data class QuotesState(
@@ -70,7 +67,11 @@ object QuotesContract {
         data class QuoteEditConfirmed(val id: String, val quote: String, val author: String) :
             Intent
 
-        data object HideDeleteConfirmationDialog : Intent
+        data class HideDeleteConfirmationDialog(
+            val id: String,
+            val isSelected: Boolean,
+        ) : Intent
+
         data object ShowQuoteModal : Intent
     }
 
@@ -78,7 +79,7 @@ object QuotesContract {
         data class ShowError(val message: String) : Effect
         data class ShowQuote(val quote: UiQuote) : Effect
         data class ShowDeleteConfirmationDialog(val info: DeleteDialogInfo) : Effect
-        data object HideDeleteConfirmationDialog : Effect
+        data class HideDeleteConfirmationDialog(val info: DeleteDialogInfo) : Effect
         data class Loading(val isLoading: Boolean) : Effect
         data class QuotesLoaded(val quotes: List<Quote>) : Effect
         data object ShowQuoteModal : Effect
@@ -92,8 +93,8 @@ object QuotesContract {
         data class ShowErrorRes(@StringRes val resId: Int) : Event
         data class ShowError(val message: String) : Event
         data class ShowQuote(val quote: UiQuote) : Event
-        data object ShowQuoteModal: Event
-        data object HideQuoteModal: Event
+        data object ShowQuoteModal : Event
+        data object HideQuoteModal : Event
     }
 }
 
