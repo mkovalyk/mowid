@@ -10,6 +10,10 @@ import com.kovcom.mowid.ui.worker.QuotesWorkerManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.dynodict.DynoDict
+import org.dynodict.android.initWith
+import org.dynodict.model.DLocale
+import org.dynodict.model.settings.Settings
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.koin.workManagerFactory
@@ -39,6 +43,10 @@ class MoWidApplication : Application() {
             }
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            DynoDict.initWith(this@MoWidApplication, endpoint = null, Settings.Production)
+            DynoDict.instance.setLocale(DLocale("en"))
         }
     }
 }

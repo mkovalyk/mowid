@@ -1,10 +1,11 @@
 package com.kovcom.mowid.model
 
-import androidx.annotation.StringRes
 import com.kovcom.domain.model.Frequencies
 import com.kovcom.domain.model.FrequencyModel
 import com.kovcom.domain.model.FrequencyType
-import com.kovcom.mowid.R
+import com.kovcom.mowid.Fours
+import com.kovcom.mowid.Once
+import com.kovcom.mowid.Twice
 
 data class UiFrequencies(
     val selectedFrequency: UiFrequency?,
@@ -13,7 +14,7 @@ data class UiFrequencies(
 
 data class UiFrequency(
     val frequencyId: Long,
-    @StringRes val value: Int,
+    val key: String,
 )
 
 fun UiFrequencies.toDomainModel() = Frequencies(
@@ -32,13 +33,13 @@ fun UiFrequency.toDomainModel() = FrequencyModel(
 
 fun FrequencyModel.toUIModel() = UiFrequency(
     frequencyId = frequency.id,
-    value = when (frequency) {
-        FrequencyType.OnceAWeek -> R.string.once_a_week
-        FrequencyType.OnceInFiveDays -> R.string.once_in_a_five_days
-        FrequencyType.OnceInTwoDays -> R.string.once_in_two_days
-        FrequencyType.OnceADay -> R.string.once_a_day
-        FrequencyType.TwiceADay -> R.string.twice_a_day
-        FrequencyType.FoursADay -> R.string.fours_a_day
+    key = when (frequency) {
+        FrequencyType.OnceAWeek -> Once.A.Week.get()
+        FrequencyType.OnceInFiveDays -> Once.In.A.Five.Days.get()
+        FrequencyType.OnceInTwoDays -> Once.In.Two.Days.get()
+        FrequencyType.OnceADay -> Once.A.Day.get()
+        FrequencyType.TwiceADay -> Twice.A.Day.get()
+        FrequencyType.FoursADay -> Fours.A.Day.get()
     }
 )
 

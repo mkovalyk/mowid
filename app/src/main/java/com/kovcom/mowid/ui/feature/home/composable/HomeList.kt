@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kovcom.domain.model.GroupType
+import com.kovcom.mowid.Label
 import com.kovcom.mowid.R
 import com.kovcom.mowid.model.UiGroup
 import com.kovcom.mowid.ui.feature.home.HomeState
@@ -97,10 +98,10 @@ fun HomeList(
                             },
                             dismissButton = {
                                 TextButton(onClick = { sendIntent(HomeUserIntent.HideGroupConfirmationDialog) }) {
-                                    Text(text = stringResource(id = R.string.label_cancel))
+                                    Text(text = Label.Cancel.get())
                                 }
                             },
-                            text = { Text(text = stringResource(id = R.string.label_delete_group_message)) }
+                            text = { Text(text = Label.Delete.Group2.Message.get()) }
                 )
             }
 

@@ -10,12 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.domain.model.GroupType
-import com.kovcom.mowid.R
+import com.kovcom.mowid.Title
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiGroup
 import com.kovcom.mowid.ui.composable.*
@@ -193,7 +192,7 @@ private fun HomeScreenContent(
 @Composable
 private fun TopBar(showMenu: MutableState<Boolean>, onNavigateToSettings: () -> Unit) {
     AppCenterAlignedTopAppBar(
-        title = stringResource(id = R.string.title_home),
+        title = Title.Home.get(),
         actions = {
             IconButton(onClick = { showMenu.value = !showMenu.value }) {
                 Icon(

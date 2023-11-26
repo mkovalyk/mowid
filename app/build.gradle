@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
+    id("org.dynodict.plugin") version "0.5.5"
 }
 
 android {
@@ -11,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.kovcom.mowid"
-        minSdk 23
+        minSdk 24
         targetSdk 34
         versionCode 1
         versionName "1.0"
@@ -102,5 +103,7 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest"
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation 'org.dynodict:library-core:0.5.5'
+    implementation 'org.dynodict:library-android:0.5.5'
 
 }

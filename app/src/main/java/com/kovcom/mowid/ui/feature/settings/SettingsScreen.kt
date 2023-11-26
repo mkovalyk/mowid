@@ -19,6 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
+import com.kovcom.mowid.Label
+import com.kovcom.mowid.Once
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiFrequency
@@ -105,15 +107,15 @@ fun Content(
 
     val userInfoLabel = buildAnnotatedString {
         if (state.userModel == null) {
-            append(stringResource(R.string.label_user_not_registered))
+            append(Label.User.Not.Registered.get())
             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                 pushStringAnnotation(
-                    tag = SIGN_IN_TAG, annotation = stringResource(id = R.string.label_sign_in)
+                    tag = SIGN_IN_TAG, annotation = Label.Sign.In.get()
                 )
-                append(stringResource(id = R.string.label_sign_in))
+                append(Label.Sign.In.get())
             }
         } else {
-            append(stringResource(R.string.label_user_signed_in_as))
+            append(Label.User.Signed.In.As.get())
             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                 pushStringAnnotation(
                     tag = USER_NAME_TAG, annotation = state.userModel.fullName
@@ -123,7 +125,7 @@ fun Content(
             append(" ")
             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.error)) {
                 pushStringAnnotation(
-                    tag = SIGN_OUT_TAG, annotation = stringResource(id = R.string.label_sign_out)
+                    tag = SIGN_OUT_TAG, annotation = Label.Sign.Out.get()
                 )
                 append(stringResource(id = R.string.label_sign_out))
             }
@@ -146,20 +148,25 @@ fun Content(
                 .fillMaxWidth()
                 .padding(16.dp), expanded = showDropDown, onExpandedChange = { showDropDown = !showDropDown }) {
 
-                OutlinedTextField(modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(), value = selectedFrequency?.value?.let { stringResource(id = it) }
-                    ?: "", onValueChange = {}, readOnly = true, label = { Text(stringResource(id = R.string.label_frequency)) }, leadingIcon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_settings), contentDescription = "TODO"
-                    )
-                }, trailingIcon = {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    value = selectedFrequency?.key ?: "",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(id = R.string.label_frequency)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_settings), contentDescription = "TODO"
+                        )
+                    }, trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDropDown)
                 })
 
                 ExposedDropdownMenu(expanded = showDropDown, onDismissRequest = { showDropDown = false }) {
                     state.frequencies.forEach { option ->
-                        DropdownMenuItem(text = { Text(stringResource(id = option.value)) }, onClick = {
+                        DropdownMenuItem(text = { Text(option.key) }, onClick = {
                             selectedFrequency = option
                             showDropDown = false
                         })
@@ -202,7 +209,7 @@ fun ScreenContentPreview() {
         val list = listOf(
             UiFrequency(
                 frequencyId = 0,
-                value = R.string.once_a_day,
+                key = Once.A.Day.get(),
             )
         )
         ScreenContent(
@@ -210,7 +217,7 @@ fun ScreenContentPreview() {
                 isLoading = false,
                 selectedFrequency = UiFrequency(
                     frequencyId = 0,
-                    value = R.string.once_a_day,
+                    key = Once.A.Day.get(),
                 ),
                 frequencies = list,
                 userModel = null,

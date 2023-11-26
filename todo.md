@@ -15,4 +15,3 @@
 - [ ] Make sure user is loaded right after signingIn
 - [ ] It should be notified about the problem with any Action
 - [ ] Attach language to a list of predefined languages
-
