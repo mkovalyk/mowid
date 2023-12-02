@@ -34,12 +34,12 @@ fun UiFrequency.toDomainModel() = FrequencyModel(
 fun FrequencyModel.toUIModel() = UiFrequency(
     frequencyId = frequency.id,
     key = when (frequency) {
-        FrequencyType.OnceAWeek -> Once.A.Week.get()
-        FrequencyType.OnceInFiveDays -> Once.In.A.Five.Days.get()
-        FrequencyType.OnceInTwoDays -> Once.In.Two.Days.get()
-        FrequencyType.OnceADay -> Once.A.Day.get()
-        FrequencyType.TwiceADay -> Twice.A.Day.get()
-        FrequencyType.FoursADay -> Fours.A.Day.get()
+            FrequencyType.OnceAWeek -> Once.A.Week.value
+            FrequencyType.OnceInFiveDays -> Once.In.A.Five.Days.value
+            FrequencyType.OnceInTwoDays -> Once.In.Two.Days.value
+            FrequencyType.OnceADay -> Once.A.Day.value
+            FrequencyType.TwiceADay -> Twice.A.Day.value
+            FrequencyType.FoursADay -> Fours.A.Day.value
     }
 )
 

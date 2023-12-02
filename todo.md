@@ -15,3 +15,9 @@
 - [ ] Make sure user is loaded right after signingIn
 - [ ] It should be notified about the problem with any Action
 - [ ] Attach language to a list of predefined languages
+- [x] Author should word-capitalized
+- [x] Multiline for quote.
+- [ ] BottomSheet should be scrollable and auto-hideable?
+- [ ] Content should not move up when bottom sheet is shown.
+- [x] Deletion doesn't work
+- [ ] If last quote is deleted, new dialog should be shown about if user wants to delete the group

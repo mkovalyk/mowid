@@ -13,5 +13,5 @@ fun QuotesScreenDestination(
     onNavigateToSettings: () -> Unit,
 ) {
     val viewModel: QuotesViewModel = koinViewModel { parametersOf(groupId) }
-    QuotesScreen(viewModel, "", onBackClicked, onNavigateToSettings)
+    QuotesScreen(viewModel, onBackClicked, onNavigateToSettings)
 }

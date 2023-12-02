@@ -5,6 +5,7 @@ import com.kovcom.domain.model.Group
 import com.kovcom.domain.model.GroupType
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlin.math.min
 
 @Parcelize
 data class UiGroup(
@@ -19,6 +20,8 @@ data class UiGroup(
 
     @IgnoredOnParcel
     val canBeDeleted: Boolean = groupType == GroupType.Personal
+
+    val combinedValue = "${min(selectedCount, count)}/$count"
 }
 
 fun UiGroup.toDomainModel() = Group(

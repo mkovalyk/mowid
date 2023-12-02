@@ -44,6 +44,7 @@ sealed class QuotesEffect : IEffect {
 object QuotesContract {
     data class State(
         val group: Group? = null,
+        val groupId: String,
         val isLoading: Boolean = true,
         val deleteDialogInfo: DeleteDialogInfo? = null,
         val quotes: List<UiQuote> = emptyList(),

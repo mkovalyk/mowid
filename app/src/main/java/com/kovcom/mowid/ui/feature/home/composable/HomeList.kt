@@ -8,12 +8,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.Label
-import com.kovcom.mowid.R
 import com.kovcom.mowid.model.UiGroup
 import com.kovcom.mowid.ui.feature.home.HomeState
 import com.kovcom.mowid.ui.feature.home.HomeUserIntent
@@ -82,26 +80,23 @@ fun HomeList(
         }
         when (dialogType) {
             is HomeState.DialogType.RemoveGroupConfirmation -> {
-                AlertDialog(onDismissRequest = {},
-                            confirmButton = {
-                                TextButton(onClick = {
-                                    sendIntent(
-                                        HomeUserIntent.RemoveGroupConfirmed(
-                                            id = dialogType.id,
-                                            name = dialogType.name,
-                                            groupType = dialogType.groupType,
-                                        )
-                                    )
-                                }) {
-                                    Text(text = stringResource(id = R.string.label_delete))
-                                }
-                            },
-                            dismissButton = {
-                                TextButton(onClick = { sendIntent(HomeUserIntent.HideGroupConfirmationDialog) }) {
-                                    Text(text = Label.Cancel.get())
-                                }
-                            },
-                            text = { Text(text = Label.Delete.Group2.Message.get()) }
+                AlertDialog(onDismissRequest = {}, confirmButton = {
+                    TextButton(onClick = {
+                        sendIntent(
+                            HomeUserIntent.RemoveGroupConfirmed(
+                                id = dialogType.id,
+                                name = dialogType.name,
+                                groupType = dialogType.groupType,
+                            )
+                        )
+                    }) {
+                        Text(text = Label.Delete.value)
+                    }
+                }, dismissButton = {
+                    TextButton(onClick = { sendIntent(HomeUserIntent.HideGroupConfirmationDialog) }) {
+                        Text(text = Label.Cancel.value)
+                    }
+                }, text = { Text(text = "TO be changed") } // TODO change
                 )
             }
 

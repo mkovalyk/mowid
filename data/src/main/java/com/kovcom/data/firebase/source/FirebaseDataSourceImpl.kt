@@ -175,17 +175,24 @@ class FirebaseDataSourceImpl constructor(
             Timber.tag(TAG).w("Token is null while deleting quote: $quoteId.")
             return Result.error(Exception("Token is null"))
         }
+        Timber.tag(TAG).i("Deleting quote $quoteId in group: $groupId")
 
         return suspendCancellableCoroutine { continuation ->
             val currentDocument =
-                dbInstance.collection(COLLECTION_PERSONAL).document().collection(COLLECTION_GROUPS)
+                dbInstance.collection(COLLECTION_PERSONAL)
+                    .document(token)
+                    .collection(COLLECTION_GROUPS)
                     .document(groupId)
-            currentDocument.collection(COLLECTION_QUOTES).document(quoteId).delete()
+            currentDocument
+                .collection(COLLECTION_QUOTES)
+                .document(quoteId)
+                .delete()
                 .addOnSuccessListener {
+                    Timber.tag(TAG).i("Quote $quoteId deleted successfully")
                     currentDocument.update(QUOTES_COUNT_FIELD, FieldValue.increment(-1))
-                    if (isSelected) removeQuoteFromSelected(groupId, quoteId, token)
                     continuation.resume(Result.success(quoteId))
                 }.addOnFailureListener { exception ->
+                    Timber.tag(TAG).e(exception)
                     continuation.resume(Result.error(exception))
                 }
         }
@@ -395,17 +402,6 @@ class FirebaseDataSourceImpl constructor(
                     continuation.resume(Result.error(exception)) {}
                 }
         }
-    }
-
-    private fun removeQuoteFromSelected(groupId: String, quoteId: String, token: String) {
-        val currentDocument = dbInstance.collection(COLLECTION_PERSONAL).document(token)
-            .collection(COLLECTION_SELECTION).document(groupId)
-        currentDocument.collection(COLLECTION_SELECTED_QUOTES).document(quoteId).delete()
-            .addOnSuccessListener {
-                currentDocument.update(
-                    SELECTED_QUOTES_COUNT_FIELD, FieldValue.increment(-1)
-                )
-            }
     }
 
     private fun userGroups(token: String): Flow<Result<List<GroupModel>>> = callbackFlow {

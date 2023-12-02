@@ -63,7 +63,7 @@ fun HomeListItem(
         )
         {
             Text(
-                text = "${groupPhrase.selectedCount}/${groupPhrase.count}",
+                text = groupPhrase.combinedValue,
                 fontSize = 12.sp,
                 style = MaterialTheme.typography.labelSmall
             )

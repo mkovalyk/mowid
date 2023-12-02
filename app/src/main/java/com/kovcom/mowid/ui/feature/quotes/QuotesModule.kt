@@ -7,13 +7,14 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val quotesModule = module {
-    viewModel<QuotesViewModel> { params -> 
+    viewModel<QuotesViewModel> { params ->
+        val groupId: String = params[0]
         QuotesViewModel(
-            get(),
             IntentProcessor(get<QuotesRepository>()),
             Reducer(),
             Publisher(),
-            dataProviders = listOf(QuotesProvider(params[0], get<QuotesRepository>()))
+            initialState = QuotesContract.State(groupId = groupId),
+            dataProviders = listOf(QuotesProvider(groupId, get<QuotesRepository>()))
         )
     }
 }

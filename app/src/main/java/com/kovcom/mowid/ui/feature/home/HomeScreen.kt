@@ -192,7 +192,7 @@ private fun HomeScreenContent(
 @Composable
 private fun TopBar(showMenu: MutableState<Boolean>, onNavigateToSettings: () -> Unit) {
     AppCenterAlignedTopAppBar(
-        title = Title.Home.get(),
+        title = Title.Home.value,
         actions = {
             IconButton(onClick = { showMenu.value = !showMenu.value }) {
                 Icon(

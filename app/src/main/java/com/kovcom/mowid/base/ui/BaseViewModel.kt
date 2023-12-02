@@ -20,12 +20,11 @@ abstract class BaseViewModel<
     private val publisher: Publisher<UiEffect, UiEvent, UiState>,
     initialUserIntents: List<Intent> = emptyList(),
     dataProviders: List<DataProvider<UiEffect>> = emptyList(),
+    initialState: UiState,
 ) : ViewModel() {
 
     private val coroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
-
-    private val initialState: UiState by lazy { createInitialState() }
 
     private val userIntentQueue: Channel<Intent> = Channel(capacity = DEFAULT_INTENT_CAPACITY)
 
@@ -41,7 +40,6 @@ abstract class BaseViewModel<
     protected open val shouldLog = true
 
     abstract fun tag(): String
-    abstract fun createInitialState(): UiState
 
     private val tag
         get() = tag()

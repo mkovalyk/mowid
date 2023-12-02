@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -60,7 +59,7 @@ fun BottomSheet(
             )
 
             Text(
-                text = stringResource(header),
+                text = header,
                 fontSize = 28.sp,
                 style = MaterialTheme.typography.headlineMedium
             )
@@ -74,11 +73,11 @@ fun BottomSheet(
                 onValueChange = { textState1 = it },
                 label = {
                     Text(
-                        text = stringResource(hint1),
+                        text = hint1,
                         style = MaterialTheme.typography.bodySmall
                     )
                 },
-                singleLine = true,
+                maxLines = 8,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
@@ -93,14 +92,18 @@ fun BottomSheet(
                 onValueChange = { textState2 = it },
                 label = {
                     Text(
-                        text = stringResource(hint2),
+                        text = hint2,
                         style = MaterialTheme.typography.bodySmall
                     )
                 },
+                maxLines = 8,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done,
-                    capitalization = KeyboardCapitalization.Sentences
+                    capitalization = if (isWordCapitalized)
+                        KeyboardCapitalization.Words
+                    else
+                        KeyboardCapitalization.Sentences
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -127,7 +130,7 @@ fun BottomSheet(
                     )
                 }) {
                 Text(
-                    text = stringResource(buttonLabel),
+                    text = buttonLabel,
                     style = MaterialTheme.typography.labelLarge
                 )
             }

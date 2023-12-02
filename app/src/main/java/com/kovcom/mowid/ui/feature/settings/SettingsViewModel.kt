@@ -24,10 +24,10 @@ class SettingsViewModel(
 ) : BaseViewModel<State, Event, Effect, Intent>(
     intentProcessor, reducer, publisher,
     dataProviders = dataProviders,
+    initialState = State(),
 ) {
 
     override fun tag(): String = "SettingsViewModel"
-    override fun createInitialState() = State()
 }
 
 class IntentProcessor(

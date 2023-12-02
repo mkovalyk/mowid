@@ -16,15 +16,9 @@ class HomeViewModel constructor(
     intentProcessor,
     reducer,
     publisher,
-    dataProviders = listOf(groupsDataProvider, userProvider)
+    dataProviders = listOf(groupsDataProvider, userProvider),
+    initialState = HomeState.EMPTY,
 ) {
-
-    override fun createInitialState(): HomeState = HomeState(
-        isLoading = true,
-        groupList = emptyList(),
-        isLoggedIn = false,
-    )
-
     override fun tag(): String = "HomeViewModel"
 }
 

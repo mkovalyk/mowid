@@ -1,6 +1,5 @@
 package com.kovcom.mowid.ui.feature.quotes
 
-import androidx.lifecycle.SavedStateHandle
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl.Companion.TAG
 import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.mowid.base.ui.*
@@ -16,21 +15,21 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 class QuotesViewModel(
-    savedStateHandle: SavedStateHandle,
     intentProcessor: IntentProcessor<State, Intent, Effect>,
     reducer: Reducer<Effect, State>,
     publisher: Publisher<Effect, Event, State>,
+    initialState: State,
     dataProviders: List<DataProvider<Effect>> = emptyList(),
 ) : BaseViewModel<State, Event, Effect, Intent>(
     intentProcessor = intentProcessor,
     reducer = reducer,
     publisher = publisher,
     dataProviders = dataProviders,
+    initialState = initialState,
+    initialUserIntents = listOf(Intent.LoadGroup(initialState.groupId))
 ) {
 
     override fun tag() = "QuotesViewModel"
-
-    override fun createInitialState() = State()
 }
 
 class IntentProcessor(private val quotesRepository: QuotesRepository) : IntentProcessor<State, Intent, Effect> {
@@ -40,7 +39,15 @@ class IntentProcessor(private val quotesRepository: QuotesRepository) : IntentPr
         currentState: State,
     ): Flow<Effect> {
         return when (intent) {
-            is Intent.AddQuoteClicked -> flowOf(Effect.ShowQuoteModal)
+            is Intent.AddQuoteClicked -> flow {
+                quotesRepository.addQuote(
+                    groupId = currentState.group?.id ?: "",
+                    quote = intent.quote,
+                    author = intent.author,
+                )
+                emit(Effect.HideQuoteModal)
+            }
+
             is Intent.DeleteQuote -> flowOf(
                 Effect.ShowDeleteConfirmationDialog(
                     DeleteDialogInfo(
@@ -62,14 +69,12 @@ class IntentProcessor(private val quotesRepository: QuotesRepository) : IntentPr
             }
 
             is Intent.QuoteDeletionConfirmed -> {
-                currentState.group?.let {
-                    quotesRepository.deleteQuote(
-                        groupId = currentState.group.id,
-                        quoteId = intent.id,
-                        isSelected = intent.isSelected,
-                    )
-                }
-                emptyFlow()
+                quotesRepository.deleteQuote(
+                    groupId = currentState.groupId,
+                    quoteId = intent.id,
+                    isSelected = intent.isSelected,
+                )
+                flowOf(Effect.HideDeleteConfirmationDialog(DeleteDialogInfo(intent.id, intent.isSelected)))
             }
 
             is Intent.QuoteEditConfirmed -> flow {

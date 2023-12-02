@@ -22,6 +22,15 @@ data class HomeState(
         data object LoginToProceed : DialogType()
         data object None : DialogType()
     }
+
+    companion object {
+
+        val EMPTY = HomeState(
+            isLoading = true,
+            groupList = emptyList(),
+            isLoggedIn = false,
+        )
+    }
 }
 
 sealed interface HomeUserIntent : UserIntent {

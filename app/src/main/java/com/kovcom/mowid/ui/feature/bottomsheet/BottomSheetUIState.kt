@@ -1,36 +1,34 @@
 package com.kovcom.mowid.ui.feature.bottomsheet
 
-import androidx.annotation.StringRes
-import com.kovcom.mowid.R
+import com.kovcom.mowid.Label
+import com.kovcom.mowid.Title
 
 sealed class BottomSheetUIState(
-    @StringRes
-    val header: Int,
-    @StringRes
-    val hint1: Int,
-    @StringRes
-    val hint2: Int,
-    @StringRes
-    val buttonLabel: Int,
+    val header: String,
+    val hint1: String,
+    val hint2: String,
+    val buttonLabel: String,
     val isSecondFieldMandatory: Boolean,
+    val isWordCapitalized: Boolean = false,
     open val id: String? = null,
     open val textField1: String = "",
     open val textField2: String = "",
 ) {
     data object AddGroupBottomSheet : BottomSheetUIState(
-        header = R.string.title_add_group,
-        hint1 = R.string.label_group,
-        hint2 = R.string.label_description,
-        buttonLabel = R.string.label_add,
+        header = Title.Add.Group.value,
+        hint1 = Label.Group.value,
+        hint2 = Label.Description.value,
+        buttonLabel = Label.Add.value,
         isSecondFieldMandatory = true,
     )
 
     data object AddQuoteBottomSheet : BottomSheetUIState(
-        header = R.string.title_add_quote,
-        hint1 = R.string.label_quote,
-        hint2 = R.string.label_author,
-        buttonLabel = R.string.label_add,
+        header = Title.Add.Quote.value,
+        hint1 = Label.Quote.value,
+        hint2 = Label.Author.value,
+        buttonLabel = Label.Add.value,
         isSecondFieldMandatory = false,
+        isWordCapitalized = true,
     )
 
     data class EditGroupBottomSheet(
@@ -38,10 +36,10 @@ sealed class BottomSheetUIState(
         override val textField1: String,
         override val textField2: String,
     ) : BottomSheetUIState(
-        header = R.string.title_edit_group,
-        hint1 = R.string.label_group,
-        hint2 = R.string.label_description,
-        buttonLabel = R.string.label_edit,
+        header = Title.Edit.Group.value,
+        hint1 = Label.Group.value,
+        hint2 = Label.Description.value,
+        buttonLabel = Label.Edit.value,
         id = id,
         textField1 = textField1,
         textField2 = textField2,
@@ -54,10 +52,10 @@ sealed class BottomSheetUIState(
         override val textField1: String,
         override val textField2: String,
     ) : BottomSheetUIState(
-        header = R.string.title_edit_quote,
-        hint1 = R.string.label_quote,
-        hint2 = R.string.label_author,
-        buttonLabel = R.string.label_edit,
+        header = Title.Edit.Quote.value,
+        hint1 = Label.Quote.value,
+        hint2 = Label.Author.value,
+        buttonLabel = Label.Edit.value,
         id = id,
         textField1 = textField1,
         textField2 = textField2,

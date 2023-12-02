@@ -4,29 +4,23 @@ import androidx.core.app.ComponentActivity
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.R
-import com.kovcom.mowid.base.ui.BaseViewModel
-import com.kovcom.mowid.base.ui.IntentProcessor
-import com.kovcom.mowid.base.ui.Publisher
-import com.kovcom.mowid.base.ui.Reducer
+import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 
 class MainViewModel constructor(
     intentProcessor: IntentProcessor<MainState, MainUserIntent, MainEffect>,
     reducer: Reducer<MainEffect, MainState>,
     publisher: Publisher<MainEffect, MainEvent, MainState>,
 ) : BaseViewModel<MainState, MainEvent, MainEffect, MainUserIntent>(
-    intentProcessor, reducer,
-    publisher
+    intentProcessor,
+    reducer,
+    publisher,
+    initialState = MainState.Loading,
 ) {
 
     override fun tag() = "MainViewModel"
-
-    override fun createInitialState(): MainState = MainState.Loading
 
     class MainIntentProcessor(
         private val userRepository: UserRepository,

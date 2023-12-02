@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -19,8 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
-import com.kovcom.mowid.Label
-import com.kovcom.mowid.Once
+import com.kovcom.mowid.*
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiFrequency
@@ -76,7 +74,7 @@ fun ScreenContent(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(topBar = {
-            AppCenterAlignedTopAppBar(title = stringResource(id = R.string.title_settings), navigationIcon = {
+            AppCenterAlignedTopAppBar(title = Title.Settings.value, navigationIcon = {
                 IconButton(onClick = onBackClicked) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack, contentDescription = "Back"
@@ -107,15 +105,15 @@ fun Content(
 
     val userInfoLabel = buildAnnotatedString {
         if (state.userModel == null) {
-            append(Label.User.Not.Registered.get())
+            append(Label.User.Not.Registered.value)
             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                 pushStringAnnotation(
-                    tag = SIGN_IN_TAG, annotation = Label.Sign.In.get()
+                    tag = SIGN_IN_TAG, annotation = Label.Sign.In.value
                 )
-                append(Label.Sign.In.get())
+                append(Label.Sign.In.value)
             }
         } else {
-            append(Label.User.Signed.In.As.get())
+            append(Label.User.Signed.In.As.value)
             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                 pushStringAnnotation(
                     tag = USER_NAME_TAG, annotation = state.userModel.fullName
@@ -125,9 +123,9 @@ fun Content(
             append(" ")
             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.error)) {
                 pushStringAnnotation(
-                    tag = SIGN_OUT_TAG, annotation = Label.Sign.Out.get()
+                    tag = SIGN_OUT_TAG, annotation = Label.Sign.Out.value
                 )
-                append(stringResource(id = R.string.label_sign_out))
+                append(Label.Sign.Out.value)
             }
 
         }
@@ -155,7 +153,7 @@ fun Content(
                     value = selectedFrequency?.key ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text(stringResource(id = R.string.label_frequency)) },
+                    label = { Text(Label.Frequency.value) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_settings), contentDescription = "TODO"
@@ -183,7 +181,7 @@ fun Content(
                 )
             }) {
                 Text(
-                    text = stringResource(id = R.string.label_apply), style = MaterialTheme.typography.labelLarge
+                    text = Label.Apply.value, style = MaterialTheme.typography.labelLarge
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -209,7 +207,7 @@ fun ScreenContentPreview() {
         val list = listOf(
             UiFrequency(
                 frequencyId = 0,
-                key = Once.A.Day.get(),
+                key = Once.A.Day.value,
             )
         )
         ScreenContent(
@@ -217,7 +215,7 @@ fun ScreenContentPreview() {
                 isLoading = false,
                 selectedFrequency = UiFrequency(
                     frequencyId = 0,
-                    key = Once.A.Day.get(),
+                    key = Once.A.Day.value,
                 ),
                 frequencies = list,
                 userModel = null,

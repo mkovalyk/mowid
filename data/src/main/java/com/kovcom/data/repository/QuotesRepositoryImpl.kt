@@ -5,15 +5,8 @@ import com.kovcom.data.firebase.source.FirebaseDataSource
 import com.kovcom.data.firebase.source.FirebaseDataSourceImpl
 import com.kovcom.data.mapper.mapToDomain
 import com.kovcom.data.mapper.toDomain
-import com.kovcom.data.model.GroupModel
-import com.kovcom.data.model.QuoteModel
-import com.kovcom.data.model.Result
-import com.kovcom.data.model.SelectedQuoteModel
-import com.kovcom.data.model.merge
-import com.kovcom.domain.model.Frequencies
-import com.kovcom.domain.model.Group
-import com.kovcom.domain.model.GroupType
-import com.kovcom.domain.model.Quote
+import com.kovcom.data.model.*
+import com.kovcom.domain.model.*
 import com.kovcom.domain.repository.QuotesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -21,6 +14,7 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 class QuotesRepositoryImpl(
     private val firebaseDataSource: FirebaseDataSource,
@@ -35,7 +29,7 @@ class QuotesRepositoryImpl(
 
         Timber.tag(TAG).i(
             "getGroupsFlow. Groups: ${groups.data?.size}. userGroups: ${userGroups.data?.size} " +
-                    "selectedGroups: ${selectedGroups.data?.size}"
+                "selectedGroups: ${selectedGroups.data?.size}"
         )
         val allGroups = groups.merge(userGroups)
         if (selectedGroups is Result.Error) {
@@ -60,7 +54,7 @@ class QuotesRepositoryImpl(
         ) { quotes, userQuotes, selectedQuotes ->
             Timber.tag(TAG).i(
                 "getQuotesFlow. Quotes: ${quotes.data?.size}. userQuotes: ${userQuotes.data?.size} " +
-                        " selectedQuotes: ${selectedQuotes.data?.size}"
+                    " selectedQuotes: ${selectedQuotes.data?.size}"
             )
             val allQuotes = quotes.merge(userQuotes)
             if (selectedQuotes is Result.Error) {
@@ -105,10 +99,11 @@ class QuotesRepositoryImpl(
         )
     }
 
-    override suspend fun addQuote(groupId: String, quote: String, author: String, quoteId: String) {
+    override suspend fun addQuote(groupId: String, quote: String, author: String) {
+        val quoteId = UUID.randomUUID().toString()
         Timber.tag(TAG).i("addQuote: $quoteId -> $groupId -> $quote -> $author")
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
-        
+
         firebaseDataSource.saveNewQuote(
             groupId,
             QuoteModel(
@@ -135,10 +130,18 @@ class QuotesRepositoryImpl(
 
     override suspend fun deleteQuote(groupId: String, quoteId: String, isSelected: Boolean) {
         firebaseDataSource.deleteQuote(groupId, quoteId, isSelected)
+        firebaseDataSource.saveSelection(
+            quote = SelectedQuoteModel(
+                id = quoteId,
+                groupId = groupId,
+            ),
+            groupType = GroupType.Personal,
+            isSelected = false,
+        )
     }
 
     override suspend fun deleteGroup(id: String, groupType: GroupType) {
-        when(groupType) {
+        when (groupType) {
             GroupType.Personal -> firebaseDataSource.deleteGroup(id)
             GroupType.Common -> Unit // TODO might
         }

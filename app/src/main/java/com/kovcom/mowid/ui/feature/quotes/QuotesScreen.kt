@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovcom.domain.model.GroupType
+import com.kovcom.mowid.Label
 import com.kovcom.mowid.R
 import com.kovcom.mowid.base.ui.EVENTS_KEY
 import com.kovcom.mowid.model.UiQuote
@@ -38,7 +39,6 @@ import timber.log.Timber
 @Composable
 fun QuotesScreen(
     viewModel: QuotesViewModel,
-    groupName: String,
     onBackClicked: () -> Unit,
     onNavigateToSettings: () -> Unit,
 ) {
@@ -91,7 +91,6 @@ fun QuotesScreen(
     }
 
     ScreenContent(
-        groupName = groupName,
         state = state,
         sendIntent = viewModel::processIntent,
         bottomSheetState = bottomSheetScaffoldState,
@@ -106,13 +105,13 @@ fun QuotesScreen(
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.processIntent(
-                        Intent.DeleteQuote(
+                        Intent.QuoteDeletionConfirmed(
                             id = info.id,
                             isSelected = info.isSelected
                         )
                     )
                 }) {
-                    Text(text = stringResource(id = R.string.label_delete))
+                    Text(text = Label.Delete.value)
                 }
             },
             dismissButton = {
@@ -124,7 +123,7 @@ fun QuotesScreen(
                         )
                     )
                 }) {
-                    Text(text = stringResource(id = R.string.label_cancel))
+                    Text(text = Label.Cancel.value)
                 }
             },
             text = { Text(text = stringResource(id = R.string.label_delete_quote_message)) }
@@ -134,7 +133,6 @@ fun QuotesScreen(
 
 @Composable
 fun ScreenContent(
-    groupName: String,
     state: QuotesContract.State,
     sendIntent: (Intent) -> Unit,
     bottomSheetState: BottomSheetScaffoldState,
@@ -178,7 +176,7 @@ fun ScreenContent(
             Scaffold(
                 topBar = {
                     AppCenterAlignedTopAppBar(
-                        title = groupName,
+                        title = state.group?.name.orEmpty(),
                         actions = {
                             IconButton(onClick = { showMenu = !showMenu }) {
                                 Icon(
@@ -293,10 +291,10 @@ fun ScreenContentPreview() {
         )
 
         ScreenContent(
-            groupName = "Group 1",
             state = QuotesContract.State(
                 isLoading = false,
-                quotes = list
+                quotes = list,
+                groupId = "1"
             ),
             sendIntent = {},
             bottomSheetState = rememberBottomSheetScaffoldState(),

@@ -13,7 +13,7 @@ interface QuotesRepository {
 
     suspend fun addGroup(name: String, description: String)
 
-    suspend fun addQuote(groupId: String, quote: String, author: String, quoteId: String)
+    suspend fun addQuote(groupId: String, quote: String, author: String)
 
     suspend fun updateUserFrequency(id: Long)
 
