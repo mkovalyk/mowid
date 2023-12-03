@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kovcom.mowid.Label
 import com.kovcom.mowid.R
 import com.kovcom.mowid.ui.theme.MoWidTheme
 
@@ -34,7 +34,7 @@ fun EmptyState(
                 .padding(horizontal = 42.dp)
                 .padding(top = 180.dp),
             textAlign = TextAlign.Center,
-            text = stringResource(id = R.string.label_empty_state)
+            text = Label.Empty.State.value,
         )
         Button(
             modifier = Modifier.padding(top = 44.dp),
@@ -42,7 +42,7 @@ fun EmptyState(
         )
         {
             Text(
-                text = stringResource(id = R.string.label_add),
+                text = Label.Add.value,
                 style = MaterialTheme.typography.labelLarge
             )
         }

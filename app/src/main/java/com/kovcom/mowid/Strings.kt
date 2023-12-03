@@ -10,12 +10,14 @@ object App : StringKey("App") {
             get() = DynoDict.instance.get(this)
     }
 }
+
 object Title : StringKey("Title") {
     object Home : StringKey("Home", Title) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Add : StringKey("Add", Title) {
         object Group : StringKey("Group", Add) {
 
@@ -29,6 +31,7 @@ object Title : StringKey("Title") {
                 get() = DynoDict.instance.get(this)
         }
     }
+
     object Edit : StringKey("Edit", Title) {
         object Group : StringKey("Group", Edit) {
 
@@ -49,47 +52,80 @@ object Title : StringKey("Title") {
             get() = DynoDict.instance.get(this)
     }
 }
+
 object Label : StringKey("Label") {
     object Add : StringKey("Add", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Edit : StringKey("Edit", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Cancel : StringKey("Cancel", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Group : StringKey("Group", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Description : StringKey("Description", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Delete : StringKey("Delete", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
+
+        object Group : StringKey("Group", Delete) {
+
+            val value: String
+                get() = DynoDict.instance.get(this)
+
+            object Message : StringKey("Message", Group) {
+
+                val value: String
+                    get() = DynoDict.instance.get(this)
+            }
+        }
+
+        object Quote : StringKey("Quote", Delete) {
+
+            val value: String
+                get() = DynoDict.instance.get(this)
+
+            object Message : StringKey("Message", Quote) {
+
+                val value: String
+                    get() = DynoDict.instance.get(this)
+            }
+        }
     }
+
     object Quote : StringKey("Quote", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Author : StringKey("Author", Label) {
 
         val value: String
             get() = DynoDict.instance.get(this)
     }
+
     object Empty : StringKey("Empty", Label) {
         object State : StringKey("State", Empty) {
 
@@ -97,19 +133,38 @@ object Label : StringKey("Label") {
                 get() = DynoDict.instance.get(this)
         }
     }
+
     object Sign : StringKey("Sign", Label) {
         object In : StringKey("In", Sign) {
+            object Success : StringKey("Success", In) {
+
+                val value: String
+                    get() = DynoDict.instance.get(this)
+            }
+
+            object Error : StringKey("Error", In) {
+
+                val value: String
+                    get() = DynoDict.instance.get(this)
+            }
 
             val value: String
                 get() = DynoDict.instance.get(this)
         }
 
         object Out : StringKey("Out", Sign) {
+            object Success : StringKey("Success", Out) {
+
+                val value: String
+                    get() = DynoDict.instance.get(this)
+            }
 
             val value: String
                 get() = DynoDict.instance.get(this)
         }
+
     }
+
     object User : StringKey("User", Label) {
         object Signed : StringKey("Signed", User) {
             object In : StringKey("In", Signed) {
@@ -148,6 +203,7 @@ object Label : StringKey("Label") {
             get() = DynoDict.instance.get(this)
     }
 }
+
 object Sign : StringKey("Sign") {
     object In : StringKey("In", Sign) {
         object Alert : StringKey("Alert", In) {
@@ -161,6 +217,7 @@ object Sign : StringKey("Sign") {
         }
     }
 }
+
 object Once : StringKey("Once") {
     object A : StringKey("A", Once) {
         object Week : StringKey("Week", A) {
@@ -175,6 +232,7 @@ object Once : StringKey("Once") {
                 get() = DynoDict.instance.get(this)
         }
     }
+
     object In : StringKey("In", Once) {
         object A : StringKey("A", In) {
             object Five : StringKey("Five", A) {
@@ -195,6 +253,7 @@ object Once : StringKey("Once") {
         }
     }
 }
+
 object Twice : StringKey("Twice") {
     object A : StringKey("A", Twice) {
         object Day : StringKey("Day", A) {
@@ -204,6 +263,7 @@ object Twice : StringKey("Twice") {
         }
     }
 }
+
 object Fours : StringKey("Fours") {
     object A : StringKey("A", Fours) {
         object Day : StringKey("Day", A) {

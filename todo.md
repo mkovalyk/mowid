@@ -17,7 +17,8 @@
 - [ ] Attach language to a list of predefined languages
 - [x] Author should word-capitalized
 - [x] Multiline for quote.
-- [ ] BottomSheet should be scrollable and auto-hideable?
+- [ ] BottomSheet should be scrollable and auto-hideable? Use material component library to show
+  bottom sheet
 - [ ] Content should not move up when bottom sheet is shown.
 - [x] Deletion doesn't work
 - [ ] If last quote is deleted, new dialog should be shown about if user wants to delete the group

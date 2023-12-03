@@ -96,7 +96,7 @@ fun HomeList(
                     TextButton(onClick = { sendIntent(HomeUserIntent.HideGroupConfirmationDialog) }) {
                         Text(text = Label.Cancel.value)
                     }
-                }, text = { Text(text = "TO be changed") } // TODO change
+                }, text = { Text(text = Label.Delete.Group.Message.value) } // TODO change
                 )
             }
 
