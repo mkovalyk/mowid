@@ -1,6 +1,5 @@
 package com.kovcom.mowid.ui.feature.settings
 
-import androidx.annotation.StringRes
 import com.kovcom.domain.model.FrequencyModel
 import com.kovcom.domain.model.User
 import com.kovcom.mowid.base.ui.*
@@ -30,6 +29,5 @@ object SettingsContract {
 
     sealed interface Event : IEvent {
         data class ShowToast(val message: String) : Event
-        data class ShowToastId(@StringRes val message: Int) : Event
     }
 }

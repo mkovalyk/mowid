@@ -2,7 +2,7 @@ package com.kovcom.mowid.ui.feature.settings
 
 import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
-import com.kovcom.mowid.R
+import com.kovcom.mowid.Label
 import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.base.ui.IntentProcessor
 import com.kovcom.mowid.base.ui.Publisher
@@ -110,7 +110,7 @@ class Publisher : Publisher<Effect, Event, State> {
             is Effect.Loading,
             -> null
 
-            is Effect.FrequencyChanged -> Event.ShowToastId(R.string.label_applied)
+            is Effect.FrequencyChanged -> Event.ShowToast(Label.Applied.value)
             is Effect.Error -> Event.ShowToast(effect.message)
         }
     }

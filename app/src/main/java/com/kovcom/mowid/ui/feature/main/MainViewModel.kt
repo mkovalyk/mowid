@@ -3,7 +3,7 @@ package com.kovcom.mowid.ui.feature.main
 import androidx.core.app.ComponentActivity
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.kovcom.domain.repository.UserRepository
-import com.kovcom.mowid.R
+import com.kovcom.mowid.Label
 import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
@@ -48,15 +48,15 @@ class MainViewModel constructor(
                 if (result.resultCode == ComponentActivity.RESULT_OK) {
                     userRepository.signInSuccess()
                     workerManager.execute(ExecutionOption.Regular)
-                    flowOf(MainEffect.ShowToast(R.string.label_sign_in_success))
+                    flowOf(MainEffect.ShowToast(Label.Sign.In.Success.value))
                 } else {
-                    flowOf(MainEffect.ShowToast(R.string.label_sign_in_error))
+                    flowOf(MainEffect.ShowToast(Label.Sign.In.Error.value))
                 }
             }
         }
     }
 
-    class MainEventReducer: Reducer<MainEffect, MainState> {
+    class MainEventReducer : Reducer<MainEffect, MainState> {
 
         override fun reduce(effect: MainEffect, state: MainState): MainState {
             return when (effect) {
@@ -78,10 +78,10 @@ class MainViewModel constructor(
             return when (effect) {
                 is MainEffect.SignIn -> MainEvent.SignIn
                 is MainEffect.SignOut -> MainEvent.SignOut
-                is MainEffect.ShowToast -> MainEvent.ShowToast(effect.messageId)
-                is MainEffect.SignInError -> MainEvent.ShowToast(R.string.label_sign_in_error)
-                is MainEffect.SignInSuccess -> MainEvent.ShowToast(R.string.label_sign_in_success)
-                is MainEffect.SignOutSuccess -> MainEvent.ShowToast(R.string.label_sign_out_success)
+                is MainEffect.ShowToast -> MainEvent.ShowToast(effect.message)
+                is MainEffect.SignInError -> MainEvent.ShowToast(Label.Sign.In.Error.value)
+                is MainEffect.SignInSuccess -> MainEvent.ShowToast(Label.Sign.In.Success.value)
+                is MainEffect.SignOutSuccess -> MainEvent.ShowToast(Label.Sign.Out.Success.value)
             }
         }
     }

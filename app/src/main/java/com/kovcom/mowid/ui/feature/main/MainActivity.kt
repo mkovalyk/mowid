@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.kovcom.mowid.Label
 import com.kovcom.mowid.R
 import com.kovcom.mowid.ui.navigation.AppNavigation
 import com.kovcom.mowid.ui.theme.MoWidTheme
@@ -76,7 +77,7 @@ class MainActivity : ComponentActivity() {
                             }
 
                             is MainEvent.ShowToast -> {
-                                Toast.makeText(this@MainActivity, it.messageId, Toast.LENGTH_LONG)
+                                Toast.makeText(this@MainActivity, it.message, Toast.LENGTH_LONG)
                                     .show()
                             }
                             is MainEvent.SignIn -> signIn()
@@ -107,7 +108,7 @@ class MainActivity : ComponentActivity() {
             .signOut(this)
             .addOnCompleteListener {
                 viewModel.processIntent(MainUserIntent.SignOutSuccess)
-                Toast.makeText(this, getString(R.string.label_sign_out_success), Toast.LENGTH_LONG)
+                Toast.makeText(this, Label.Sign.Out.Success.value, Toast.LENGTH_LONG)
                     .show()
             }
     }

@@ -1,11 +1,7 @@
 package com.kovcom.mowid.ui.feature.main
 
-import androidx.annotation.StringRes
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.kovcom.mowid.base.ui.IEffect
-import com.kovcom.mowid.base.ui.IEvent
-import com.kovcom.mowid.base.ui.IState
-import com.kovcom.mowid.base.ui.UserIntent
+import com.kovcom.mowid.base.ui.*
 
 sealed class MainState : IState {
     data object Loading : MainState()
@@ -22,14 +18,14 @@ sealed interface MainUserIntent : UserIntent {
 }
 
 sealed interface MainEvent : IEvent {
-    data class ShowToast(@StringRes val messageId: Int) : MainEvent
+    data class ShowToast(val message: String) : MainEvent
     data class NavigateToQuote(val groupId: String, val quoteId: String) : MainEvent
     data object SignIn : MainEvent
     data object SignOut : MainEvent
 }
 
 sealed interface MainEffect : IEffect {
-    data class ShowToast(@StringRes val messageId: Int) : MainEffect
+    data class ShowToast(val message: String) : MainEffect
     data object SignInSuccess : MainEffect
     data object SignInError : MainEffect
     data object SignIn : MainEffect
