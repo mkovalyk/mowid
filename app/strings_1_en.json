@@ -151,6 +151,28 @@
     {
       "key": "Fours.A.Day",
       "value": "4 times a day"
+    },
+    {
+      "key": "Group.Created",
+      "value": "Group created"
+    },
+    {
+      "key": "Group.Removed",
+      "value": "Group {name} removed",
+      "params": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "key": "Group.Unselected",
+      "value": "Group unselected"
+    },
+    {
+      "key": "Group.Selected",
+      "value": "Group selected"
     }
   ]
 }
