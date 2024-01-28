@@ -1,6 +1,6 @@
 {
   "schemeVersion": 1,
-  "editionVersion": 1,
+  "editionVersion": 2,
   "name": "strings",
   "language": "en",
   "translations": [
@@ -94,7 +94,7 @@
     },
     {
       "key": "Label.User.Signed.In.As",
-      "value": "You are signed in as"
+      "value": "\"You are signed in as \""
     },
     {
       "key": "Label.User.Not.Registered",
@@ -151,6 +151,22 @@
     {
       "key": "Fours.A.Day",
       "value": "4 times a day"
+    },
+    {
+      "key": "Group.Created",
+      "value": "Group created"
+    },
+    {
+      "key": "Group.Removed",
+      "value": "Group {name} removed"
+    },
+    {
+      "key": "Group.Unselected",
+      "value": "Group unselected"
+    },
+    {
+      "key": "Group.Selected",
+      "value": "Group selected"
     }
   ]
 }

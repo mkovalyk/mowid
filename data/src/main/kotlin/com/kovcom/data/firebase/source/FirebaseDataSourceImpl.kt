@@ -1,5 +1,6 @@
 package com.kovcom.data.firebase.source
 
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
@@ -246,8 +247,11 @@ class FirebaseDataSourceImpl constructor(
         Timber.tag(TAG).i("Saving selection: $quote, $groupType, $isSelected")
         val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
         return suspendCancellableCoroutine { continuation ->
-            val currentDocument = dbInstance.collection(COLLECTION_PERSONAL).document(token)
-                .collection(COLLECTION_SELECTION).document(quote.groupId)
+            val currentDocument = dbInstance
+                .collection(COLLECTION_PERSONAL)
+                .document(token)
+                .collection(COLLECTION_SELECTION)
+                .document(quote.groupId)
             currentDocument.get().addOnCompleteListener {
                 if (it.result.exists()) {
                     val current = it.result.toObject<SelectedGroupModel>()
@@ -277,6 +281,74 @@ class FirebaseDataSourceImpl constructor(
                         )
                     )
                 }
+            }
+        }
+    }
+
+    private fun selectionForGroup(token: String, groupId: String): DocumentReference {
+        return dbInstance
+            .collection(COLLECTION_PERSONAL)
+            .document(token)
+            .collection(COLLECTION_SELECTION)
+            .document(groupId)
+    }
+
+    override suspend fun savePersonalSelection(groupId: String, isSelected: Boolean): Result<SelectedQuoteModel> {
+        Timber.tag(TAG).i("Saving selection for group $groupId: $isSelected")
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
+        return suspendCancellableCoroutine { continuation ->
+            val quotesForGroup = dbInstance
+                .collection(COLLECTION_PERSONAL)
+                .document(token)
+                .collection(COLLECTION_GROUPS)
+                .document(groupId)
+                .collection(COLLECTION_QUOTES)
+                .get()
+            if (isSelected) {
+                quotesForGroup.addOnSuccessListener { task ->
+                    val quotes = mutableListOf<SelectedQuoteModelV2>()
+                    for (doc in task.documents) {
+                        quotes.add(SelectedQuoteModelV2(doc.id))
+                    }
+                    selectionForGroup(token, groupId)
+                        .set(
+                            SelectedGroupModel(
+                                groupId = groupId,
+                                quotesIds = quotes,
+                                groupType = GroupType.Personal,
+                            )
+                        )
+                        .addOnSuccessListener {
+                            continuation.resume(Result.success(SelectedQuoteModel(groupId = groupId))) {}
+                        }
+                }
+            } else {
+                selectionForGroup(token, groupId).delete()
+                continuation.resume(Result.success(SelectedQuoteModel(groupId = groupId))) {}
+            }
+        }
+    }
+
+    override suspend fun saveCommonGroupSelection(groupId: String, quoteIds: List<String>, isSelected: Boolean): Result<SelectedQuoteModel> {
+        Timber.tag(TAG).i("Saving selection for group $groupId: $isSelected")
+        val token = tokenFlow.first() ?: return Result.error(Exception("Token is null"))
+        return suspendCancellableCoroutine { continuation ->
+            val quotes = quoteIds.map { SelectedQuoteModelV2(it) }
+            if (isSelected) {
+                selectionForGroup(token, groupId)
+                    .set(
+                        SelectedGroupModel(
+                            groupId = groupId,
+                            quotesIds = quotes,
+                            groupType = GroupType.Common,
+                        )
+                    )
+                    .addOnSuccessListener {
+                        continuation.resume(Result.success(SelectedQuoteModel(groupId = groupId))) {}
+                    }
+            } else {
+                selectionForGroup(token, groupId).delete()
+                continuation.resume(Result.success(SelectedQuoteModel(groupId = groupId))) {}
             }
         }
     }
@@ -544,9 +616,7 @@ class FirebaseDataSourceImpl constructor(
         private const val COLLECTION_FREQUENCY = "frequency"
         private const val COLLECTION_GROUPS = "groups"
         private const val COLLECTION_QUOTES = "quotes"
-        private const val COLLECTION_SELECTED_QUOTES = "selectedquotes"
         private const val FREQUENCY_FIELD = "frequency"
-        private const val SELECTED_QUOTES_COUNT_FIELD = "selectedQuotesCount"
         private const val SELECTED_QUOTES_ID_FIELD = "quotesIds"
         private const val QUOTES_COUNT_FIELD = "quotesCount"
         private const val GROUP_NAME_FIELD = "name"

@@ -69,7 +69,6 @@ sealed interface HomeEvent : IEvent {
     data class ShowError(val message: String) : HomeEvent
     data class ShowSnackbar(val message: String) : HomeEvent
     data class ItemClicked(val groupPhrase: UiGroup) : HomeEvent
-    data class ShowGroupSelectionChangedMessage(val selected: Boolean) : HomeEvent
 }
 
 sealed interface HomeEffect : IEffect {

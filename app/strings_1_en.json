@@ -161,7 +161,7 @@
       "value": "Group {name} removed",
       "params": [
         {
-          "name": "name",
+          "key": "name",
           "type": "string"
         }
       ]

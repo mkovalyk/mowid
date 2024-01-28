@@ -71,7 +71,7 @@ fun HomeListItem(
                 style = MaterialTheme.typography.labelSmall
             )
             Checkbox(
-                checked = groupPhrase.count == groupPhrase.selectedCount,
+                checked = groupPhrase.isAllSelected,
                 onCheckedChange = { onCheckboxClick(groupPhrase.id, it, groupPhrase.groupType) })
         }
     }

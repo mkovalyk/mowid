@@ -92,6 +92,28 @@ class CommonGroupsDataSourceImpl constructor(
 
     }
 
+    override suspend fun getQuotesForGroup(groupId: String): Result<List<QuoteModel>> {
+        selectedLocaleFlow.firstOrNull()?.data?.let { locale ->
+            return suspendCancellableCoroutine { continuation ->
+
+                dbInstance.collection(COLLECTION_LOCALE)
+                    .document(locale)
+                    .collection(COLLECTION_GROUPS)
+                    .document(groupId)
+                    .collection(COLLECTION_QUOTES)
+                    .get()
+                    .addOnSuccessListener { task ->
+                        val quotes = mutableListOf<QuoteModel>()
+                        for (doc in task) {
+                            quotes.add(doc.toObject())
+                        }
+                        continuation.resume(Result.success(quotes))
+                    }
+
+            }
+        } ?: return Result.error(Exception("Locale id is null"))
+    }
+
     private fun groupsFlow(selectedLocaleId: String): Flow<Result<List<GroupModel>>> =
         callbackFlow {
             val subscription =

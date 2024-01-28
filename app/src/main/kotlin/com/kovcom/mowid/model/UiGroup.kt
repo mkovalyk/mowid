@@ -21,7 +21,11 @@ data class UiGroup(
     @IgnoredOnParcel
     val canBeDeleted: Boolean = groupType == GroupType.Personal
 
+    @IgnoredOnParcel
     val combinedValue = "${min(selectedCount, count)}/$count"
+
+    @IgnoredOnParcel
+    val isAllSelected = count != 0 && count == min(selectedCount, count)
 }
 
 fun UiGroup.toDomainModel() = Group(

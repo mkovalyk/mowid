@@ -2,6 +2,7 @@ package com.kovcom.mowid.ui.feature.home
 
 import com.kovcom.domain.repository.QuotesRepository
 import com.kovcom.domain.repository.UserRepository
+import com.kovcom.mowid.Group
 import com.kovcom.mowid.base.ui.*
 import com.kovcom.mowid.model.toUIModel
 import kotlinx.coroutines.flow.*
@@ -123,15 +124,6 @@ class HomeReducer : Reducer<HomeEffect, HomeState> {
                 isLoading = effect.isLoading
             )
 
-            is HomeEffect.ShowAddGroupModel,
-            is HomeEffect.ShowEditGroupModal,
-            is HomeEffect.ShowError,
-            is HomeEffect.ShowGroupCreatedMessage,
-            is HomeEffect.ShowLoginScreen,
-            is HomeEffect.HideGroupModal,
-            is HomeEffect.OpenDetails,
-            is HomeEffect.RemoveGroupConfirmed,
-            -> state
 
             is HomeEffect.UserLoaded -> state.copy(
                 isLoggedIn = effect.isLoggedIn
@@ -160,10 +152,18 @@ class HomeReducer : Reducer<HomeEffect, HomeState> {
                 }
             )
 
-            is HomeEffect.ShowGroupSelectionMessage -> TODO()
+            is HomeEffect.ShowGroupSelectionMessage,
+            is HomeEffect.ShowAddGroupModel,
+            is HomeEffect.ShowEditGroupModal,
+            is HomeEffect.ShowError,
+            is HomeEffect.ShowGroupCreatedMessage,
+            is HomeEffect.ShowLoginScreen,
+            is HomeEffect.HideGroupModal,
+            is HomeEffect.OpenDetails,
+            is HomeEffect.RemoveGroupConfirmed,
+            -> state
         }
     }
-
 }
 
 class HomePublisher : Publisher<HomeEffect, HomeEvent, HomeState> {
@@ -171,14 +171,19 @@ class HomePublisher : Publisher<HomeEffect, HomeEvent, HomeState> {
     override fun publish(effect: HomeEffect, currentState: HomeState): HomeEvent? {
         return when (effect) {
             is HomeEffect.ShowError -> HomeEvent.ShowError(effect.message)
-            is HomeEffect.ShowGroupCreatedMessage -> HomeEvent.ShowSnackbar("Group created")
+            is HomeEffect.ShowGroupCreatedMessage -> HomeEvent.ShowSnackbar(Group.Created.value)
             is HomeEffect.ShowLoginScreen -> HomeEvent.ShowLoginScreen
             is HomeEffect.HideGroupModal -> HomeEvent.HideGroupModal
             is HomeEffect.OpenDetails -> HomeEvent.ItemClicked(effect.groupPhrase)
 
-            is HomeEffect.RemoveGroupConfirmed -> HomeEvent.ShowSnackbar("Group ${effect.name} removed")
+            is HomeEffect.RemoveGroupConfirmed -> HomeEvent.ShowSnackbar(Group.Removed.value(effect.name))
             is HomeEffect.ShowAddGroupModel -> HomeEvent.ShowAddGroupModal
-            is HomeEffect.ShowGroupSelectionMessage -> HomeEvent.ShowSnackbar(effect.selected)
+            is HomeEffect.ShowGroupSelectionMessage -> {
+                when (effect.selected) {
+                    true -> HomeEvent.ShowSnackbar(Group.Selected.value)
+                    false -> HomeEvent.ShowSnackbar(Group.Unselected.value)
+                }
+            }
 
             is HomeEffect.RemoveGroup,
             is HomeEffect.Loaded,

@@ -168,6 +168,21 @@ class QuotesRepositoryImpl(
         )
     }
 
+    override suspend fun saveSelection(groupId: String, groupType: GroupType, isSelected: Boolean) {
+        when (groupType) {
+            GroupType.Personal -> firebaseDataSource.savePersonalSelection(groupId, isSelected)
+            GroupType.Common -> {
+                val quotes = commonGroupsDataSource.getQuotesForGroup(groupId).data.orEmpty()
+                    .map { it.id }
+                firebaseDataSource.saveCommonGroupSelection(
+                    groupId = groupId,
+                    quoteIds = quotes,
+                    isSelected = isSelected
+                )
+            }
+        }
+    }
+
     override suspend fun editQuote(
         groupId: String,
         quoteId: String,

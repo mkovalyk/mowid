@@ -45,8 +45,9 @@ class MoWidApplication : Application() {
             Timber.plant(Timber.DebugTree())
         }
         CoroutineScope(Dispatchers.Main).launch {
-            DynoDict.initWith(this@MoWidApplication, endpoint = null, Settings.Production)
-            DynoDict.instance.setLocale(DLocale("en"))
+            DynoDict.initWith(this@MoWidApplication, endpoint = null, Settings.Production).apply {
+                setLocale(DLocale("en"))
+            }
         }
     }
 }
