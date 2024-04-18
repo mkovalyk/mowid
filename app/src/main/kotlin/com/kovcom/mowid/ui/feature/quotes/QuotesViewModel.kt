@@ -61,7 +61,7 @@ class IntentProcessor(private val quotesRepository: QuotesRepository) : IntentPr
                     quotesRepository.saveSelection(
                         groupId = currentState.group.id,
                         quoteId = intent.quote.id,
-                        isSelected = intent.quote.isSelected,
+                        isSelected = !intent.quote.isSelected,
                         groupType = currentState.group.groupType,
                     )
                 }
