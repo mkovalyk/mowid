@@ -18,41 +18,6 @@
     <string name="label_delete_group_message">Ви впевнені, що хочете видалити групи?</string>
 
 
-    <!--    Delete quote-->
-    <string name="label_delete_quote">Видалити цитату?</string>
-    <string name="label_delete_quote_message">Ви впевнені, що хочете видалити цитату?</string>
-    <string name="label_delete">Видалити</string>
 
-    <!--   Quotes screen-->
-    <string name="title_add_quote">Додати цитату</string>
-    <string name="title_edit_quote">Редагувати цитату</string>
-    <string name="label_quote">Цитата</string>
-    <string name="label_author">Автор (необов\'язково)</string>
-    <string name="label_empty_state">Поки немає жодної цитати.. Натисни ось цю кнопочку нижче щоб додати першу</string>
-
-    <!--   SignIn, SignOut-->
-    <string name="label_sign_in_success">Авторизація закінчена</string>
-    <string name="label_sign_in_error">Помилка авторизації</string>
-    <string name="label_sign_out_success">Вихід з акаунту підтверджено</string>
-    <string name="label_user_signed_in_as">Ви увійшли як </string>
-    <string name="label_user_not_registered">Ви не зареєстровані, будь ласка </string>
-
-    <string name="label_sign_in">Авторизуйтеся</string>
-    <string name="label_sign_out">Вихід з акаунту</string>
-    <string name="sign_in_alert_dialog_text">Що б продовжити ви повинні авторизуватися</string>
-
-    <!--     Settings-->
-    <string name="title_settings">Налаштування</string>
-    <string name="label_apply">Застосувати</string>
-    <string name="label_frequency">Частота оновлення</string>
-    <string name="label_applied">Застосовано</string>
-
-    <!--    Frequencies-->
-    <string name="once_a_week">1 раз на тиждень</string>
-    <string name="once_in_a_five_days">1 раз у 5 днів</string>
-    <string name="once_in_two_days">1 раз у 2 дні</string>
-    <string name="once_a_day">1 раз в день</string>
-    <string name="twice_a_day">2 рази за день</string>
-    <string name="fours_a_day">4 рази за день</string>
 
 </resources>

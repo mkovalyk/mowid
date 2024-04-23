@@ -1,0 +1,80 @@
+{
+  "schemeVersion": 1,
+  "editionVersion": 1,
+  "name": "settings",
+  "language": "en",
+  "translations": [
+    {
+      "key": "Label.Sign.In.Success",
+      "value": "Signing in complete"
+    },
+    {
+      "key": "Label.Sign.In.Error",
+      "value": "Signing in error"
+    },
+    {
+      "key": "Label.Sign.Out.Success",
+      "value": "Signing out complete"
+    },
+    {
+      "key": "Label.User.Signed.In.As",
+      "value": "\"You are signed in as \""
+    },
+    {
+      "key": "Label.User.Not.Registered",
+      "value": "You are not registered, please "
+    },
+    {
+      "key": "Label.Sign.In",
+      "value": "SignIn"
+    },
+    {
+      "key": "Label.Sign.Out",
+      "value": "SignOut"
+    },
+    {
+      "key": "Sign.In.Alert.Dialog.Text",
+      "value": "To continue you should SignIn"
+    },
+    {
+      "key": "Title.Settings",
+      "value": "Settings"
+    },
+    {
+      "key": "Label.Apply",
+      "value": "Apply"
+    },
+    {
+      "key": "Label.Frequency",
+      "value": "Frequency"
+    },
+    {
+      "key": "Label.Applied",
+      "value": "Applied"
+    },
+    {
+      "key": "Once.A.Week",
+      "value": "1 time a week"
+    },
+    {
+      "key": "Once.In.A.Five.Days",
+      "value": "1 time in 5 days"
+    },
+    {
+      "key": "Once.In.Two.Days",
+      "value": "1 time in 2 days"
+    },
+    {
+      "key": "Once.A.Day",
+      "value": "1 time a day"
+    },
+    {
+      "key": "Twice.A.Day",
+      "value": "2 times a day"
+    },
+    {
+      "key": "Fours.A.Day",
+      "value": "4 times a day"
+    }
+  ]
+}
