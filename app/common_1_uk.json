@@ -1,0 +1,156 @@
+{
+  "schemeVersion": 1,
+  "editionVersion": 1,
+  "name": "common",
+  "language": "uk",
+  "translations": [
+    {
+      "key": "App.Name",
+      "value": "MoWid"
+    },
+    {
+      "key": "Title.Home",
+      "value": "MoWid"
+    },
+    {
+      "key": "Label.Add",
+      "value": "Додати"
+    },
+    {
+      "key": "Label.Edit",
+      "value": "Редагувати"
+    },
+    {
+      "key": "Label.Cancel",
+      "value": "Відмінити"
+    },
+    {
+      "key": "Title.Add.Group",
+      "value": "Додати групу"
+    },
+    {
+      "key": "Title.Edit.Group",
+      "value": "Редагувати групу"
+    },
+    {
+      "key": "Label.Group",
+      "value": "Група"
+    },
+    {
+      "key": "Label.Description",
+      "value": "Опис"
+    },
+    {
+      "key": "Label.Delete.Group",
+      "value": "Видалити групу?"
+    },
+    {
+      "key": "Label.Delete.Group.Message",
+      "value": "Ви впевнені, що хочете видалити групи?"
+    },
+    {
+      "key": "Label.Delete.Quote",
+      "value": "Видалити цитату?"
+    },
+    {
+      "key": "Label.Delete.Quote.Message",
+      "value": "Ви впевнені, що хочете видалити цитату?"
+    },
+    {
+      "key": "Label.Delete",
+      "value": "Видалити"
+    },
+    {
+      "key": "Title.Add.Quote",
+      "value": "Додати цитату"
+    },
+    {
+      "key": "Title.Edit.Quote",
+      "value": "Редагувати цитату"
+    },
+    {
+      "key": "Label.Quote",
+      "value": "Цитата"
+    },
+    {
+      "key": "Label.Author",
+      "value": "Автор (необов\\'язково)"
+    },
+    {
+      "key": "Label.Empty.State",
+      "value": "Поки немає жодної цитати.. Натисни ось цю кнопочку нижче щоб додати першу"
+    },
+    {
+      "key": "Label.Sign.In.Success",
+      "value": "Авторизація закінчена"
+    },
+    {
+      "key": "Label.Sign.In.Error",
+      "value": "Помилка авторизації"
+    },
+    {
+      "key": "Label.Sign.Out.Success",
+      "value": "Вихід з акаунту підтверджено"
+    },
+    {
+      "key": "Label.User.Signed.In.As",
+      "value": "Ви увійшли як "
+    },
+    {
+      "key": "Label.User.Not.Registered",
+      "value": "Ви не зареєстровані, будь ласка "
+    },
+    {
+      "key": "Label.Sign.In",
+      "value": "Авторизуйтеся"
+    },
+    {
+      "key": "Label.Sign.Out",
+      "value": "Вихід з акаунту"
+    },
+    {
+      "key": "Sign.In.Alert.Dialog.Text",
+      "value": "Що б продовжити ви повинні авторизуватися"
+    },
+    {
+      "key": "Title.Settings",
+      "value": "Налаштування"
+    },
+    {
+      "key": "Label.Apply",
+      "value": "Застосувати"
+    },
+    {
+      "key": "Label.Frequency",
+      "value": "Частота оновлення"
+    },
+    {
+      "key": "Label.Applied",
+      "value": "Застосовано"
+    },
+    {
+      "key": "Once.A.Week",
+      "value": "1 раз на тиждень"
+    },
+    {
+      "key": "Once.In.A.Five.Days",
+      "value": "1 раз у 5 днів"
+    },
+    {
+      "key": "Once.In.Two.Days",
+      "value": "1 раз у 2 дні"
+    },
+    {
+      "key": "Once.A.Day",
+      "value": "1 раз в день"
+    },
+    {
+      "key": "Twice.A.Day",
+      "value": "2 рази за день"
+    },
+    {
+      "key": "Fours.A.Day",
+      "value": "4 рази за день"
+    }
+  ]
+}

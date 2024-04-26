@@ -1,12 +1,31 @@
 {
     "defaultLanguage": "en",
     "languages": [
-        "en"
+        "en",
+        "uk"
     ],
     "buckets": [
         {
             "name": "common",
             "schemeVersion": 2,
+            "editionVersion": 1,
+            "language": "en"
+        },
+        {
+            "name": "common",
+            "schemeVersion": 1,
+            "editionVersion": 1,
+            "language": "uk"
+        },
+        {
+            "name": "settings",
+            "schemeVersion": 1,
+            "editionVersion": 1,
+            "language": "en"
+        },
+        {
+            "name": "quotes",
+            "schemeVersion": 1,
             "editionVersion": 1,
             "language": "en"
         }
