@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kovcom.mowid.model.UiQuote
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun QuoteListItem(
@@ -99,7 +98,7 @@ fun QuoteListItem(
 @Preview(showBackground = true)
 @Composable
 fun QuoteListItemPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         QuoteListItem(
             UiQuote(
                 id = "1",
@@ -119,7 +118,7 @@ fun QuoteListItemPreview() {
 @Preview(showBackground = true)
 @Composable
 fun QuoteListItemLongPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         QuoteListItem(
             UiQuote(
                 id = "1",

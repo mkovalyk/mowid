@@ -1,4 +1,4 @@
-package com.kovcom.mowid.ui.theme
+package com.kovcom.design.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

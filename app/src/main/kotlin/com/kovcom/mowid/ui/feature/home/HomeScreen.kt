@@ -25,7 +25,6 @@ import com.kovcom.mowid.ui.feature.bottomsheet.BottomSheet
 import com.kovcom.mowid.ui.feature.bottomsheet.BottomSheetUIState
 import com.kovcom.mowid.ui.feature.home.composable.HomeList
 import com.kovcom.mowid.ui.feature.main.MainUserIntent
-import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -208,7 +207,7 @@ private fun TopBar(showMenu: MutableState<Boolean>, onNavigateToSettings: () -> 
 @Composable
 fun ScreenContentPreview() {
     PreviewComposable {
-        MoWidTheme {
+        com.kovcom.design.theme.MoWidTheme {
             val list = listOf(
                 UiGroup(
                     id = "1",

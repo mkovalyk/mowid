@@ -19,7 +19,6 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.kovcom.mowid.Label
 import com.kovcom.mowid.R
 import com.kovcom.mowid.ui.navigation.AppNavigation
-import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -42,7 +41,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MoWidTheme {
+            com.kovcom.design.theme.MoWidTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

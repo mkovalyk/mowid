@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +30,7 @@ fun AppCenterAlignedTopAppBar(
 @Preview(showBackground = true)
 @Composable
 fun AppCenterAlignedTopAppBarPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         AppCenterAlignedTopAppBar(
             title = "Title"
         )

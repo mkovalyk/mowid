@@ -1,6 +1,6 @@
 # Scope to do:
 
-- [ ] Integrate Dynodict
+- [x] Integrate Dynodict
 - [x] All user's groups/list don't have any relation to language
 - [x] After editing, back action doesn't work/ any bottom sheet opening
 - [x] Auto select after creation - that is why User creates a new quote
@@ -22,3 +22,4 @@
 - [ ] Content should not move up when bottom sheet is shown.
 - [x] Deletion doesn't work
 - [ ] If last quote is deleted, new dialog should be shown about if user wants to delete the group
+- [ ] Add an ability to change the size of the text in a widget 

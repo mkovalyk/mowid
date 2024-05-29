@@ -20,7 +20,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun BottomSheet(
@@ -147,7 +146,7 @@ fun BottomSheet(
 @Preview(showBackground = true)
 @Composable
 fun HomeBottomSheetPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         BottomSheet(
             bottomSheetUIState = BottomSheetUIState.AddGroupBottomSheet,
             onButtonClick = { _, _, _ -> },

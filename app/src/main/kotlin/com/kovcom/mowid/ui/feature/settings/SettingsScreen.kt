@@ -28,7 +28,6 @@ import com.kovcom.mowid.ui.feature.main.MainUserIntent
 import com.kovcom.mowid.ui.feature.main.MainViewModel
 import com.kovcom.mowid.ui.feature.settings.SettingsContract.Intent
 import com.kovcom.mowid.ui.feature.settings.SettingsContract.State
-import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -202,7 +201,7 @@ fun Content(
 @Preview(showBackground = true)
 @Composable
 fun ScreenContentPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         val list = listOf(
             UiFrequency(
                 frequencyId = 0,

@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun SwipeToDeleteBackground() {
@@ -33,7 +32,7 @@ fun SwipeToDeleteBackground() {
 @Preview(showBackground = true)
 @Composable
 fun SwipeToDeleteBackgroundPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         SwipeToDeleteBackground()
     }
 }

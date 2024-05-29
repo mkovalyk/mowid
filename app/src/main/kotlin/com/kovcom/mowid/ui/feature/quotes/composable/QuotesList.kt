@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kovcom.mowid.model.UiQuote
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -75,7 +74,7 @@ fun QuotesList(
 @Preview(showBackground = true)
 @Composable
 fun QuotesListPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         QuotesList(
             listOf(
                 UiQuote(

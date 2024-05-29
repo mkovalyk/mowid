@@ -17,7 +17,6 @@ import com.kovcom.mowid.ui.composable.PreviewComposable
 import com.kovcom.mowid.ui.feature.home.HomeState
 import com.kovcom.mowid.ui.feature.home.HomeUserIntent
 import com.kovcom.mowid.ui.feature.quotes.composable.SwipeToDeleteBackground
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -120,7 +119,7 @@ fun HomeList(
 @Composable
 fun HomeListPreview() {
     PreviewComposable {
-        MoWidTheme {
+        com.kovcom.design.theme.MoWidTheme {
             HomeList(
                 listOf(
                     UiGroup(

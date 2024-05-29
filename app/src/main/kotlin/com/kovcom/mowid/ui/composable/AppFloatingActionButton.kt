@@ -7,7 +7,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun AppFloatingActionButton(onClick: () -> Unit) {
@@ -25,7 +24,7 @@ fun AppFloatingActionButton(onClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun AppFloatingActionButtonPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         AppFloatingActionButton(
             onClick = {}
         )

@@ -6,7 +6,7 @@
   "buckets": [
     {
       "name": "strings",
-      "schemeVersion": 1,
+      "schemeVersion": 2,
       "editionVersion": 2,
       "language": "en"
     }

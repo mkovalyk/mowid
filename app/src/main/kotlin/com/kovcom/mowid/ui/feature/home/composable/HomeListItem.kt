@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.sp
 import com.kovcom.domain.model.GroupType
 import com.kovcom.mowid.model.UiGroup
 import com.kovcom.mowid.ui.composable.PreviewComposable
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun HomeListItem(
@@ -81,7 +80,7 @@ fun HomeListItem(
 @Composable
 fun HomeListItemPreview() {
     PreviewComposable {
-        MoWidTheme {
+        com.kovcom.design.theme.MoWidTheme {
             HomeListItem(
                 UiGroup(
                     id = "1",

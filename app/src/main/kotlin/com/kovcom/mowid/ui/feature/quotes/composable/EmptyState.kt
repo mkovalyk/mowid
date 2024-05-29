@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kovcom.mowid.Label
 import com.kovcom.mowid.R
-import com.kovcom.mowid.ui.theme.MoWidTheme
 
 @Composable
 fun EmptyState(
@@ -52,7 +51,7 @@ fun EmptyState(
 @Preview(showBackground = true)
 @Composable
 fun EmptyStatPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         EmptyState {}
     }
 }

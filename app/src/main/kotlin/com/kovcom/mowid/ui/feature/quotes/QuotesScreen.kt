@@ -29,7 +29,6 @@ import com.kovcom.mowid.ui.feature.bottomsheet.BottomSheetUIState
 import com.kovcom.mowid.ui.feature.quotes.QuotesContract.Intent
 import com.kovcom.mowid.ui.feature.quotes.composable.EmptyState
 import com.kovcom.mowid.ui.feature.quotes.composable.QuotesList
-import com.kovcom.mowid.ui.theme.MoWidTheme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -260,7 +259,7 @@ fun ScreenContent(
 @Preview(showBackground = true)
 @Composable
 fun ScreenContentPreview() {
-    MoWidTheme {
+    com.kovcom.design.theme.MoWidTheme {
         val list = listOf(
             UiQuote(
                 id = "1",
