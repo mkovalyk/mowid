@@ -7,6 +7,18 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MoWid" />
+        android:theme="@style/Theme.MoWid">
+        <activity
+            android:name=".playground.ComponentsActivity"
+            android:exported="true"
+            android:label="@string/title_activity_components"
+            android:theme="@style/Theme.MoWid">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
 
 </manifest>

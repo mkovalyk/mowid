@@ -33,6 +33,7 @@ val md_theme_light_surfaceTint = Color(0xFF006D43)
 val md_theme_light_outlineVariant = Color(0xFFC0C9C0)
 val md_theme_light_scrim = Color(0xFF000000)
 
+
 val blue_900 = Color(0xFF101118)
 val blue_700 = Color(0xFF27293A)
 val blue_500 = Color(0xFF3D405B)

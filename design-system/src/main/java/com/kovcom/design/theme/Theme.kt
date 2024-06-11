@@ -9,12 +9,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
-
 private val LightColors = lightColorScheme(
     primary = green_900,
     primaryContainer = md_theme_light_primaryContainer,
     onPrimary = blue_500,
-    onPrimaryContainer = md_theme_light_onPrimaryContainer,
+    onPrimaryContainer = blue_900,
     secondary = blue_900,
     secondaryContainer = green_700,
     onSecondary = md_theme_light_onSecondary,
