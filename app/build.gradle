@@ -55,56 +55,54 @@ dependencies {
     implementation project(":data")
 
     // ktx
-    implementation "androidx.core:core-ktx:$core_ktx_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
-    implementation "androidx.navigation:navigation-fragment-ktx:$navigation_version"
+    implementation libs.androidx.navigation.fragment.ktx
 
     // coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_core_version"
 
     // compose
-    implementation platform('androidx.compose:compose-bom:2024.05.00')
-    implementation "androidx.compose.material3:material3"
-    implementation "androidx.compose.ui:ui-util"
-    implementation "androidx.compose.runtime:runtime"
+    implementation platform(libs.androidx.compose.bom)
+    implementation libs.androidx.material3
+    implementation libs.androidx.ui.util
+    implementation libs.androidx.runtime
     // compose - Android Studio Preview support
-    implementation "androidx.compose.ui:ui-tooling-preview"
+    implementation libs.androidx.ui.tooling.preview
     // compose - Integration with activities
-    implementation "androidx.activity:activity-compose"
+    implementation libs.androidx.activity.compose
     // compose - Add window size utils
-    implementation "androidx.compose.material3:material3-window-size-class"
+    implementation libs.androidx.material3.window
     // compose - Integration with ViewModels
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
     // compose - Integration with Lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_compose_version"
     // compose - Integration with Navigation
-    implementation "androidx.navigation:navigation-compose:$navigation_version"
-    implementation "androidx.glance:glance-appwidget:1.0.0"
+    implementation libs.androidx.navigation.compose
+    implementation libs.androidx.glance.appwidget
 
-    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation libs.play.services.auth
 
-    implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation libs.androidx.core.splashscreen
 
-    implementation "io.insert-koin:koin-bom:3.5.6"
-    implementation "io.insert-koin:koin-core"
-    implementation "io.insert-koin:koin-android"
-    implementation "io.insert-koin:koin-androidx-workmanager"
-    implementation "io.insert-koin:koin-androidx-compose"
+    implementation libs.koin.bom
+    implementation libs.koin.core
+    implementation libs.koin.android
+    implementation libs.koin.androidx.workmanager
+    implementation libs.koin.androidx.compose
 
     implementation project(":design-system")
 
     // tests
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4"
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.junit
 
-    debugImplementation "androidx.compose.ui:ui-tooling"
-    debugImplementation "androidx.compose.ui:ui-test-manifest"
+    debugImplementation libs.androidx.ui.tooling
+    debugImplementation libs.androidx.ui.test.manifest
 
-    implementation 'com.jakewharton.timber:timber:5.0.1'
-    implementation 'org.dynodict:core:0.6.6'
-    implementation 'org.dynodict:android:0.6.6'
+    implementation libs.timber
+    implementation libs.dynodict.core
+    implementation libs.dynodict.android
 
 }

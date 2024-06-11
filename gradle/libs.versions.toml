@@ -1,6 +1,69 @@
 [versions]
+android = "0.6.6"
+appcompat = "1.7.0"
+composeBom = "2024.05.00"
+core = "0.6.7"
+coreKtx = "1.13.1"
+coreSplashscreen = "1.0.1"
+espressoCore = "3.5.1"
+glanceAppwidget = "1.0.0"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+koinBom = "3.5.6"
+lifecycleRuntimeKtx = "2.8.1"
+lifecycleViewmodelKtx = "2.8.1"
+material = "1.12.0"
+navigationCompose = "2.7.7"
+navigationFragmentKtx = "2.7.7"
+playServicesAuth = "21.2.0"
+timber = "5.0.1"
 
 [libraries]
+# AndroidX
+androidx-activity-compose = { module = "androidx.activity:activity-compose" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glanceAppwidget" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-material3 = { module = "androidx.compose.material3:material3" }
+androidx-material3-window = { module = "androidx.compose.material3:material3-window-size-class" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-runtime = { module = "androidx.compose.runtime:runtime" }
+androidx-ui = { module = "androidx.compose.ui:ui" }
+androidx-ui-util = { module = "androidx.compose.ui:ui-util" }
+
+# Testing
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+# Compose
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+
+# Material
+material = { module = "com.google.android.material:material", version.ref = "material" }
+
+# Koin
+koin-android = { module = "io.insert-koin:koin-android" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
+koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
+koin-core = { module = "io.insert-koin:koin-core" }
+
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+
+# Dynodict
+dynodict-core = { module = "org.dynodict:core", version.ref = "core" }
+dynodict-android = { module = "org.dynodict:android", version.ref = "android" }
 
 [plugins]
 
