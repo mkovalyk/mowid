@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.kovcom.design.theme.MoWidTheme
 
 @Composable
-fun PrimaryButton(
+fun SecondaryButton(
     text: String,
     enabled: Boolean = true,
     onClick: () -> Unit,
@@ -25,26 +25,25 @@ fun PrimaryButton(
         enabled = enabled,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f),
-            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
+            disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
         )
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PrimaryButtonPreview() {
+fun SecondaryButtonPreview() {
     MoWidTheme {
         Column {
-            PrimaryButton(text = "Primary Button") {}
-            PrimaryButton(text = "Primary Button", enabled = false) {}
+            SecondaryButton(text = "Secondary Button") {}
+            SecondaryButton(text = "Secondary Button", enabled = false) {}
         }
     }
 }

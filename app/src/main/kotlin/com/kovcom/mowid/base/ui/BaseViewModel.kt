@@ -8,11 +8,12 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import kotlin.system.measureTimeMillis
 
+
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class BaseViewModel<
         UiState : IState,
         UiEvent : IEvent,
-        UiEffect : IEffect,
+    UiEffect : IEffectV2,
         Intent : UserIntent,
         >(
     private val intentProcessor: IntentProcessor<UiState, Intent, UiEffect>,
@@ -119,22 +120,22 @@ abstract class BaseViewModel<
     }
 }
 
-interface DataProvider<E : IEffect> {
+interface DataProvider<E : IEffectV2> {
 
     fun observe(): Flow<E>
 }
 
-interface IntentProcessor<S : IState, Intent : UserIntent, E : IEffect> {
+interface IntentProcessor<S : IState, Intent : UserIntent, E : IEffectV2> {
 
     suspend fun processIntent(intent: Intent, currentState: S): Flow<E>
 }
 
-interface Reducer<UiEffect : IEffect, S : IState> {
+interface Reducer<UiEffect : IEffectV2, S : IState> {
 
     fun reduce(effect: UiEffect, state: S): S
 }
 
-interface Publisher<UiEffect : IEffect, E : IEvent, S : IState> {
+interface Publisher<UiEffect : IEffectV2, E : IEvent, S : IState> {
 
     fun publish(effect: UiEffect, currentState: S): E?
 }

@@ -71,7 +71,7 @@ sealed interface HomeEvent : IEvent {
     data class ItemClicked(val groupPhrase: UiGroup) : HomeEvent
 }
 
-sealed interface HomeEffect : IEffect {
+sealed interface HomeEffect : IEffectV2 {
     data class Loading(val isLoading: Boolean) : HomeEffect
     data class Loaded(val information: List<Group>) : HomeEffect
     data class ShowError(val message: String) : HomeEffect
