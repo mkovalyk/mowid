@@ -64,3 +64,10 @@ val white = Color(0xFFFFFFFF)
 val grey_700 = Color(0xFF404040)
 val grey_500 = Color(0xFF808080)
 val grey_300 = Color(0xFFBFBFBF)
+
+
+public object TextColors {
+
+    public val onPrimary = blue_700
+    public val onSecondary = eggshell_700
+}

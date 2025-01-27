@@ -10,14 +10,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
 private val LightColors = lightColorScheme(
-    primary = green_900,
-    primaryContainer = md_theme_light_primaryContainer,
-    onPrimary = blue_500,
+    primary = green_500,
+    primaryContainer = green_900,
+    onPrimary = blue_100,
     onPrimaryContainer = blue_900,
-    secondary = blue_900,
-    secondaryContainer = green_700,
+    secondary = blue_700,
+    secondaryContainer = blue_900,
     onSecondary = md_theme_light_onSecondary,
-    onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    onSecondaryContainer = blue_900,
     tertiary = md_theme_light_tertiary,
     tertiaryContainer = green_700,
     onTertiary = md_theme_light_onTertiary,
