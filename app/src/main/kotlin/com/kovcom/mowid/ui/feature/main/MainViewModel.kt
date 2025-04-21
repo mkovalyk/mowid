@@ -1,6 +1,6 @@
 package com.kovcom.mowid.ui.feature.main
 
-import androidx.core.app.ComponentActivity
+import android.app.Activity
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.kovcom.domain.repository.UserRepository
 import com.kovcom.mowid.Label
@@ -9,7 +9,7 @@ import com.kovcom.mowid.ui.worker.ExecutionOption
 import com.kovcom.mowid.ui.worker.QuotesWorkerManager
 import kotlinx.coroutines.flow.*
 
-class MainViewModel constructor(
+class MainViewModel(
     intentProcessor: IntentProcessor<MainState, MainUserIntent, MainEffect>,
     reducer: Reducer<MainEffect, MainState>,
     publisher: Publisher<MainEffect, MainEvent, MainState>,
@@ -43,9 +43,9 @@ class MainViewModel constructor(
             }
         }
 
-        private suspend fun signInResult(result: FirebaseAuthUIAuthenticationResult): Flow<MainEffect> {
+        private fun signInResult(result: FirebaseAuthUIAuthenticationResult): Flow<MainEffect> {
             return flow {
-                if (result.resultCode == ComponentActivity.RESULT_OK) {
+                if (result.resultCode == Activity.RESULT_OK) {
                     userRepository.signInSuccess()
                     workerManager.execute(ExecutionOption.Regular)
                     flowOf(MainEffect.ShowToast(Label.Sign.In.Success.value))
@@ -66,7 +66,7 @@ class MainViewModel constructor(
                 is MainEffect.SignOutSuccess,
                 is MainEffect.SignInSuccess,
                 is MainEffect.ShowToast,
-                -> state
+                    -> state
 
             }
         }

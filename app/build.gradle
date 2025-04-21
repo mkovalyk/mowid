@@ -5,15 +5,16 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
     id("org.dynodict.plugin")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.kovcom.mowid"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -38,9 +39,6 @@ android {
     }
     buildFeatures {
         compose true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion "1.5.4"
     }
     packagingOptions {
         resources {
@@ -85,8 +83,7 @@ dependencies {
     implementation libs.play.services.auth
 
     implementation libs.androidx.core.splashscreen
-
-    implementation libs.koin.bom
+    implementation platform(libs.koin.bom)
     implementation libs.koin.core
     implementation libs.koin.android
     implementation libs.koin.androidx.workmanager

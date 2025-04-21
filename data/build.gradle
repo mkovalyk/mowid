@@ -34,9 +34,9 @@ dependencies {
     implementation project(":domain")
 
     // di
-    implementation "io.insert-koin:koin-bom:3.5.1"
-    implementation "io.insert-koin:koin-core"
-    implementation "io.insert-koin:koin-android"
+    implementation platform(libs.koin.bom)
+    implementation libs.koin.core
+    implementation libs.koin.android
 
     // coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_core_version"

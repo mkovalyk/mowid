@@ -27,14 +27,14 @@ fun QuotesList(
             items = quotes,
             key = { quoteModel -> quoteModel.id }
         ) { currentItem ->
-            val dismissState = rememberDismissState(
+            val dismissState = rememberSwipeToDismissBoxState(
                 confirmValueChange = {
-                    if (it == DismissValue.DismissedToStart) {
+                    if (it == SwipeToDismissBoxValue.StartToEnd) {
                         onItemDeleted(currentItem.id, currentItem.isSelected)
                     }
                     true
                 },
-                positionalThreshold = { 200.dp.toPx() }
+                positionalThreshold = { 200.dp.value }
             )
 
             LaunchedEffect(currentItem) {
@@ -44,18 +44,19 @@ fun QuotesList(
             }
 
             if (currentItem.canBeDeleted) {
-                SwipeToDismiss(
+                SwipeToDismissBox(
                     modifier = Modifier.animateItemPlacement(),
                     state = dismissState,
-                    background = { SwipeToDeleteBackground() },
-                    dismissContent = {
+                    backgroundContent = { SwipeToDeleteBackground() },
+                    content = {
                         QuoteListItem(
                             quote = currentItem,
                             onCheckChanged = onCheckedChange,
                             onEdit = onEdit
                         )
                     },
-                    directions = setOf(DismissDirection.EndToStart),
+                    enableDismissFromEndToStart = true,
+//                    directions = setOf(DismissDirection.EndToStart),
                 )
             } else {
                 QuoteListItem(
@@ -64,9 +65,7 @@ fun QuotesList(
                     onEdit = onEdit
                 )
             }
-            Divider(
-                color = MaterialTheme.colorScheme.outlineVariant,
-            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
 }

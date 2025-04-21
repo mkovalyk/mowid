@@ -36,14 +36,14 @@ fun HomeList(
         ) {
             items(items = groupPhraseList) { item ->
                 val currentItem by rememberUpdatedState(item)
-                val dismissState = rememberDismissState(
+                val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
-                        if (it == DismissValue.DismissedToStart) {
+                        if (it == SwipeToDismissBoxValue.StartToEnd) {
                             onDelete(currentItem)
                         }
                         true
                     },
-                    positionalThreshold = { 200.dp.toPx() }
+                    positionalThreshold = { 200.dp.value }
                 )
                 LaunchedEffect(item) {
                     if (!item.isSwipeToDeleteOpened) {
@@ -52,11 +52,11 @@ fun HomeList(
                 }
 
                 if (item.canBeDeleted) {
-                    SwipeToDismiss(
+                    SwipeToDismissBox(
                         modifier = Modifier.animateItemPlacement(),
                         state = dismissState,
-                        background = { SwipeToDeleteBackground() },
-                        dismissContent = {
+                        backgroundContent = { SwipeToDeleteBackground() },
+                        content = {
                             HomeListItem(
                                 groupPhrase = item,
                                 onClick = onClick,
@@ -66,7 +66,8 @@ fun HomeList(
                                 }
                             )
                         },
-                        directions = setOf(DismissDirection.EndToStart),
+                        enableDismissFromEndToStart = true,
+//                        directions = setOf(SwipeToDismissBoxValue.EndToStart),
                     )
                 } else {
                     HomeListItem(
@@ -78,9 +79,7 @@ fun HomeList(
                         }
                     )
                 }
-                Divider(
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             }
 
         }

@@ -13,7 +13,7 @@ import kotlin.system.measureTimeMillis
 abstract class BaseViewModel<
         UiState : IState,
         UiEvent : IEvent,
-    UiEffect : IEffectV2,
+    UiEffect : IEffect,
         Intent : UserIntent,
         >(
     private val intentProcessor: IntentProcessor<UiState, Intent, UiEffect>,
@@ -120,22 +120,22 @@ abstract class BaseViewModel<
     }
 }
 
-interface DataProvider<E : IEffectV2> {
+interface DataProvider<E : IEffect> {
 
     fun observe(): Flow<E>
 }
 
-interface IntentProcessor<S : IState, Intent : UserIntent, E : IEffectV2> {
+interface IntentProcessor<S : IState, Intent : UserIntent, E : IEffect> {
 
     suspend fun processIntent(intent: Intent, currentState: S): Flow<E>
 }
 
-interface Reducer<UiEffect : IEffectV2, S : IState> {
+interface Reducer<UiEffect : IEffect, S : IState> {
 
     fun reduce(effect: UiEffect, state: S): S
 }
 
-interface Publisher<UiEffect : IEffectV2, E : IEvent, S : IState> {
+interface Publisher<UiEffect : IEffect, E : IEvent, S : IState> {
 
     fun publish(effect: UiEffect, currentState: S): E?
 }
