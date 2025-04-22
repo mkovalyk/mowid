@@ -11,11 +11,11 @@ import kotlin.system.measureTimeMillis
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class BaseViewModel<
-        UiState : IState,
-        UiEvent : IEvent,
+    UiState : IState,
+    UiEvent : IEvent,
     UiEffect : IEffect,
-        Intent : UserIntent,
-        >(
+    Intent : UserIntent,
+    >(
     private val intentProcessor: IntentProcessor<UiState, Intent, UiEffect>,
     private val reducer: Reducer<UiEffect, UiState>,
     private val publisher: Publisher<UiEffect, UiEvent, UiState>,
@@ -99,6 +99,7 @@ abstract class BaseViewModel<
         val duration = measureTimeMillis {
             result = reducer.reduce(effect, currentState)
         }
+        Timber.tag(tag).i("Reduced took $duration")
         return result
     }
 
