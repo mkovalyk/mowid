@@ -1,4 +1,4 @@
-package com.kovcom.design.playground
+package com.kovcom.mowid.playground
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

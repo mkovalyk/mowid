@@ -1,20 +1,21 @@
 plugins {
-    alias(libs.plugins.library)
+    alias(libs.plugins.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
 }
 
 android {
-    namespace = "com.kovcom.design"
+    namespace = "com.kovcom.mowid.playground"
     compileSdk = 35
 
     defaultConfig {
+        applicationId = "com.kovcom.mowid.playground"
         minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     buildTypes {
@@ -42,6 +43,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":design-system"))
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.util)
@@ -58,14 +61,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-
     // compose - Android Studio Preview support
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
     testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
