@@ -1,4 +1,4 @@
-package com.kovcom.design.obj
+package com.kovcom.design.obj.button
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

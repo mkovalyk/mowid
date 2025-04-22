@@ -10,8 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kovcom.design.obj.PrimaryButton
-import com.kovcom.design.obj.SecondaryButton
+import com.kovcom.design.obj.button.Outlined
+import com.kovcom.design.obj.button.PrimaryButton
+import com.kovcom.design.obj.button.SecondaryButton
 import com.kovcom.design.theme.MoWidTheme
 
 class ComponentsActivity : ComponentActivity() {
@@ -33,6 +34,7 @@ class ComponentsActivity : ComponentActivity() {
                     ) {
                         PrimaryButtons()
                         SecondaryButtons()
+                        OutlinedButtons()
                     }
                 }
             }
@@ -51,6 +53,13 @@ class ComponentsActivity : ComponentActivity() {
         Text("Primary: ")
         PrimaryButton(text = "Buttons", onClick = {})
         PrimaryButton(text = "Buttons", enabled = false, onClick = {})
+    }
+
+    @Composable
+    private fun OutlinedButtons() {
+        Text("Outlined: ")
+        Outlined(text = "Buttons", onClick = {})
+        Outlined(text = "Buttons", enabled = false, onClick = {})
     }
 }
 
