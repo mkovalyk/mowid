@@ -1,8 +1,9 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
+    alias(libs.plugins.application)
+    alias(libs.plugins.kotlin.android)
+//    id 'kotlin-android'
     id 'kotlin-parcelize'
-    id 'org.jetbrains.kotlin.android'
+//    id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
     id("org.dynodict.plugin")
     alias(libs.plugins.compose.compiler)
@@ -51,32 +52,27 @@ android {
 dependencies {
     implementation project(":domain")
     implementation project(":data")
+    implementation project(":design-system")
 
     // ktx
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.viewmodel.ktx
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation libs.androidx.lifecycle.runtime.ktx
     implementation libs.androidx.navigation.fragment.ktx
 
     // coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_core_version"
+    implementation libs.coroutines.core
 
     // compose
     implementation platform(libs.androidx.compose.bom)
     implementation libs.androidx.material3
     implementation libs.androidx.ui.util
     implementation libs.androidx.runtime
-    // compose - Android Studio Preview support
     implementation libs.androidx.ui.tooling.preview
-    // compose - Integration with activities
     implementation libs.androidx.activity.compose
-    // compose - Add window size utils
     implementation libs.androidx.material3.window
-    // compose - Integration with ViewModels
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
-    // compose - Integration with Lifecycle
-    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_compose_version"
-    // compose - Integration with Navigation
+    implementation libs.androidx.lifecycle.viewmodel.compose
+    implementation libs.androidx.lifecycle.runtime.compose
     implementation libs.androidx.navigation.compose
     implementation libs.androidx.glance.appwidget
 
@@ -89,8 +85,6 @@ dependencies {
     implementation libs.koin.androidx.workmanager
     implementation libs.koin.androidx.compose
 
-    implementation project(":design-system")
-
     // tests
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
@@ -101,5 +95,4 @@ dependencies {
     implementation libs.timber
     implementation libs.dynodict.core
     implementation libs.dynodict.android
-
 }
