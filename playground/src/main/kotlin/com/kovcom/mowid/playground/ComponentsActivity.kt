@@ -10,9 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kovcom.design.obj.button.Outlined
-import com.kovcom.design.obj.button.PrimaryButton
-import com.kovcom.design.obj.button.SecondaryButton
+import com.kovcom.design.obj.button.*
 import com.kovcom.design.theme.MoWidTheme
 
 class ComponentsActivity : ComponentActivity() {
@@ -22,8 +20,10 @@ class ComponentsActivity : ComponentActivity() {
         setContent {
             MoWidTheme {
                 Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    floatingActionButton = {
+                        Fab(icon = FabIconType.Add, onClick = {})
+                    },
                 ) { paddingValues ->
                     Column(
                         modifier = Modifier
