@@ -6,12 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kovcom.design.BottomBar
+import com.kovcom.design.BottomBarIconType
+import com.kovcom.design.BottomBarState
 import com.kovcom.design.obj.button.*
 import com.kovcom.design.theme.MoWidTheme
+import timber.log.Timber
 
 class ComponentsActivity : ComponentActivity() {
 
@@ -19,11 +23,35 @@ class ComponentsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MoWidTheme {
+                var bottomState by remember {
+                    mutableStateOf(
+                        BottomBarState(
+                            icons = listOf(
+                                BottomBarIconType.Home,
+                                BottomBarIconType.Favorites,
+                                BottomBarIconType.Profile
+                            ),
+                            selectedIcon = BottomBarIconType.Home,
+                            fabIcon = FabIconType.Add
+                        )
+                    )
+                }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    floatingActionButton = {
-                        Fab(icon = FabIconType.Add, onClick = {})
-                    },
+                    bottomBar = {
+                        BottomBar(
+                            state = bottomState,
+                            onFabClick = {
+                                Timber.tag("BottomBar").d("FAB clicked")
+                            },
+                            onIconClick = { icon ->
+                                Timber.tag("BottomBar").d("Icon clicked: $icon")
+                                bottomState = bottomState.copy(
+                                    selectedIcon = icon
+                                )
+                            },
+                        )
+                    }
                 ) { paddingValues ->
                     Column(
                         modifier = Modifier
