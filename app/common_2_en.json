@@ -1,0 +1,28 @@
+{
+  "schemeVersion": 2,
+  "editionVersion": 1,
+  "name": "common",
+  "language": "en",
+  "translations": [
+    {
+      "key": "App.Name",
+      "value": "MoWid"
+    },
+    {
+      "key": "Title.Home",
+      "value": "MoWid"
+    },
+    {
+      "key": "Label.Add",
+      "value": "Add"
+    },
+    {
+      "key": "Label.Edit",
+      "value": "Edit"
+    },
+    {
+      "key": "Label.Cancel",
+      "value": "Cancel"
+    }
+  ]
+}

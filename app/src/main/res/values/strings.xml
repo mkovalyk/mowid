@@ -14,6 +14,10 @@
     <string name="label_group">Group</string>
     <string name="label_description">Description</string>
 
+    <!--    Delete quote-->
+    <string name="label_delete_group">Delete group?</string>
+    <string name="label_delete_group_message">Are you sure you want to delete this group?</string>
+
     <!--     Quotes screen-->
     <string name="title_add_quote">Add quote</string>
     <string name="title_edit_quote">Edit quote</string>

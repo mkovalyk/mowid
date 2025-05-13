@@ -1,17 +1,14 @@
 plugins {
-    id 'com.android.library'
-    id 'kotlin-kapt'
-    id 'org.jetbrains.kotlin.android'
-    id 'com.google.dagger.hilt.android'
-    id 'com.google.gms.google-services'
+    alias(libs.plugins.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
-        minSdk 23
-        targetSdk 33
+        minSdk 24
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -24,35 +21,39 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
+        jvmTarget = JavaVersion.VERSION_17
     }
+    namespace 'com.kovcom.data'
 }
 
 dependencies {
     implementation project(":domain")
 
     // di
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation platform(libs.koin.bom)
+    implementation libs.koin.core
+    implementation libs.koin.android
 
     // coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_core_version"
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation libs.coroutines.core
+    implementation libs.androidx.datastore.preferences
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.junit
+    androidTestImplementation libs.androidx.espresso.core
 
 
     // Firebase
-    implementation platform('com.google.firebase:firebase-bom:31.2.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
-    api 'com.firebaseui:firebase-ui-auth:7.2.0'
-    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.analytics.ktx
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.play.services.auth)
+    api libs.firebase.ui.auth
+    implementation libs.firebase.firestore.ktx
 
-    implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation libs.timber
 }

@@ -1,0 +1,14 @@
+{
+  "defaultLanguage": "en",
+  "languages": [
+    "en"
+  ],
+  "buckets": [
+    {
+      "name": "strings",
+      "schemeVersion": 2,
+      "editionVersion": 2,
+      "language": "en"
+    }
+  ]
+}
